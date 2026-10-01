@@ -1,0 +1,47 @@
+# Pilot configuration. Everything here is a development-time choice; freeze
+# before the final run and record the frozen copy in manifests/.
+
+server:
+  base_url: "http://localhost:8000/v1"
+  api_key: "EMPTY"          # vLLM ignores it; the openai client requires one
+  timeout_s: 300
+
+# Served model names. Must match --served-model-name in scripts/01_serve.sh.
+models:
+  bf16: "qwen2.5-vl-7b-bf16"
+  int4: "qwen2.5-vl-7b-awq"
+
+data:
+  root: "data"                                   # DriveBench layout, see docs/DATA_PREPAER.md upstream
+  annotations: "data/drivebench-test.json"       # raw file from HF drive-bench/arena
+  # Corruption name -> directory under data/corruption/. Keys are the names we
+  # use in results; values are the upstream directory names from
+  # script/llava1.5-7b.sh. "clean" and "NoImage" are handled specially.
+  conditions:
+    clean: null
+    NoImage: null
+    LowLight: "LowLight"       # DriveBench paper calls this "Dark"
+    Fog: "Fog"
+
+prompt:
+  system_file: "prompt.txt"    # DriveBench system prompt, camera sentence rewritten per question
+  # Appended to MCQ questions only, so the first generated token is the option
+  # letter and the margin can be read from its logprobs. Set to "" to disable.
+  mcq_suffix: " Begin your answer with the option letter."
+
+images:
+  # null = send originals and let vLLM's max_pixels cap decide the token count.
+  # [224, 224] reproduces the released DriveBench adapter, which resizes every
+  # view to 224x224 before inference.
+  resize_to: null
+  noimage_size: [224, 224]     # released NoImage control: black 224x224 per view
+
+generation:
+  temperature: 0.0
+  max_tokens: 128
+  top_logprobs: 5
+  seed: 0
+
+pilot:
+  n_questions: 20
+  results_dir: "results/pilot"
