@@ -2,7 +2,7 @@
 # One-shot setup on a fresh Vast.ai (or any Ubuntu + CUDA) instance.
 # Run as root or a sudo user from any directory:
 #
-#   curl -sL https://raw.githubusercontent.com/Ron5474/Quantization-under-sensor-corruption/main/scripts/vast_setup.sh | bash
+#   curl -sL https://raw.githubusercontent.com/bhagyeshrathi07/Quantization-under-sensor-corruption/main/scripts/vast_setup.sh | bash
 #
 # Installs uv + the project + vLLM, downloads DriveBench annotations and the
 # model weights, and prints the next commands. Images (DriveBench.zip) are
@@ -10,7 +10,7 @@
 set -euo pipefail
 
 WORK="${WORK:-/workspace}"            # Vast mounts the instance disk here
-REPO="https://github.com/Ron5474/Quantization-under-sensor-corruption.git"
+REPO="https://github.com/bhagyeshrathi07/Quantization-under-sensor-corruption.git"
 export HF_HOME="$WORK/hf"
 export DEBIAN_FRONTEND=noninteractive
 

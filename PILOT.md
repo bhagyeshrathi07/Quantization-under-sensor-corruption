@@ -80,7 +80,7 @@ Rent: filter GPU = RTX 4090, disk ≥ 100 GB, on-demand (not interruptible), rel
 Then, over SSH:
 
 ```bash
-curl -sL https://raw.githubusercontent.com/Ron5474/Quantization-under-sensor-corruption/main/scripts/vast_setup.sh | bash
+curl -sL https://raw.githubusercontent.com/bhagyeshrathi07/Quantization-under-sensor-corruption/main/scripts/vast_setup.sh | bash
 ```
 
 That installs everything under `/workspace`, starts the weight and image downloads in the background, and prints the next commands. Record the host's machine ID (instance page) in `manifests/machine.txt`; profiling sessions must all run on the same host. Stop (not destroy) the instance between sessions to keep `/workspace`; storage is billed per GB-month while stopped. `rsync -avz vast:/workspace/qflip/results/ results/` before destroying.
@@ -106,7 +106,7 @@ export http_proxy=http://172.16.1.2:3128 https_proxy=$http_proxy
 S=/data/cmpe249-fa26/students/$USER; mkdir -p $S && cd $S
 module load python3/3.12.12
 python3 -m venv $S/qflip-venv && source $S/qflip-venv/bin/activate
-git clone https://github.com/Ron5474/Quantization-under-sensor-corruption.git qflip && cd qflip
+git clone https://github.com/bhagyeshrathi07/Quantization-under-sensor-corruption.git qflip && cd qflip
 pip install -e ".[dev,data]" vllm
 pytest
 
