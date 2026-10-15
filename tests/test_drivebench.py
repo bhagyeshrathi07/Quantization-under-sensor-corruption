@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from qflip.client import option_margin
 from qflip.drivebench import (
     condition_image_path,
@@ -43,6 +45,14 @@ def test_route_cell():
 def test_rewrite_camera_sentence():
     assert "a single camera image: [CAM_BACK]." in rewrite_camera_sentence(PROMPT, ["CAM_BACK"])
     assert "2 camera images in the sequence [CAM_FRONT, CAM_BACK]." in rewrite_camera_sentence(PROMPT, ["CAM_BACK", "CAM_FRONT"])
+
+
+def test_resolve_image_path_drops_leading_data():
+    from qflip.drivebench import resolve_image_path
+
+    assert resolve_image_path("data/nuscenes/samples/CAM_FRONT/a.jpg", "data") == Path("data/nuscenes/samples/CAM_FRONT/a.jpg")
+    assert resolve_image_path("data/corruption/Fog/CAM_FRONT/a.jpg", "/x/data") == Path("/x/data/corruption/Fog/CAM_FRONT/a.jpg")
+    assert resolve_image_path("nuscenes/samples/CAM_FRONT/a.jpg", "data") == Path("data/nuscenes/samples/CAM_FRONT/a.jpg")
 
 
 def test_condition_image_path():

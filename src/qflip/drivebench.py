@@ -160,6 +160,16 @@ def condition_image_path(path: str, condition: str, condition_dir: str | None) -
     return path.replace("nuscenes/samples", f"corruption/{condition_dir}")
 
 
+def resolve_image_path(path: str, data_root: str | Path) -> Path:
+    """Annotation paths are written as `data/nuscenes/samples/...` relative to
+    the upstream repo root. Map that onto our data root, which is the `data/`
+    directory itself, so the leading `data/` is dropped."""
+    p = Path(path)
+    if p.parts and p.parts[0] == "data":
+        p = Path(*p.parts[1:])
+    return Path(data_root) / p
+
+
 def load_image_bytes(
     path: str | None,
     data_root: str | Path,
@@ -172,7 +182,7 @@ def load_image_bytes(
         buf = io.BytesIO()
         img.save(buf, format="PNG")
         return buf.getvalue()
-    full = Path(data_root) / path
+    full = resolve_image_path(path, data_root)
     if resize_to is None:
         return full.read_bytes()
     img = Image.open(full).convert("RGB").resize(tuple(resize_to))
