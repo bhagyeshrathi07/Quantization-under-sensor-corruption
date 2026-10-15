@@ -73,6 +73,65 @@ PYTHONPATH=. python evaluate/eval.py /abs/path/results/pilot/bf16_clean.driveben
 python scripts/04_scene_split.py    # -> manifests/scene_split.json
 ```
 
+## HPC (SJSU CoE-HPC3, `/data/cmpe249-fa26`)
+
+Facts verified October 14, 2026:
+
+- Login is a two-hop: laptop to `coe-hpc1.sjsu.edu` (needs SJSU VPN), then `ssh coe-hpc3` (node `g17`). SLURM, `/data`, `/scratch` are on hpc3. An ssh config with `ProxyJump` makes `ssh hpc` one step.
+- No direct internet anywhere on the cluster; `export http_proxy=http://172.16.1.2:3128 https_proxy=$http_proxy` works on g17.
+- `/data` is >90% full and the README forbids dataset copies there. Use `/scratch/cmpe249-fa26/$USER` for weights and the DriveBench zip (13 TB free; wiped 21 days after semester end).
+- nuScenes `samples/` is already at `/data/cmpe249-fa26/datasets/nuscenes/v1.0-trainval`. DriveBench clean images are those files, so symlink instead of downloading. Only the corrupted images come from the zip.
+- `module load python3/3.12.12`. The course `mmdet3d-cu118` env is irrelevant to us.
+- A100 nodes `cs[001-004]` (4 GPUs each) were idle; `sbatch --test-only` quoted an immediate start. H100s had a ~9 h wait. P100 nodes cannot run vLLM.
+- GPU work is batch-only, one GPU per job, release promptly (course email, October 2026).
+
+One-time setup on **g17** (CPU login node):
+
+```bash
+export http_proxy=http://172.16.1.2:3128 https_proxy=$http_proxy
+S=/data/cmpe249-fa26/students/$USER; mkdir -p $S && cd $S
+module load python3/3.12.12
+python3 -m venv $S/qflip-venv && source $S/qflip-venv/bin/activate
+git clone https://github.com/Ron5474/Quantization-under-sensor-corruption.git qflip && cd qflip
+pip install -e ".[dev,data]" vllm
+pytest
+
+python scripts/download_drivebench.py --json-only       # annotations, 32 MB
+mkdir -p data && ln -s /data/cmpe249-fa26/datasets/nuscenes/v1.0-trainval data/nuscenes
+python scripts/download_drivebench.py --verify          # expect "all clean images present"
+
+export HF_HOME=/scratch/cmpe249-fa26/$USER/hf; mkdir -p $HF_HOME
+hf download Qwen/Qwen2.5-VL-7B-Instruct                 # ~17 GB via proxy, on g17, NOT in a GPU job
+hf download Qwen/Qwen2.5-VL-7B-Instruct-AWQ             # ~6 GB  (older hub: huggingface-cli download ...)
+```
+
+Corrupted images (LowLight, Fog) come from `DriveBench.zip` (Google Drive, size unknown). Download it to `/scratch/cmpe249-fa26/$USER/` via the proxy with `gdown`, or on a laptop and `scp` to `hpc:/scratch/cmpe249-fa26/<id>/`, then extract only what is needed:
+
+```bash
+cd $S/qflip && unzip -q /scratch/cmpe249-fa26/$USER/DriveBench.zip 'corruption/LowLight/*' 'corruption/Fog/*' -d data/
+```
+
+Until then, the `NoImage` condition needs no image files and exercises the full pipeline: `sbatch scripts/hpc_pilot.sbatch bf16 NoImage 20`.
+
+Every new shell: `module load python3/3.12.12 && source $S/qflip-venv/bin/activate && export http_proxy=... https_proxy=...`.
+
+Submit (one GPU, model loaded once, all conditions in one job, job exits when done):
+
+```bash
+mkdir -p logs
+sbatch scripts/hpc_pilot.sbatch bf16 clean 20
+sbatch scripts/hpc_pilot.sbatch int4 clean 20
+squeue -u $USER
+tail -f logs/qflip-<jobid>.out
+python scripts/05_compare_flips.py results/pilot/bf16_clean.jsonl results/pilot/int4_clean.jsonl
+# later, full matrix per precision in a single job:
+sbatch scripts/hpc_pilot.sbatch bf16 clean,NoImage,LowLight,Fog 0
+```
+
+The job refuses to start if weights are not cached (`HF_HUB_OFFLINE=1`), so the GPU never sits idle on a download. `--time=02:00:00` is a cap, not a hold; the job ends when the scripts end. For `--n 0` full runs raise it to 3 h. The job pins `--gres=gpu:a100:1`; switch to `h100` only if the A100 queue backs up. Do not submit interactive GPU sessions.
+
+Results and manifests land in the repo checkout under `$S`; `git add results`-style copying is not needed, rsync `results/` and `manifests/` to your laptop or commit manifests from the head node.
+
 ## What to record in the week-5 gate note
 
 - vLLM / transformers versions, `MAX_PIXELS`, tokens per view, peak MiB for each precision
