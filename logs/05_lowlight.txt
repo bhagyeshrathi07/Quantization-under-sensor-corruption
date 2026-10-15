@@ -1,0 +1,14 @@
+paired MCQ questions: 8
+reference accuracy: 0.500   quantized accuracy: 0.500
+flips: {'unchanged': 8}
+harmful-flip rate F_h = 0/4 = 0.000
+
+by cell:
+  behavior/MCQ     unchanged       4
+  perception/MCQ   unchanged       4
+
+by BF16 margin (<0.5 vs >=0.5; pilot bin, freeze real bins on dev scenes):
+  high  unchanged       3
+  low   unchanged       5
+
+harmful examples:

@@ -1,0 +1,24 @@
+date: 2026-10-15T01:37:30+00:00
+host: c1f37198f202
+os: Linux 6.8.0-138-generic x86_64 GNU/Linux
+python: Python 3.12.3
+uv: uv 0.12.10 (x86_64-unknown-linux-gnu)
+
+== GPU ==
+index, name, driver_version, memory.total [MiB], memory.used [MiB], power.limit [W]
+0, NVIDIA GeForce RTX 4090, 580.178.04, 24564 MiB, 22300 MiB, 300.00 W
+
+== CUDA toolkit (nvcc) ==
+Build cuda_13.0.r13.0/compiler.36424714_0
+
+== RAM ==
+               total        used        free      shared  buff/cache   available
+Mem:           125Gi        42Gi        42Gi       100Mi        45Gi        82Gi
+Swap:           38Gi        19Mi        38Gi
+
+== Disk (need ~50 GB for models + DriveBench images) ==
+Filesystem      Size  Used Avail Use% Mounted on
+overlay         102G   45G   58G  44% /
+
+== HF cache ==
+0	/workspace/.hf_home
