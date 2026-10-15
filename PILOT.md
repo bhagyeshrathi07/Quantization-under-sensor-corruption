@@ -73,7 +73,21 @@ PYTHONPATH=. python evaluate/eval.py /abs/path/results/pilot/bf16_clean.driveben
 python scripts/04_scene_split.py    # -> manifests/scene_split.json
 ```
 
+## Vast.ai (rented RTX 4090)
+
+Rent: filter GPU = RTX 4090, disk ≥ 100 GB, on-demand (not interruptible), reliability ≥ 98%, download speed ≥ 500 Mbps, DLPerf doesn't matter. Template: **PyTorch (Vast)** or any `nvidia/cuda:12.x` Ubuntu image; launch mode **SSH**. Add your laptop's public key under Account → Keys first. Avoid the cheapest hosts; they are often power-limited, which skews latency.
+
+Then, over SSH:
+
+```bash
+curl -sL https://raw.githubusercontent.com/Ron5474/Quantization-under-sensor-corruption/main/scripts/vast_setup.sh | bash
+```
+
+That installs everything under `/workspace`, starts the weight and image downloads in the background, and prints the next commands. Record the host's machine ID (instance page) in `manifests/machine.txt`; profiling sessions must all run on the same host. Stop (not destroy) the instance between sessions to keep `/workspace`; storage is billed per GB-month while stopped. `rsync -avz vast:/workspace/qflip/results/ results/` before destroying.
+
 ## HPC (SJSU CoE-HPC3, `/data/cmpe249-fa26`)
+
+Kept for reference; the team chose Vast.ai on October 14, 2026.
 
 Facts verified October 14, 2026:
 
