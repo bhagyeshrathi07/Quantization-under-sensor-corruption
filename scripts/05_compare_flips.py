@@ -15,11 +15,13 @@ from qflip.records import read_records  # noqa: E402
 
 
 def classify(ref: dict, quant: dict) -> str:
+    """Uses the strict rule (letter at the start of the answer). The released
+    DriveBench rule also matches the article "a" and misreads explanations."""
     if ref["mcq_correct"] and not quant["mcq_correct"]:
         return "harmful"
     if not ref["mcq_correct"] and quant["mcq_correct"]:
         return "beneficial"
-    if ref["mcq_pred"] != quant["mcq_pred"]:
+    if ref["mcq_pred_strict"] != quant["mcq_pred_strict"]:
         return "neutral_change"
     return "unchanged"
 
@@ -62,7 +64,7 @@ def main():
     print("\nharmful examples:")
     for qid in common:
         if classify(ref[qid], qnt[qid]) == "harmful":
-            print(f"  {qid} {ref[qid]['cell']} gt={ref[qid]['mcq_gt']} bf16={ref[qid]['mcq_pred']} int4={qnt[qid]['mcq_pred']} margin={ref[qid].get('margin')}")
+            print(f"  {qid} {ref[qid]['cell']} gt={ref[qid]['mcq_gt']} bf16={ref[qid]['mcq_pred_strict']} int4={qnt[qid]['mcq_pred_strict']} margin={ref[qid].get('margin')}")
 
 
 if __name__ == "__main__":

@@ -115,7 +115,10 @@ def main():
                         "mcq_pred": normalize_mcq(c.text),
                         "mcq_pred_strict": normalize_mcq_strict(c.text),
                         "mcq_gt": normalize_mcq(q.answer),
-                        "mcq_correct": normalize_mcq(c.text) == normalize_mcq(q.answer) and normalize_mcq(c.text) != "",
+                        # strict = option letter at the start of the answer (primary);
+                        # released = DriveBench evaluate/utils.py rule, which also matches the article "a"
+                        "mcq_correct": normalize_mcq_strict(c.text) == normalize_mcq(q.answer) and normalize_mcq_strict(c.text) != "",
+                        "mcq_correct_released": normalize_mcq(c.text) == normalize_mcq(q.answer) and normalize_mcq(c.text) != "",
                         "margin_letter": letter,
                         "margin": margin,
                         "option_probs": probs,
@@ -140,12 +143,13 @@ def main():
     errors = sum(1 for r in recs if r["error"])
     mcq = [r for r in recs if r["cell"] and r["cell"].endswith("MCQ")]
     acc = sum(r["mcq_correct"] for r in mcq) / len(mcq) if mcq else None
+    acc_rel = sum(r["mcq_correct_released"] for r in mcq) / len(mcq) if mcq else None
     no_margin = sum(1 for r in mcq if r["margin"] is None)
     lat = sorted(r["latency_s"] for r in recs if not r["error"])
     print("\nSUMMARY")
     print(f"  questions: {len(recs)}  errors: {errors}")
     print(f"  cells: {dict(sorted(((c, sum(1 for r in recs if r['cell'] == c)) for c in {r['cell'] for r in recs})))}")
-    print(f"  MCQ accuracy (released rule): {acc}  ({len(mcq)} MCQ, {no_margin} without option margin)")
+    print(f"  MCQ accuracy strict={acc}  released-rule={acc_rel}  ({len(mcq)} MCQ, {no_margin} without option margin)")
     if lat:
         print(f"  latency s p50={lat[len(lat)//2]:.2f} p95={lat[int(len(lat)*0.95)-1 if len(lat) > 1 else 0]:.2f}")
     print(f"  prompt tokens mean: {sum(r['prompt_tokens'] or 0 for r in recs)/max(len(recs),1):.0f}")
