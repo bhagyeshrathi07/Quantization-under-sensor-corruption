@@ -16,7 +16,7 @@ Data:
 ```bash
 uv pip install -e ".[data]"
 python scripts/download_drivebench.py --json-only   # 32 MB of annotations, enough for 04_scene_split.py
-python scripts/download_drivebench.py               # + DriveBench.zip from Google Drive (large), extract, verify
+python scripts/download_drivebench.py               # + DriveBench.zip from Google Drive (7.2 GB, corruption images only), extract, verify
 python scripts/download_drivebench.py --verify      # re-check layout any time
 ```
 
@@ -25,7 +25,7 @@ Resulting layout (upstream `docs/DATA_PREPAER.md`):
 ```
 data/
   drivebench-test.json        # 1461 questions, 174 scenes, 1200 clean images
-  nuscenes/samples/CAM_*/     # clean images
+  nuscenes/samples/CAM_*/     # clean images: NOT in the zip; nuScenes keyframes (nuscenes.org or a symlink)
   corruption/LowLight/CAM_*/  # corrupted images, same file names
   corruption/Fog/CAM_*/
 ```

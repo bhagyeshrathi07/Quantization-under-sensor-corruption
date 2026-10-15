@@ -1,10 +1,11 @@
 """Download DriveBench into data/ in the layout upstream docs/DATA_PREPAER.md expects.
 
   1. Annotation JSONs from HF dataset drive-bench/arena (~32 MB) -> data/*.json
-  2. Image archive DriveBench.zip from Google Drive (size unknown until download;
-     nuScenes samples plus corrupted copies, expect tens of GB) -> data/DriveBench.zip
-  3. Extract and arrange as data/nuscenes/samples/ and data/corruption/<Type>/
-  4. Verify every image path in drivebench-test.json exists
+  2. Image archive DriveBench.zip from Google Drive (7.2 GB): the 15 corruption
+     types only, no clean images -> data/DriveBench.zip
+  3. Extract and arrange as data/corruption/<Type>/CAM_*/
+  4. Verify every clean image path in drivebench-test.json exists under
+     data/nuscenes/samples/ (clean images come from nuScenes itself, not the zip)
 
     python scripts/download_drivebench.py             # everything
     python scripts/download_drivebench.py --json-only # step 1 only (enough for 04_scene_split.py)
@@ -57,31 +58,37 @@ def download_zip(data: Path) -> Path:
 
 
 def extract_and_arrange(data: Path, zip_path: Path) -> None:
-    if (data / "nuscenes" / "samples").is_dir() and (data / "corruption").is_dir():
-        print("[extract] data/nuscenes/samples and data/corruption exist, skipping")
+    """DriveBench.zip (7.2 GB, verified October 2026) contains ONLY the 15
+    corruption types as DriveBench/<Type>/CAM_*/<nuScenes file name>.jpg.
+    Clean images are not included; they are nuScenes keyframes and must be
+    obtained from nuscenes.org (registration) into data/nuscenes/samples/."""
+    if (data / "corruption").is_dir():
+        print("[extract] data/corruption exists, skipping")
         return
     tmp = data / "_extract"
     if not tmp.exists():
-        print(f"[extract] unzipping {zip_path} -> {tmp} (this takes a while)")
+        print(f"[extract] unzipping {zip_path} -> {tmp} (7.5 GB extracted)")
         tmp.mkdir(parents=True)
         subprocess.run(["unzip", "-q", str(zip_path), "-d", str(tmp)], check=True)
 
-    # The archive's internal layout is not documented upstream; locate the two
-    # directories we need by name wherever they landed.
-    samples = next((p for p in tmp.rglob("samples") if p.is_dir() and any(p.glob("CAM_*"))), None)
-    corruption = next((p for p in tmp.rglob("corruption") if p.is_dir()), None)
-    if samples is None or corruption is None:
-        print("[extract] could not find 'samples/CAM_*' and 'corruption/' in the archive. Top of tree:")
+    # Find the directory whose children are corruption types (each holding CAM_* dirs).
+    def is_type_dir(p: Path) -> bool:
+        return p.is_dir() and (p / "CAM_FRONT").is_dir()
+
+    root = next((p for p in [tmp, *tmp.rglob("*")] if p.is_dir() and any(is_type_dir(c) for c in p.iterdir())), None)
+    if root is None:
+        print("[extract] could not find <Type>/CAM_FRONT directories in the archive. Top of tree:")
         for p in sorted(tmp.rglob("*"))[:40]:
             print("   ", p.relative_to(tmp))
-        sys.exit("[extract] arrange data/nuscenes/samples and data/corruption by hand, then rerun with --verify")
+        sys.exit("[extract] arrange data/corruption/<Type>/CAM_*/ by hand, then rerun with --verify")
 
-    (data / "nuscenes").mkdir(exist_ok=True)
-    shutil.move(str(samples), str(data / "nuscenes" / "samples"))
-    shutil.move(str(corruption), str(data / "corruption"))
+    shutil.move(str(root), str(data / "corruption"))
     print(f"[extract] corruption types: {sorted(p.name for p in (data / 'corruption').iterdir() if p.is_dir())}")
     shutil.rmtree(tmp, ignore_errors=True)
-    print("[extract] done; DriveBench.zip kept (delete it to reclaim space)")
+    print("[extract] done; DriveBench.zip kept (delete it to reclaim 7.2 GB)")
+    if not (data / "nuscenes" / "samples").is_dir():
+        print("[extract] NOTE: clean images are not in the zip. Put nuScenes keyframes at data/nuscenes/samples/"
+              " (symlink to a nuScenes checkout, or download from nuscenes.org) before running the clean condition.")
 
 
 def verify(data: Path) -> None:
