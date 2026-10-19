@@ -1,0 +1,45 @@
+{
+  "precision": "bf16",
+  "model": "qwen2.5-vl-7b-bf16",
+  "condition": "NoImage",
+  "question_id": "da41ecbc-7e4c3282-812d330bf0",
+  "n_views": 6,
+  "prompt_tokens": 738,
+  "approx_tokens_per_view_incl_text": 123.0,
+  "completion_tokens": 80,
+  "latency_s": 1.311,
+  "gpu_mem_baseline_mib": 21738,
+  "gpu_mem_peak_mib": 21854,
+  "answer": "D\n\nThe ego vehicle appears to be steering to the left as indicated by the slight offset in the lane markings visible in the front-left and front-right cameras. There is no indication of high speed or fast movement; the vehicle seems to be maintaining a steady pace within the lane. Therefore, the most accurate description is that the ego vehicle is steering to the left and is driving with normal speed.",
+  "gt": "C",
+  "first_token_top_logprobs": [
+    {
+      "token": "D",
+      "logprob": -0.5004590749740601
+    },
+    {
+      "token": "A",
+      "logprob": -1.37545907497406
+    },
+    {
+      "token": "B",
+      "logprob": -2.7504591941833496
+    },
+    {
+      "token": "C",
+      "logprob": -2.8754591941833496
+    },
+    {
+      "token": "The",
+      "logprob": -5.37545919418335
+    }
+  ],
+  "margin_letter": "D",
+  "margin": 0.3535287304563617,
+  "option_probs": {
+    "D": 0.6062522805690973,
+    "A": 0.2527235501127356,
+    "B": 0.06389851264354791,
+    "C": 0.056390239487693644
+  }
+}

@@ -132,7 +132,7 @@ mcq_correct_released, margin_letter, margin, option_probs
 
 ## 14. Provenance per run
 
-`manifests/serve_<precision>.txt` (model, flags, versions, power limit, GPU name) and `manifests/machine.txt` (host facts) are written by the serve and check scripts. Results are not tracked in git (`results/` is ignored); they are synced from the host after each session and the raw files for the final report are archived with the submission.
+`manifests/serve_<precision>.txt` (model, flags, versions, power limit, GPU name) and `manifests/machine.txt` (host facts) are written by the serve and check scripts. Pilot results under `results/pilot/` are tracked in git; full-run results are not (synced from the host after each session) and the raw files for the final report are archived with the submission.
 
 ## Change log
 

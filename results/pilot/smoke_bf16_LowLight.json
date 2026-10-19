@@ -1,0 +1,45 @@
+{
+  "precision": "bf16",
+  "model": "qwen2.5-vl-7b-bf16",
+  "condition": "LowLight",
+  "question_id": "da41ecbc-7e4c3282-812d330bf0",
+  "n_views": 6,
+  "prompt_tokens": 1740,
+  "approx_tokens_per_view_incl_text": 290.0,
+  "completion_tokens": 81,
+  "latency_s": 1.372,
+  "gpu_mem_baseline_mib": 21854,
+  "gpu_mem_peak_mib": 22148,
+  "answer": "D. The ego vehicle is steering to the left. The ego vehicle is driving with normal speed.\n\nThe camera is positioned on the front of the ego vehicle, and the view shows that the vehicle is turning to the left. There are no signs of high speed, such as blurred surroundings or a sense of rapid movement. Therefore, it can be inferred that the ego vehicle is driving with normal speed.",
+  "gt": "C",
+  "first_token_top_logprobs": [
+    {
+      "token": "D",
+      "logprob": -0.37116560339927673
+    },
+    {
+      "token": "A",
+      "logprob": -1.6211656332015991
+    },
+    {
+      "token": "C",
+      "logprob": -2.7461655139923096
+    },
+    {
+      "token": "B",
+      "logprob": -3.1211655139923096
+    },
+    {
+      "token": "The",
+      "logprob": -6.246165752410889
+    }
+  ],
+  "margin_letter": "D",
+  "margin": 0.4922615212182001,
+  "option_probs": {
+    "D": 0.6899296773979444,
+    "A": 0.19766815617974434,
+    "C": 0.06417346227200202,
+    "B": 0.04410573260244393
+  }
+}

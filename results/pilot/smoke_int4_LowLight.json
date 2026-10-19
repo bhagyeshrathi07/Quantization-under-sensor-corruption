@@ -1,0 +1,45 @@
+{
+  "precision": "int4",
+  "model": "qwen2.5-vl-7b-awq",
+  "condition": "LowLight",
+  "question_id": "da41ecbc-7e4c3282-812d330bf0",
+  "n_views": 6,
+  "prompt_tokens": 1740,
+  "approx_tokens_per_view_incl_text": 290.0,
+  "completion_tokens": 81,
+  "latency_s": 0.574,
+  "gpu_mem_baseline_mib": 21748,
+  "gpu_mem_peak_mib": 22172,
+  "answer": "D. The ego vehicle is steering to the left. The ego vehicle is driving with normal speed.\n\nExplanation: Based on the sequence of images, the ego vehicle appears to be turning to the left as it moves forward. The camera angle suggests that the vehicle is not moving at an unusually high speed, indicating a normal driving pace. Therefore, option D best describes the current behavior of the ego vehicle.",
+  "gt": "C",
+  "first_token_top_logprobs": [
+    {
+      "token": "D",
+      "logprob": -0.32822683453559875
+    },
+    {
+      "token": "A",
+      "logprob": -1.5626018047332764
+    },
+    {
+      "token": "B",
+      "logprob": -3.3282268047332764
+    },
+    {
+      "token": "C",
+      "logprob": -3.4844768047332764
+    },
+    {
+      "token": "The",
+      "logprob": -6.3751020431518555
+    }
+  ],
+  "margin_letter": "D",
+  "margin": 0.5106095862196806,
+  "option_probs": {
+    "D": 0.7201996350256085,
+    "A": 0.2095900488059279,
+    "B": 0.035856629536141445,
+    "C": 0.0306698005267319
+  }
+}

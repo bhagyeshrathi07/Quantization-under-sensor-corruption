@@ -73,4 +73,4 @@ tests/                             19 offline unit tests (pytest)
 
 **Open team decisions** are listed in [TEAM_REVIEW.md](TEAM_REVIEW.md), section 8 and the October 19 addendum.
 
-Results (`results/`) are not tracked in git; raw pilot files live on the laptop and the Vast.ai host and are archived with the final submission.
+Pilot results (`results/pilot/`, 152 KB) are tracked so teammates can run `05_compare_flips.py` on them. Full-run results stay untracked and are synced from the host; the final raw files are archived with the submission.

@@ -219,6 +219,7 @@ __marimo__/
 
 # project
 data/
-results/
+results/*
 !results/.gitkeep
+!results/pilot/
 .venv/
