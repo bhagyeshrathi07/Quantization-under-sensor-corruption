@@ -20,13 +20,13 @@ Pilot run on a rented RTX 4090 (Vast.ai, host machine id m:3752, Norway; power l
 ## Findings that change the protocol
 
 1. **Released DriveBench MCQ normalizer misreads explanations.** `evaluate/utils.py` matches `\b(a|option a)\b`, so "D. ... appears to be **a** vehicle" scores as option A. On the 8 pilot MCQs: strict rule 4/8 for both precisions and zero flips; released rule 2/8 vs 1/8 and one phantom harmful flip. Our primary rule is now "letter at the start of the answer"; the released rule is stored alongside (`mcq_correct_released`) for comparability. This must be reported, and it casts doubt on published DriveBench MCQ numbers for any model that explains its answers.
-2. **DriveBench.zip has no clean images.** It holds the 15 corruption types only (7.2 GB; 1800 files per type). Clean images are nuScenes keyframes (1200 needed). Options: ask the instructor to allow copying those 1200 files off the class HPC; register at nuscenes.org; or run the clean condition on the HPC. Pending.
+2. **DriveBench.zip has no clean images.** It holds the 15 corruption types only (7.2 GB; 1800 files per type). Clean images are nuScenes keyframes (1200 needed). Resolved October 15: Motional mirrors nuScenes on the AWS Open Data registry (`s3://motional-nuscenes`, anonymous, CC BY-NC-SA 4.0) as keyframe-only tarballs; `scripts/download_clean_images.py` streams them and keeps the 1200 referenced files. No HPC copy or nuscenes.org account needed.
 3. **Memory comparison needs equal KV-cache bytes.** With the 0.9 utilization setting both precisions show ~22 GB. Profiling runs must set `--kv-cache-memory-bytes` identically; the pilot numbers are not a memory result.
 4. **Power-limited host.** 300 W cap. Latency numbers are for this host; profiling sessions must all use one pinned host, and the cap must be stated.
 
 ## Not yet done
 
-- Clean condition (blocked on images).
+- Clean condition (images now fetchable; run next session).
 - Fog condition (images present, not run).
 - Own INT4 quantization from the base checkpoint (llm-compressor); official AWQ used for the pilot.
 - Three-repeat stability slice.

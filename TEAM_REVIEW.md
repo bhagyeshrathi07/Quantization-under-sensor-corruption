@@ -1,4 +1,4 @@
-# Team review: scope change and decisions (September 29 – October 1, 2026)
+# Team review: scope change and decisions (September 29 – October 1, 2026; addendum October 19)
 
 For Bhagyesh and Akshay. This summarizes what happened after the professor reviewed our September 8 proposal, what was changed in the repo, what has been built so far, and what still needs your sign-off. Read the "Decisions that need your confirmation" section first if you are short on time.
 
@@ -160,3 +160,50 @@ Please reply yes/no or propose an alternative for each.
 3. On the 4090 machine: `bash scripts/00_check_machine.sh`, install vLLM, `python scripts/download_drivebench.py`.
 4. `bash scripts/01_serve.sh bf16`, then `02_smoke_request.py`. The gate checks printed at the end decide 7B versus 3B and whether the margin analysis is feasible.
 5. Twenty-question run on both precisions, `05_compare_flips.py`, and write the week-5 gate note (items listed at the bottom of `PILOT.md`).
+
+
+## 10. Addendum, October 19, 2026: what happened since
+
+Sections 1–9 above are unchanged from October 1. This section records what changed afterwards.
+
+### Compute: rented 4090, not the HPC
+
+The SJSU course HPC was checked on October 14 and works (A100 nodes idle, immediate start), but it is batch-only, needs the campus VPN plus a two-hop login, and the course rules allow one GPU per job with prompt release. Ronak chose a rented RTX 4090 on Vast.ai instead (about $0.76 per hour, stopped between sessions so its disk persists). Consequences:
+
+- The proposal's "team-owned workstation" wording was wrong and has been corrected to a rented, pinned host (proposal sections 6 and 8, audit compute row).
+- The host is power-limited to 300 W, not the stock 450 W. Every latency number carries that caveat, and all profiling sessions run on the same host.
+- No credentials (HF token, API keys, SSH private keys) are stored on the instance; results are synced off after every session.
+- HPC stays as the fallback. `scripts/hpc_pilot.sbatch` works.
+
+### Week-5 gate passed (October 15)
+
+See `manifests/gate_week5.md`. Short version: 7B BF16 serves six views on 24 GB; official AWQ INT4 serves; option-letter logprobs work, so the margin analysis is feasible; 20 LowLight questions on both precisions with zero errors; BF16 p50 2.39 s, INT4 p50 0.91 s per question. No 3B fallback. Zero flips on 8 MCQs is expected at that size and is not a result.
+
+### Two findings that change the protocol
+
+1. **Released DriveBench MCQ scorer bug.** Its regex matches the article "a" as option A, so explanations get scored as A. On the pilot this manufactured one harmful flip that did not exist. Our primary rule is now "option letter at the start of the answer"; the released rule is stored alongside (`mcq_correct_released`). This must be in the report, and it means published DriveBench MCQ numbers for explaining models are suspect. **Needs your sign-off (item 8 below).**
+2. **DriveBench.zip has no clean images.** It holds the 15 corruption types only. The clean images are nuScenes keyframes. They turn out to be on Motional's public AWS mirror (no account, CC BY-NC-SA 4.0) as keyframe-only tarballs; `scripts/download_clean_images.py` streams them and keeps the 1200 files we need (verified on one tarball, 108 of 1200 found, so all ten tarballs are needed, about 10 minutes on the Vast host). No HPC copy and no professor permission needed.
+
+### Built since October 1
+
+- `src/qflip/flips.py` and the rewritten `05_compare_flips.py`: flip classes, F_h, accuracy delta, change rate, paired bootstrap over scenes (2000 draws), breakdowns by cell, view count, margin bin, condition; several condition pairs in one call.
+- `06_stability.py`: 60 development-scene questions, three repeats, self-disagreement rates (the nondeterminism floor).
+- `07_profile.py`: streamed requests for time to first token, p50/p95/p99, decode tokens per second, peak memory, with the server manifest embedded; three sessions per precision.
+- `01_serve.sh` pins `--kv-cache-memory-bytes` to 2 GiB for both precisions, so memory can be compared. The pilot's memory numbers are not a result.
+- `--split final|development|calibration` on the run scripts, so the full run never touches calibration or development scenes.
+- `PROTOCOL.md`: the executable protocol, every item marked frozen, pilot default, or to decide. The week-7 freeze is a pass over that file.
+- 19 offline unit tests pass. The streaming path and the KV-cache flag have not yet been exercised against the real server (next GPU session).
+
+### Open items, updated
+
+Items 1–6 in section 8 are still open; nobody has replied. Added:
+
+7. **Hardware wording:** confirm the rented-4090 description in the proposal (sections 6 and 8) and audit.
+8. **Strict MCQ rule as primary**, released rule secondary. Alternative: released rule primary for comparability, strict rule secondary; we think that is wrong because it scores explanations as A.
+9. **Image-token budget:** keep about 165 tokens per view (`max_pixels` 200704, measured) or pilot about 512 (`max_pixels` 401408) on development scenes and pick by accuracy and memory. The 512 setting roughly doubles prompt length and BF16 latency.
+10. **Coverage minimum** for a cell to be assessed (questions and scenes); prediction/VQA has 45 final-scene questions and is the cell at risk.
+11. **Email to the professor:** revised proposal link plus a one-line note that we run vLLM with Qwen2.5-VL-7B on one rented RTX 4090. The HPC-copy request is no longer needed.
+
+### Next GPU session (about 1.5 hours on the Vast host)
+
+Fetch clean images; verify streaming and the KV flag on vLLM 0.31; clean and Fog 20-question runs on both precisions; stability slice on both; profile session 1; smoke test the own-AWQ checkpoint if it exists by then. Then freeze `PROTOCOL.md`.

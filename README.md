@@ -4,11 +4,11 @@
 **Team:** Ronak, Bhagyesh, and Akshay  
 **Track:** System / Deployment (supported by experimental research)  
 **Duration:** 14 weeks  
-**Prepared:** September 8, 2026. **Revised:** September 29, 2026, after instructor feedback.
+**Prepared:** September 8, 2026. **Revised:** September 29, 2026, after instructor feedback. **Status updated:** October 19, 2026.
 
 ## Abstract
 
-Quantization reduces the precision of the numbers used inside a neural network, potentially reducing memory use and inference time. Average accuracy on a benchmark may stay almost unchanged after quantization while individual answers still change, and some of those changes turn a correct driving decision into an incorrect one. This project will deploy one driving-scene vision-language model, Qwen2.5-VL-7B-Instruct, in vLLM at BF16 and at INT4, run the same DriveBench questions through both, and identify every case in which the full-precision model is correct but the quantized model changes the answer or the driving decision. We will analyze these failures by driving task, answer format, the full-precision model's confidence margin, the number of camera views, and, as a stress test, a small set of sensor-corruption conditions. We will measure the latency and memory savings that INT4 provides under matched serving settings, and, if time permits, test one simple mitigation: retaining a small set of sensitive decoder layers at BF16. The contribution is a reproducible, hardware-measured, paired failure analysis of a quantized driving VLM, extending prior work that reports only aggregate scores. The study runs on one RTX 4090 (24 GB); an RTX 3060 Ti (8 GB) is supplementary, and neither HPC access nor a Jetson is required.
+Quantization reduces the precision of the numbers used inside a neural network, potentially reducing memory use and inference time. Average accuracy on a benchmark may stay almost unchanged after quantization while individual answers still change, and some of those changes turn a correct driving decision into an incorrect one. This project deploys one driving-scene vision-language model, Qwen2.5-VL-7B-Instruct, in vLLM at BF16 and at INT4, runs the same DriveBench questions through both, and identifies every case in which the full-precision model is correct but the quantized model changes the answer or the driving decision. We analyze these failures by driving task, answer format, the full-precision model's confidence margin, the number of camera views, and, as a stress test, a small set of sensor-corruption conditions. We measure the latency and memory savings that INT4 provides under matched serving settings, and, if time permits, test one simple mitigation: retaining a small set of sensitive decoder layers at BF16. The contribution is a reproducible, hardware-measured, paired failure analysis of a quantized driving VLM, extending prior work that reports only aggregate scores. The study runs on one rented RTX 4090 (24 GB, power-limited to 300 W) pinned for all measurements; SJSU's course HPC is the fallback, and no Jetson is required.
 
 ## Repository contents
 
@@ -18,16 +18,59 @@ Quantization reduces the precision of the numbers used inside a neural network, 
 | C. Project Proposal | [C_PROJECT_PROPOSAL.md](C_PROJECT_PROPOSAL.md) |
 | D. AI Novelty & Feasibility Audit | [D_AI_NOVELTY_FEASIBILITY_AUDIT.md](D_AI_NOVELTY_FEASIBILITY_AUDIT.md) |
 
-The survey covers ten papers from November 2023 to November 2025 plus 2026 context. The proposal specifies the model and precision pair, the flip-classification protocol, the analysis factors, numerical targets, data handling, team responsibilities, and the revised timeline. The audit contains the original AI critique, the instructor feedback that narrowed the scope, and the documented prior-work overlap and remaining uncertainty.
+Working documents:
+
+| File | Purpose |
+|---|---|
+| [PROTOCOL.md](PROTOCOL.md) | Exact execution protocol: checkpoints, serving flags, prompt, scoring rules, flip classes, statistics, record schema. Draft until the week-7 freeze; each item marked frozen, pilot default, or to decide. |
+| [PILOT.md](PILOT.md) | Runbook: setup, data, serve, smoke test, runs, stability, profile, Vast.ai and HPC notes. |
+| [TEAM_REVIEW.md](TEAM_REVIEW.md) | Summary for teammates of the scope change, every decision and its reason, and the items that still need sign-off. |
+| [manifests/gate_week5.md](manifests/gate_week5.md) | Week-5 baseline gate: pilot measurements and the findings that changed the protocol. |
+
+Code (package `qflip`, Python 3.12, vLLM):
+
+```
+config/pilot.yaml                  every tunable in one place; frozen copy goes to manifests/ at the freeze
+prompt.txt                         DriveBench system prompt, verbatim
+src/qflip/drivebench.py            annotations, view selection, prompt building, corruption paths, MCQ normalization
+src/qflip/client.py                vLLM OpenAI-compatible client: logprobs, option margin, streaming for TTFT
+src/qflip/runner.py                one question in, one result record out (shared by all run scripts)
+src/qflip/flips.py                 pairing, flip classes, paired bootstrap over scenes, factor grouping
+src/qflip/split.py, stats.py, gpu.py, records.py
+scripts/download_drivebench.py     annotations (HF) + corruption images (Google Drive zip)
+scripts/download_clean_images.py   clean nuScenes keyframes streamed from the public AWS mirror
+scripts/00_check_machine.sh        host facts -> manifests/machine.txt
+scripts/01_serve.sh bf16|int4      vllm serve with the protocol's flags, equal KV-cache bytes
+scripts/02_smoke_request.py        one six-view request: tokens per view, logprobs, margin, memory
+scripts/03_smoke_drivebench.py     N or all questions per (precision, condition), resumable, --split
+scripts/04_scene_split.py          calibration / development / final scene manifest
+scripts/05_compare_flips.py        flips with bootstrap CIs, breakdowns by cell, views, margin, condition
+scripts/06_stability.py            three-repeat slice: nondeterminism floor
+scripts/07_profile.py              TTFT, latency percentiles, decode tok/s, peak memory per session
+scripts/rescore.py                 recompute MCQ fields after a rule change
+scripts/vast_setup.sh, hpc_pilot.sbatch
+tests/                             19 offline unit tests (pytest)
+```
 
 ## Scope
 
-**Required:** Qwen2.5-VL-7B-Instruct at BF16 versus INT4 (AWQ preferred, GPTQ contingency) in vLLM, on DriveBench, in the clean condition plus a three-condition stress test (Dark, Fog, NoImage). Per-question flip classification, breakdowns by task, format, confidence margin, view count, and condition, and matched latency and memory measurements. Fallback model: Qwen2.5-VL-3B-Instruct.
+**Required:** Qwen2.5-VL-7B-Instruct at BF16 versus INT4 (AWQ) in vLLM, on DriveBench, in the clean condition plus a three-condition stress test (Dark, Fog, NoImage). Per-question flip classification, breakdowns by task, format, confidence margin, view count, and condition, and matched latency and memory measurements. The 3B fallback is no longer needed: the 7B model passed the week-5 gate.
 
 **If time permits:** one mitigation that retains selected decoder layers at BF16.
 
 **Removed on September 29, 2026:** the camera-based occupancy perception strand (FlashOcc-M0 in TensorRT), the full corruption matrix, and GPU energy as a required measurement. FP8, additional models, the remaining DriveBench conditions, energy, and Jetson measurements are extensions.
 
-## Status
+## Status (October 19, 2026, semester week 7)
 
-Proposal stage, revised. No model has been downloaded, quantized, or benchmarked yet. Software revisions and resource measurements will be recorded during the week 4–5 pilot rather than estimated here.
+**Done.**
+- Week-5 baseline gate passed on October 15 ([manifests/gate_week5.md](manifests/gate_week5.md)): BF16 7B serves six views on the 24 GB card; official AWQ INT4 serves; option-letter log-probabilities are available, so the margin analysis is feasible; 20-question LowLight run on both precisions with zero errors; BF16 p50 2.39 s versus INT4 0.91 s per question at batch size 1.
+- Two protocol findings from the pilot: the released DriveBench MCQ normalizer scores the article "a" in an explanation as option A, so a strict letter-first rule is now primary and the released rule is recorded alongside; and the DriveBench image archive contains only corrupted images, so clean nuScenes keyframes are fetched from Motional's public AWS mirror (no account; CC BY-NC-SA 4.0).
+- Analysis tooling built and unit-tested offline: paired bootstrap, stability slice, deployment profile with streaming TTFT, equal KV-cache serving, scene-split filtering.
+
+**In progress (weeks 6–7, freeze and build).** Protocol freeze ([PROTOCOL.md](PROTOCOL.md)), own INT4 quantization from the base checkpoint, next GPU session (clean and Fog pilots, stability, profile, streaming and KV-flag verification on vLLM 0.31).
+
+**Not started.** The 8-run matrix on final scenes (weeks 8–9), analysis and explorer (10–11), mitigation (12), report (13–14).
+
+**Open team decisions** are listed in [TEAM_REVIEW.md](TEAM_REVIEW.md), section 8 and the October 19 addendum.
+
+Results (`results/`) are not tracked in git; raw pilot files live on the laptop and the Vast.ai host and are archived with the final submission.

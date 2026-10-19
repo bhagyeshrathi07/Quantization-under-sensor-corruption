@@ -1,6 +1,6 @@
-# Pilot runbook (weeks 4–5)
+# Runbook
 
-Covers proposal timeline rows "4–5": serve BF16 and INT4, smoke request, 20-question DriveBench run, scene split. Everything writes to `results/pilot/` and `manifests/`.
+Setup, data, serving, runs, stability, profiling, and host notes. Written for the week 4–5 pilot and kept current; the week-5 gate results are in `manifests/gate_week5.md` and the protocol itself in `PROTOCOL.md`. Everything writes to `results/` (not tracked in git) and `manifests/`.
 
 ## 0. One-time setup
 
@@ -17,6 +17,7 @@ Data:
 uv pip install -e ".[data]"
 python scripts/download_drivebench.py --json-only   # 32 MB of annotations, enough for 04_scene_split.py
 python scripts/download_drivebench.py               # + DriveBench.zip from Google Drive (7.2 GB, corruption images only), extract, verify
+python scripts/download_clean_images.py             # clean nuScenes keyframes from the public AWS mirror (streams ~45 GB, keeps ~200 MB, no account)
 python scripts/download_drivebench.py --verify      # re-check layout any time
 ```
 
@@ -25,12 +26,14 @@ Resulting layout (upstream `docs/DATA_PREPAER.md`):
 ```
 data/
   drivebench-test.json        # 1461 questions, 174 scenes, 1200 clean images
-  nuscenes/samples/CAM_*/     # clean images: NOT in the zip; nuScenes keyframes (nuscenes.org or a symlink)
+  nuscenes/samples/CAM_*/     # clean images: NOT in the zip; fetched by download_clean_images.py (or a symlink on the HPC)
   corruption/LowLight/CAM_*/  # corrupted images, same file names
   corruption/Fog/CAM_*/
 ```
 
 If Google Drive blocks the large download, get `DriveBench.zip` in a browser, drop it in `data/`, rerun. Config lives in `config/pilot.yaml`.
+
+Clean images come from Motional's public mirror on the AWS Open Data registry (`s3://motional-nuscenes`, anonymous, CC BY-NC-SA 4.0). The 1200 keyframes sit inside ten `v1.0-trainvalNN_keyframes.tgz` tarballs (4 to 6 GB each) with no scene index, so the script streams each tarball through `tar` and keeps only the referenced files, stopping when none are missing. Worst case ~45 GB of transfer: about 10 minutes on the Vast box, about an hour on a home connection. Rerunning skips files already present.
 
 ## 1. Serve (own terminal, one precision at a time)
 
@@ -60,14 +63,28 @@ python scripts/03_smoke_drivebench.py --precision int4
 python scripts/05_compare_flips.py results/pilot/bf16_clean.jsonl results/pilot/int4_clean.jsonl
 ```
 
-Runs are resumable (rerun the same command to continue). `--n 0` runs every eligible question. The `.drivebench.json` output feeds the upstream scorer:
+Runs are resumable (rerun the same command to continue). `--n 0` runs every eligible question; add `--split final` for the full run so calibration and development scenes stay out. `05_compare_flips.py` takes any number of ref/quant pairs, reports flip counts with paired bootstrap CIs over scenes, and breaks them down with `--by cell n_views margin condition`. The `.drivebench.json` output feeds the upstream scorer:
 
 ```bash
 # in a DriveBench checkout, with data/visual_description.json present
 PYTHONPATH=. python evaluate/eval.py /abs/path/results/pilot/bf16_clean.drivebench.json
 ```
 
-## 4. Scene split
+## 4. Stability floor and deployment profile
+
+```bash
+# same server as above; 60 development-scene questions, 3 repeats, per precision and condition
+python scripts/06_stability.py --precision bf16 --condition clean
+python scripts/06_stability.py --precision bf16 --condition clean --report      # summarize only
+
+# profile: 50 six-view development questions, streamed for TTFT; one invocation = one session, run three
+python scripts/07_profile.py --precision bf16 --session 1
+python scripts/07_profile.py --report results/profile/*.json
+```
+
+`01_serve.sh` now pins `--kv-cache-memory-bytes` to 2 GiB for both precisions, so peak memory from `07_profile.py` compares weights plus a fixed cache. The pilot used `--gpu-memory-utilization 0.9` instead (`KV_BYTES=` restores that), which is why its memory numbers are not a result. The stability summary's `self_change_rate` is the floor any BF16-versus-INT4 `change_rate` must clear.
+
+## 5. Scene split
 
 ```bash
 python scripts/04_scene_split.py    # -> manifests/scene_split.json
@@ -146,13 +163,27 @@ The job refuses to start if weights are not cached (`HF_HUB_OFFLINE=1`), so the 
 
 Results and manifests land in the repo checkout under `$S`; `git add results`-style copying is not needed, rsync `results/` and `manifests/` to your laptop or commit manifests from the head node.
 
-## What to record in the week-5 gate note
+## Next GPU session checklist (after the October 15 pilot)
 
-- vLLM / transformers versions, `MAX_PIXELS`, tokens per view, peak MiB for each precision
-- whether option-letter logprobs came back on MCQ (margin feasibility)
-- MCQ accuracy and harmful flips on the 20-question slice (sanity only, not a result)
-- p50/p95 latency per precision
-- decision: 7B or 3B
+Resume the same Vast host (profiling must stay on one host), then in order:
+
+```bash
+cd /workspace/qflip && git pull && source .venv/bin/activate && export HF_HOME=/workspace/hf
+python scripts/download_clean_images.py                       # ~10 min at 800 Mbps; all ten tarballs needed
+python scripts/download_drivebench.py --verify                # expect "all clean images present"
+bash scripts/01_serve.sh bf16                                 # separate pane; confirms --kv-cache-memory-bytes is accepted
+python scripts/02_smoke_request.py --precision bf16           # clean condition now possible
+python scripts/03_smoke_drivebench.py --precision bf16 --condition clean
+python scripts/03_smoke_drivebench.py --precision bf16 --condition Fog
+python scripts/06_stability.py --precision bf16 --condition clean
+python scripts/07_profile.py --precision bf16 --session 1     # first real use of the streaming path
+# swap the server to int4 and repeat 03 (clean, Fog), 06, 07
+python scripts/05_compare_flips.py results/pilot/bf16_clean.jsonl results/pilot/int4_clean.jsonl results/pilot/bf16_Fog.jsonl results/pilot/int4_Fog.jsonl --by cell n_views margin condition
+```
+
+Before stopping the instance: `rsync -avz vast:/workspace/qflip/results/ results/` and `rsync -avz vast:/workspace/qflip/manifests/ manifests/`, then commit `manifests/`.
+
+The week-5 gate note (`manifests/gate_week5.md`) recorded: vLLM and transformers versions, `MAX_PIXELS`, tokens per view, peak MiB per precision, logprob availability, MCQ accuracy and flips on the 20-question slice, p50/p95 latency, and the 7B decision.
 
 ## Known differences from the released DriveBench adapter
 

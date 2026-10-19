@@ -1,7 +1,7 @@
 # D. AI Novelty & Feasibility Audit
 
 **Project:** Quantization-Induced Decision Failures in a Driving Vision-Language Model: A Paired BF16-versus-INT4 Deployment Study (formerly "Quantization Under Sensor Corruption: Deployment and Robustness of Driving Perception and Vision-Language Models")  
-**Audit date:** September 8, 2026. **Revised:** September 29, 2026, after instructor feedback.  
+**Audit date:** September 8, 2026. **Revised:** September 29, 2026, after instructor feedback. **Pilot update:** October 19, 2026 (gate 1 passed; two protocol findings added).  
 **Assessment basis:** The team's pre-audit project brief (not submitted), a targeted search of recent papers and official repositories, the proposed 14-week experiment plan, and the instructor's written feedback on the September 8 proposal. Quoted "original claims" below refer to the pre-audit brief. This audit reports a literature-based assessment; no project experiments or performance measurements have been completed.
 
 ## Revision after instructor feedback (September 29, 2026)
@@ -26,6 +26,9 @@ The instructor reviewed the September 8 proposal and recommended reducing scope 
 - MCQ accuracy as the primary flip signal; VQA rubric scoring secondary and dependent on judge access and budget.
 - GPU energy demoted to an extension.
 - Roles: Ronak owns quantization, serving, profiling, and mitigation; Akshay owns the DriveBench adapter, scoring, and flip classification; Bhagyesh owns infrastructure, statistics, and the explorer.
+- Added October 19, 2026: compute is a rented, power-limited RTX 4090 (not a team-owned workstation); the strict letter-first MCQ rule is primary and the released rule secondary; image-token budget (about 165 versus about 512 tokens per view) to be chosen on development scenes.
+
+**Pilot findings that bear on the audit (October 15, 2026; details in `manifests/gate_week5.md`).** The two feasibility risks named above are resolved: the 7B BF16 six-view workload serves within 24 GB, and vLLM returns the option letters in the first-token log-probabilities, so the margin factor is measurable. Two new items replaced them. First, the released DriveBench MCQ normalizer matches the article "a" as option A, which turned one of eight pilot questions into a phantom harmful flip; the project now scores with a strict letter-first rule and records the released rule alongside. Any comparison with published DriveBench MCQ numbers for models that explain their answers must note this. Second, the released image archive excludes the clean images; they are nuScenes keyframes, now fetched from Motional's public AWS mirror under CC BY-NC-SA 4.0, which removes the data-access risk.
 
 ## Original paste-ready AI critique summary (September 8, 2026)
 
@@ -74,7 +77,7 @@ Searches so far covered exact paper titles, official-code availability, DriveBen
 | **Stress test** | Dark, Fog, and NoImage from the released DriveBench conditions. | Remaining fourteen conditions are an extension. |
 | **Deployment measurement** | Peak GPU memory, time to first token, throughput, p50/p95/p99 latency under matched KV-cache settings. | GPU energy per answer is an extension. |
 | **Mitigation** | Not required. | If time permits after week 11: retain selected decoder layers at BF16; if the runtime cannot execute it, use a controlled calibration-set change instead. |
-| **Compute** | One RTX 4090 with 24 GB VRAM. | RTX 3060 Ti for development only. HPC and Jetson are optional. |
+| **Compute** | One rented RTX 4090 (24 GB, Vast.ai, pinned host, 300 W power limit) for every measurement. | SJSU course HPC (A100, batch only) if the host is lost; team laptops for development only; Jetson optional. |
 | **Removed** | Perception strand (FlashOcc-M0, BEVDet, TensorRT, INT8 calibration, RoboBEV protocol). | Not an extension this semester. |
 | **Outputs** | Executable BF16 and INT4 pipelines, manifests, logs, per-question flip tables, analysis with uncertainty, documented limitations, report, and demo. | Upstream merges, paper acceptance, and a public submission community are stretch outcomes. |
 
@@ -86,8 +89,10 @@ Keep all quality tolerances, performance targets, and statistical decision rules
 |---|---|
 | **Lost time** | Weeks 1–3 went to the original proposal. The revised plan has 11 weeks. The pilot starts immediately and in parallel with document revision; mitigation is the first item cut if the schedule slips. |
 | **Learning cost** | Serving/quantization ramp-up **2–3 weeks**; scoring and statistics infrastructure **1–2 weeks**, overlapping across the three students. Not measured completion guarantees. |
-| **24 GB memory limit** | Test the entire six-view workload, including activations, context, generated tokens, and runtime allocations, in the week 4–5 pilot. Freeze a workable image-token budget before the main evaluation. A 3B result must be labeled as such, with both precisions matched. |
-| **Margin measurement** | vLLM must return log-probabilities over the option letters at the answer position. Verify in the pilot with the Qwen chat template. Fallback: constrain the MCQ answer format to a single option token and read the first-token distribution. If neither works, margin is reported as unassessed and the primary hypothesis is tested on task/format/view count. |
+| **24 GB memory limit** | *Resolved October 15, 2026:* the 7B BF16 six-view workload serves in vLLM 0.31.0 on the 24 GB card. Remaining item: choose the image-token budget (about 165 versus about 512 tokens per view) on development scenes before the freeze. |
+| **Margin measurement** | *Resolved October 15, 2026:* with the MCQ suffix "Begin your answer with the option letter.", the first generated token is the letter and all four options appear in the top-5 log-probabilities. The suffix is a deviation from the released prompt and is stated in the report. |
+| **Scorer normalization** | The released MCQ normalizer misreads explanations (article "a" as option A). Strict letter-first rule is primary; released rule recorded; both reported. Published DriveBench MCQ numbers are not directly comparable to ours for explaining models. |
+| **Rented, power-limited hardware** | The 4090 host is rented and capped at 300 W. All profiling runs on one pinned host with the cap stated; if the host is lost, the profile is re-run on the replacement and both are reported. Results are synced off the host after every session; nothing on it is backed up. |
 | **Runtime versus simulated quantization** | Record which tensors actually execute at INT4 (decoder only; vision encoder BF16). Fake-quantized results do not satisfy the deployment requirement. |
 | **Flips versus nondeterminism** | Greedy decoding, fixed seeds, and a three-repeat slice per precision quantify runtime instability; flips smaller than that noise floor are not attributed to quantization. |
 | **One shared GPU** | Reserve GPU windows; run scoring, statistics, and explorer work on CPU. Project the full matrix (8 quality runs plus profiling) from pilot throughput. |
@@ -107,7 +112,7 @@ Keep all quality tolerances, performance targets, and statistical decision rules
 
 ## Decision gates (revised)
 
-1. **End of week 5, baseline gate:** BF16 7B serves the six-view workload in 24 GB with the frozen image budget; official AWQ INT4 serves; 20-question smoke test produces valid answers and scorer output; `logprobs` available for MCQ options; scene splits published. Otherwise switch to 3B or the margin fallback immediately.
+1. **End of week 5, baseline gate:** BF16 7B serves the six-view workload in 24 GB with the frozen image budget; official AWQ INT4 serves; 20-question smoke test produces valid answers and scorer output; `logprobs` available for MCQ options; scene splits published. Otherwise switch to 3B or the margin fallback immediately. *Passed October 15, 2026 (`manifests/gate_week5.md`); 7B kept.*
 2. **End of week 7, executable quantization gate:** own INT4 checkpoint from the base model runs in vLLM and reproduces the pilot; prompt, decoding, flip definitions, margin bins, eligibility, and coverage minimums frozen. Otherwise fall back to the official AWQ checkpoint and drop mitigation.
 3. **Before the main sweep, experiment gate:** confirmatory comparisons stated; calibration/development/test separation verified; judge cost recorded or VQA marked unassessed.
 4. **Before final reporting, evidence gate:** distinguish experiments completed from planned extensions; report uncertainty, failed budgets, and unexecuted mitigation explicitly; refresh the overlap search.
@@ -128,7 +133,9 @@ Keep all quality tolerances, performance targets, and statistical decision rules
 Observed defaults and interfaces, not claims that a published result is erroneous.
 
 - DriveBench preprocessing selects camera views referenced by the question via `<c1,CAM_BACK,x,y>` tags. Preserve that mapping, record the actual view count per question, and use it as the view-count factor. The released NoImage adapter supplies 224×224 black images while retaining `<image>` placeholders; removing image tokens is a different intervention. [Preprocessor](https://github.com/worldbench/DriveBench/blob/main/tools/preprocess.py), [released adapter](https://github.com/worldbench/DriveBench/blob/main/inference/llava1.5.py)
+- DriveBench's released MCQ normalizer (`evaluate/utils.py`, `preprocess_answer`) searches the lower-cased answer for `\b(a|option a)\b`, then B, C, D in order. The pattern for A matches the English article, so any explanation containing " a " before the real letter is scored as option A, and the A pattern is tried first. On the eight pilot MCQs this changed the released-rule tally from 4/8 to 2/8 for BF16 and to 1/8 for INT4 and produced one phantom harmful flip; the strict rule gave 4/8 for both precisions and no flips. The project reports the strict rule as primary and the released rule as secondary. Published DriveBench MCQ accuracies for models that explain their answers are affected by this and should not be compared with ours without that caveat.
 - DriveBench's released evaluator routes five cells (perception MCQ and VQA, prediction VQA, planning VQA, behavior MCQ), silently drops prediction MCQ (`pass`), raises on unknown tags, and runs GPT scoring only with `--eval-gpt`; the clean prediction-VQA cell has only 61 questions. Publish included/skipped question IDs and the tag-to-score mapping. Unsupported or empty cells are unassessed or N/A, never converted into scores. [Evaluator](https://github.com/worldbench/DriveBench/blob/main/evaluate/eval.py), [paper supplement](https://openaccess.thecvf.com/content/ICCV2025/supplemental/Xie_Are_VLMs_Ready_ICCV_2025_supplemental.pdf)
 - The official `Qwen2.5-VL-7B-Instruct-AWQ` checkpoint quantizes the language decoder and leaves the vision encoder at BF16. Any own-quantized checkpoint must record its `modules_to_not_convert` (or equivalent ignore list) so that the baseline INT4 and the mitigation differ only in the retained decoder layers. [Model card](https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct-AWQ)
-- vLLM's start-up profiling assumes 1,280 image tokens per image unless `max_pixels` and `--limit-mm-per-prompt` are set; the pilot must record the actual image-token count per view under the frozen budget.
+- vLLM's start-up profiling assumes 1,280 image tokens per image unless `max_pixels` and `--limit-mm-per-prompt` are set. *Pilot: at `max_pixels = 200704` the processor produced about 165 image tokens per 1600×900 view, not the 252 estimated from the pixel count.*
+- The released DriveBench image archive (`DriveBench.zip`, 7.2 GB) contains the 15 corruption types only; clean images are nuScenes keyframes, available without registration from Motional's AWS Open Data mirror as keyframe-only tarballs under CC BY-NC-SA 4.0.
 - The FlashOcc-specific checks from the September 8 audit (M0 config/checkpoint pairing, `dataset_type='val'` calibration default, TensorRT 8.4 plugin compatibility) no longer apply and are retained only in git history.
