@@ -31,12 +31,14 @@ python scripts/download_drivebench.py --json-only 2>&1 | tail -1
 (hf download Qwen/Qwen2.5-VL-7B-Instruct > "$WORK/dl-bf16.log" 2>&1 \
   || huggingface-cli download Qwen/Qwen2.5-VL-7B-Instruct > "$WORK/dl-bf16.log" 2>&1) &
 (python scripts/download_drivebench.py > "$WORK/dl-images.log" 2>&1) &
+(python scripts/download_clean_images.py > "$WORK/dl-clean.log" 2>&1) &
 
 cat <<EOF
 
 setup done. downloads running in background:
   tail -f $WORK/dl-bf16.log      # ~17 GB weights
   tail -f $WORK/dl-images.log    # DriveBench.zip + extract + verify
+  tail -f $WORK/dl-clean.log     # clean nuScenes keyframes streamed from the public AWS mirror (~10 min)
 
 every new shell:
   cd $WORK/qflip && source .venv/bin/activate && export HF_HOME=$WORK/hf

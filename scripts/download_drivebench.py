@@ -61,7 +61,8 @@ def extract_and_arrange(data: Path, zip_path: Path) -> None:
     """DriveBench.zip (7.2 GB, verified October 2026) contains ONLY the 15
     corruption types as DriveBench/<Type>/CAM_*/<nuScenes file name>.jpg.
     Clean images are not included; they are nuScenes keyframes and must be
-    obtained from nuscenes.org (registration) into data/nuscenes/samples/."""
+    fetched with scripts/download_clean_images.py (public AWS mirror) into
+    data/nuscenes/samples/."""
     if (data / "corruption").is_dir():
         print("[extract] data/corruption exists, skipping")
         return
@@ -87,8 +88,8 @@ def extract_and_arrange(data: Path, zip_path: Path) -> None:
     shutil.rmtree(tmp, ignore_errors=True)
     print("[extract] done; DriveBench.zip kept (delete it to reclaim 7.2 GB)")
     if not (data / "nuscenes" / "samples").is_dir():
-        print("[extract] NOTE: clean images are not in the zip. Put nuScenes keyframes at data/nuscenes/samples/"
-              " (symlink to a nuScenes checkout, or download from nuscenes.org) before running the clean condition.")
+        print("[extract] NOTE: clean images are not in the zip. Run scripts/download_clean_images.py"
+              " (or symlink a nuScenes checkout at data/nuscenes) before running the clean condition.")
 
 
 def verify(data: Path) -> None:
@@ -102,6 +103,7 @@ def verify(data: Path) -> None:
     print(f"[verify] cells: {dict(sorted(Counter((r['question_type'], tuple(r['tag'])) for r in records).items()))}")
     if missing:
         print(f"[verify] MISSING {len(missing)} clean images, e.g. {missing[:3]}")
+        print("[verify] fetch them with: python scripts/download_clean_images.py")
     else:
         print("[verify] all clean images present")
     corr = data / "corruption"

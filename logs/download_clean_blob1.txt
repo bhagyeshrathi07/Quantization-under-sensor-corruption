@@ -1,0 +1,4 @@
+1200 clean images referenced, 0 present, 1200 missing
+streaming https://d36yt3mvayqw5m.cloudfront.net/public/v1.0/v1.0-trainval01_keyframes.tgz (1200 still missing)
+  -> 108 present, 1092 missing
+still missing 1092, e.g. ['samples/CAM_BACK/n008-2018-05-21-11-06-59-0400__CAM_BACK__1526915264937570.jpg', 'samples/CAM_BACK/n008-2018-05-21-11-06-59-0400__CAM_BACK__1526915328037570.jpg', 'samples/CAM_BACK/n008-2018-05-21-11-06-59-0400__CAM_BACK__1526915624387570.jpg']
