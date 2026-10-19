@@ -43,3 +43,17 @@ class PeakMemorySampler:
     def __exit__(self, *exc):
         self._stop.set()
         self._thread.join()
+
+
+def query_gpu_info(gpu_index: int = 0) -> dict:
+    """Name, driver, power limit (W), total memory (MiB); values None if unavailable."""
+    try:
+        out = subprocess.check_output(
+            ["nvidia-smi", f"--id={gpu_index}", "--query-gpu=name,driver_version,power.limit,memory.total",
+             "--format=csv,noheader,nounits"],
+            text=True,
+        ).strip().splitlines()[0]
+        name, driver, power, mem = [x.strip() for x in out.split(",")]
+        return {"name": name, "driver": driver, "power_limit_w": float(power), "memory_total_mib": int(mem)}
+    except (subprocess.CalledProcessError, FileNotFoundError, ValueError, IndexError):
+        return {"name": None, "driver": None, "power_limit_w": None, "memory_total_mib": None}

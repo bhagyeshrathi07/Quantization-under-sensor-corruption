@@ -9,6 +9,7 @@ Writes two files per (precision, condition):
     python scripts/03_smoke_drivebench.py --precision int4
     python scripts/03_smoke_drivebench.py --precision bf16 --condition LowLight
     python scripts/03_smoke_drivebench.py --precision bf16 --n 0   # all questions
+    python scripts/03_smoke_drivebench.py --precision bf16 --n 0 --split final   # full run on final scenes only
 
 Question selection is deterministic (seeded), stratified so every eligible cell
 appears, and identical across precisions and conditions.
@@ -16,40 +17,20 @@ appears, and identical across precisions and conditions.
 
 import argparse
 import json
-import random
 import sys
-from collections import defaultdict
 from pathlib import Path
 
 from tqdm import tqdm
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from qflip.client import chat, make_client, option_margin  # noqa: E402
+from qflip.client import make_client  # noqa: E402
 from qflip.config import load_config  # noqa: E402
-from qflip.drivebench import build_messages, load_questions, normalize_mcq, normalize_mcq_strict  # noqa: E402
+from qflip.drivebench import load_questions  # noqa: E402
 from qflip.gpu import PeakMemorySampler  # noqa: E402
 from qflip.records import append_record, load_done_ids, read_records  # noqa: E402
-
-
-def select_pilot_questions(questions, n, seed=0):
-    eligible = [q for q in questions if q.cell is not None]
-    if n <= 0:
-        return eligible
-    by_cell = defaultdict(list)
-    for q in eligible:
-        by_cell[q.cell].append(q)
-    rng = random.Random(seed)
-    cells = sorted(by_cell)
-    for c in cells:
-        rng.shuffle(by_cell[c])
-    picked, i = [], 0
-    while len(picked) < n and any(by_cell.values()):
-        c = cells[i % len(cells)]
-        if by_cell[c]:
-            picked.append(by_cell[c].pop())
-        i += 1
-    return picked
+from qflip.runner import read_system_prompt, run_question, select_stratified  # noqa: E402
+from qflip.split import filter_split  # noqa: E402
 
 
 def main():
@@ -58,6 +39,8 @@ def main():
     ap.add_argument("--condition", default="clean")
     ap.add_argument("--config", default="config/pilot.yaml")
     ap.add_argument("--n", type=int, default=None, help="questions to run; 0 = all; default from config")
+    ap.add_argument("--split", default="all", help="scene split to draw from: all, calibration, development, final")
+    ap.add_argument("--split-file", default="manifests/scene_split.json")
     args = ap.parse_args()
 
     cfg = load_config(args.config)
@@ -67,8 +50,8 @@ def main():
     client = make_client(cfg)
     n = cfg["pilot"]["n_questions"] if args.n is None else args.n
 
-    questions = select_pilot_questions(load_questions(cfg["data"]["annotations"]), n)
-    system_prompt = Path(cfg["prompt"]["system_file"]).read_text()
+    questions = select_stratified(filter_split(load_questions(cfg["data"]["annotations"]), args.split, args.split_file), n)
+    system_prompt = read_system_prompt(cfg)
     out_dir = Path(cfg["pilot"]["results_dir"])
     jsonl = out_dir / f"{args.precision}_{args.condition}.jsonl"
     done = load_done_ids(jsonl)
@@ -77,53 +60,7 @@ def main():
 
     with PeakMemorySampler() as mem:
         for q in tqdm(todo):
-            messages = build_messages(
-                q,
-                system_prompt,
-                args.condition,
-                cfg["data"]["conditions"][args.condition],
-                cfg["data"]["root"],
-                cfg["images"]["resize_to"],
-                tuple(cfg["images"]["noimage_size"]),
-                cfg["prompt"]["mcq_suffix"],
-            )
-            c = chat(client, model, messages, cfg["generation"])
-            rec = {
-                "question_id": q.question_id,
-                "scene_token": q.scene_token,
-                "frame_token": q.frame_token,
-                "question_type": q.question_type,
-                "tag": q.tag,
-                "cell": q.cell,
-                "views": q.views,
-                "n_views": q.n_views,
-                "condition": args.condition,
-                "precision": args.precision,
-                "model": model,
-                "gt": q.answer,
-                "pred": c.text,
-                "error": c.error,
-                "prompt_tokens": c.prompt_tokens,
-                "completion_tokens": c.completion_tokens,
-                "latency_s": round(c.latency_s, 4),
-                "first_token_top_logprobs": c.first_token_top_logprobs,
-            }
-            if q.is_mcq:
-                letter, margin, probs = option_margin(c.first_token_top_logprobs)
-                rec.update(
-                    {
-                        "mcq_pred": normalize_mcq(c.text),
-                        "mcq_pred_strict": normalize_mcq_strict(c.text),
-                        "mcq_gt": normalize_mcq(q.answer),
-                        # strict = option letter at the start of the answer (primary);
-                        # released = DriveBench evaluate/utils.py rule, which also matches the article "a"
-                        "mcq_correct": normalize_mcq_strict(c.text) == normalize_mcq(q.answer) and normalize_mcq_strict(c.text) != "",
-                        "mcq_correct_released": normalize_mcq(c.text) == normalize_mcq(q.answer) and normalize_mcq(c.text) != "",
-                        "margin_letter": letter,
-                        "margin": margin,
-                        "option_probs": probs,
-                    }
-                )
+            rec = run_question(client, model, q, cfg, args.condition, args.precision, system_prompt)
             append_record(jsonl, rec)
 
     # upstream-format file for evaluate/eval.py

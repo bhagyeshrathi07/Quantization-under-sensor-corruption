@@ -14,10 +14,12 @@ PORT="${PORT:-8000}"
 MAX_PIXELS="${MAX_PIXELS:-200704}"
 MAX_MODEL_LEN="${MAX_MODEL_LEN:-4096}"
 GPU_UTIL="${GPU_UTIL:-0.90}"
-# Equal KV-cache byte capacity across precisions (proposal 5.2). Requires a
-# vLLM version that supports --kv-cache-memory-bytes; leave empty to skip and
-# use --gpu-memory-utilization for the pilot only.
-KV_BYTES="${KV_BYTES:-}"
+# Equal KV-cache byte capacity across precisions (proposal 5.2), so peak memory
+# reflects weights plus a fixed cache rather than a fraction of the card.
+# 2 GiB is ~9x what one 4096-token sequence needs for this model (~57 KB per
+# token) and fits beside BF16 weights on 24 GB. Set KV_BYTES= (empty) to fall
+# back to --gpu-memory-utilization, which was the pilot behavior.
+KV_BYTES="${KV_BYTES-$((2 * 1024 * 1024 * 1024))}"
 
 case "$PRECISION" in
   bf16)
@@ -49,6 +51,8 @@ mkdir -p manifests
   echo "max_pixels: $MAX_PIXELS"
   echo "max_model_len: $MAX_MODEL_LEN"
   echo "kv_args: ${KV_ARGS[*]}"
+  echo "power_limit_w: $(nvidia-smi --query-gpu=power.limit --format=csv,noheader,nounits 2>/dev/null | head -1 || echo unknown)"
+  echo "gpu: $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | head -1 || echo unknown)"
   echo "vllm: $(python -c 'import vllm; print(vllm.__version__)' 2>/dev/null || echo unknown)"
   echo "transformers: $(python -c 'import transformers; print(transformers.__version__)' 2>/dev/null || echo unknown)"
 } | tee "manifests/serve_${PRECISION}.txt"
