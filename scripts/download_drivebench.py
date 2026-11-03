@@ -1,6 +1,7 @@
 """Download DriveBench into data/ in the layout upstream docs/DATA_PREPAER.md expects.
 
-  1. Annotation JSONs from HF dataset drive-bench/arena (~32 MB) -> data/*.json
+  1. Annotation JSONs from HF dataset drive-bench/arena (~32 MB) -> data/*.json,
+     plus data/visual_description.json from the toolkit repo (judge prompts)
   2. Image archive DriveBench.zip from Google Drive (7.2 GB): the 15 corruption
      types only, no clean images -> data/DriveBench.zip
   3. Extract and arrange as data/corruption/<Type>/CAM_*/
@@ -31,12 +32,18 @@ ANNOTATION = "drivebench-test.json"
 def download_json(data: Path) -> None:
     if (data / ANNOTATION).exists():
         print(f"[json] {data / ANNOTATION} exists, skipping")
-        return
-    from huggingface_hub import snapshot_download
+    else:
+        from huggingface_hub import snapshot_download
 
-    print(f"[json] downloading {HF_REPO} -> {data}")
-    snapshot_download(repo_id=HF_REPO, repo_type="dataset", local_dir=data, allow_patterns=["*.json"])
-    print(f"[json] files: {sorted(p.name for p in data.glob('*.json'))}")
+        print(f"[json] downloading {HF_REPO} -> {data}")
+        snapshot_download(repo_id=HF_REPO, repo_type="dataset", local_dir=data, allow_patterns=["*.json"])
+        print(f"[json] files: {sorted(p.name for p in data.glob('*.json'))}")
+    # Object visual descriptions used by the VQA judge prompts live in the
+    # toolkit repo, not the HF dataset.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+    from qflip.judge import ensure_visual_description
+
+    ensure_visual_description(data / "visual_description.json")
 
 
 def download_zip(data: Path) -> Path:

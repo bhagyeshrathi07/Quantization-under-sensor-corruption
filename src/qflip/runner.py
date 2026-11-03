@@ -54,6 +54,7 @@ def run_question(client, model: str, q: Question, cfg: dict, condition: str, pre
         "question_type": q.question_type,
         "tag": q.tag,
         "cell": q.cell,
+        "question": q.question,
         "views": q.views,
         "n_views": q.n_views,
         "condition": condition,

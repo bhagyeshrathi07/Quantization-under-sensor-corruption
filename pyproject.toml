@@ -13,6 +13,8 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=8"]
 data = ["huggingface_hub>=0.25", "gdown>=5"]
+# scripts/quantize_awq.py; install on the GPU host only. Pin at the freeze.
+quant = ["llmcompressor>=0.14", "datasets>=3", "accelerate>=1"]
 
 [build-system]
 requires = ["setuptools>=68"]

@@ -1,6 +1,6 @@
 # Experiment protocol (draft for the week-7 freeze)
 
-**Status: DRAFT, October 19, 2026.** Each item is marked **FROZEN** (decided and tested), **PILOT DEFAULT** (in use, expected to stand, confirm at freeze), or **TO DECIDE** (needs a development-scene pilot or a team decision). When the freeze happens, every TO DECIDE item is resolved, the date is written here, and a copy of `config/pilot.yaml` is saved as `manifests/config_frozen.yaml`. After that, changes to anything in this file require a dated entry in the change log at the bottom. Analysis of final-scene results does not begin before the freeze.
+**Status: DRAFT, October 20, 2026.** Each item is marked **FROZEN** (decided and tested), **PILOT DEFAULT** (in use, expected to stand, confirm at freeze), or **TO DECIDE** (needs a development-scene pilot or a team decision). When the freeze happens, every TO DECIDE item is resolved, the date is written here, and a copy of `config/pilot.yaml` is saved as `manifests/config_frozen.yaml`. After that, changes to anything in this file require a dated entry in the change log at the bottom. Analysis of final-scene results does not begin before the freeze.
 
 The proposal ([C_PROJECT_PROPOSAL.md](C_PROJECT_PROPOSAL.md)) states what we intend; this file states exactly how it is executed, so that a reader can rerun the study from the repository.
 
@@ -11,7 +11,7 @@ The proposal ([C_PROJECT_PROPOSAL.md](C_PROJECT_PROPOSAL.md)) states what we int
 | Model | Qwen2.5-VL-7B-Instruct (not the 3B fallback; week-5 gate passed) | FROZEN |
 | BF16 reference | `Qwen/Qwen2.5-VL-7B-Instruct`, revision `cc594898137f460bfe9f0759e9844b3ce807cfb5` | FROZEN |
 | INT4 for the pilot | `Qwen/Qwen2.5-VL-7B-Instruct-AWQ` (official; decoder INT4, vision encoder BF16) | FROZEN (pilot only) |
-| INT4 for the final comparison | Own AWQ W4A16 checkpoint from the base revision above, built with llm-compressor, calibration prompts from the calibration scenes only; `ignore` list recorded (vision encoder, embeddings, lm_head) | TO DECIDE: tool version, group size (128 expected), calibration prompt count |
+| INT4 for the final comparison | Own checkpoint from `scripts/quantize_awq.py`: llm-compressor `AWQModifier` + `QuantizationModifier`, scheme `W4A16_ASYM` (4-bit weights with zero point, group size 128, the official checkpoint's convention), targets `Linear`, ignore `lm_head`, embeddings, vision tower (`config/pilot.yaml` `quantize:`). Calibration: every eligible calibration-split question (107 from 17 scenes), rendered exactly as the runs render them (same system prompt, views, `max_pixels` 200704, clean condition), `max_seq_len` 4096. Saved as compressed-tensors; served with `INT4_MODEL=<dir>`; `manifests/quantize_<name>.json` records recipe, tool versions, and calibration question ids | PILOT DEFAULT (script written and dry-run tested October 20; first real build next GPU session). TO DECIDE: llm-compressor version pin |
 | Fallback | If the own checkpoint does not run in vLLM by end of week 7, the official AWQ checkpoint becomes the final INT4 and the mitigation is reported as not executed | FROZEN rule |
 
 ## 2. Serving
@@ -20,7 +20,7 @@ All runs use `scripts/01_serve.sh`, one precision at a time, one server per GPU.
 
 | Flag | Value | Status |
 |---|---|---|
-| vLLM / torch / transformers | 0.31.0 / 2.13.0+cu130 / 5.17.0 (pilot versions; pin in `pyproject.toml` at freeze) | PILOT DEFAULT |
+| vLLM / torch / transformers | 0.31.0 / 2.13.0+cu130 / 5.17.0 (pilot versions). At the freeze: `uv pip freeze > manifests/requirements_frozen.txt` on the host, and pin the same versions in `pyproject.toml` | PILOT DEFAULT |
 | `--max-model-len` | 4096 | PILOT DEFAULT |
 | `--limit-mm-per-prompt` | `{"image": 6}` | FROZEN |
 | `--mm-processor-kwargs max_pixels` | 200704 (measured ~165 image tokens per 1600×900 view, ~1293 prompt tokens for six views) | TO DECIDE: keep, or raise to 401408 (~512 tokens per view) after a development-scene pilot on both precisions |
@@ -60,11 +60,11 @@ All runs use `scripts/01_serve.sh`, one precision at a time, one server per GPU.
 | Eligible cells | perception/MCQ, perception/VQA, prediction/VQA, planning/VQA, behavior/MCQ (released scorer routing). Prediction MCQ is dropped by the released scorer and is not run | FROZEN |
 | Scene split | `manifests/scene_split.json`, seed 0: calibration 10% (17 scenes), development 15% (26 scenes), final 75% (131 scenes, 1116 questions, of which prediction/VQA 45) | FROZEN |
 | Use of splits | Calibration scenes: quantization calibration only. Development scenes: every prompt, image, decoding, bin, and mitigation choice; stability slice; profile slice. Final scenes: the 8-run matrix, touched once | FROZEN rule |
-| Coverage minimum | A cell with fewer than N final-scene questions or fewer than M scenes is reported as unassessed | TO DECIDE: N and M (prediction/VQA at 45 questions is the cell at risk) |
+| Coverage minimum | A group with fewer than N questions or fewer than M scenes is reported as unassessed (`05_compare_flips.py` prints UNASSESSED and writes `assessed: false`; defaults `analysis.min_questions` 30 and `analysis.min_scenes` 10 in config, overridable with `--min-n` / `--min-scenes`) | TO DECIDE: N and M (prediction/VQA at 45 final questions is the cell at risk) |
 
 ## 6. Conditions and matrix
 
-Clean, NoImage, LowLight, Fog × BF16, INT4 = 8 quality runs on final scenes with `scripts/03_smoke_drivebench.py --n 0 --split final`. Mitigation, if executed, adds one precision configuration × the same conditions. **FROZEN** (conditions pending team item 1; default stands if no objection by the freeze).
+Clean, NoImage, LowLight, Fog × BF16, INT4 = 8 quality runs on final scenes, driven by `scripts/run_matrix.sh` (per precision: start the server, wait for `/health`, run each condition with `03_smoke_drivebench.py --n 0 --split final --out-dir results/final`, stop the server; resumable; the serve manifest is copied next to the results). Mitigation, if executed, adds one precision configuration × the same conditions. **FROZEN** (conditions pending team item 1; default stands if no objection by the freeze).
 
 ## 7. Scoring
 
@@ -72,7 +72,7 @@ Clean, NoImage, LowLight, Fog × BF16, INT4 = 8 quality runs on final scenes wit
 |---|---|---|
 | MCQ, primary | **Strict rule:** the normalized answer is the option letter at the start of the response (`normalize_mcq_strict`); correct if it equals the ground-truth letter. Stored as `mcq_correct` | FROZEN |
 | MCQ, secondary | **Released rule:** upstream `evaluate/utils.py` regex, which also matches the article "a" as option A. Stored as `mcq_correct_released` and reported alongside for comparability with published DriveBench numbers, with the defect stated | FROZEN |
-| VQA | Rubric score via a fixed judge model, version, and prompt, from the released evaluator with `--eval-gpt`; correctness threshold frozen on development scenes. Only if judge budget is approved; otherwise VQA cells are unassessed and a 100-pair human-scored sample is reported | TO DECIDE (team item 2) |
+| VQA | Rubric score 0–100 from `scripts/08_judge_vqa.py`: the released judge templates verbatim (`src/qflip/judge_prompts.py`, per-cell routing as upstream `evaluate/eval.py`), the released system line, temperature 0, `max_tokens` 512, object visual description from the toolkit's `data/visual_description.json` (planning template). The released `--eval-gpt` path is not runnable as shipped (its `request.py` passes `max_tokens` to a method that does not accept it and retries forever), so the request is made here with the openai client; model name and template hash are written into every record. Judge model: `judge.model` in config (released code hard-codes gpt-3.5-turbo). Correct = score ≥ `judge.correct_threshold`, frozen on development scenes. VQA flip classes: harmful, beneficial, unchanged (no neutral_change; wording always differs). Only if judge budget is approved; otherwise VQA cells are unassessed and a 100-pair human-scored sample is reported | TO DECIDE (team item 2): judge model, threshold, budget |
 | Errors | Requests that error are retried on rerun; a question still errored after the run is counted in the failed total and excluded from denominators with the count published | FROZEN |
 
 ## 8. Flip classification and factors
@@ -120,7 +120,7 @@ Per-layer sensitivity on development scenes: re-quantize with one decoder block 
 One JSON object per line in `results/<run>/<precision>_<condition>.jsonl`, written by `qflip.runner.run_question`:
 
 ```
-question_id, scene_token, frame_token, question_type, tag, cell, views, n_views,
+question_id, scene_token, frame_token, question_type, tag, cell, question, views, n_views,
 condition, precision, model, gt, pred, error, prompt_tokens, completion_tokens,
 latency_s, first_token_top_logprobs,
 # MCQ only:
@@ -128,12 +128,15 @@ mcq_pred (released rule), mcq_pred_strict, mcq_gt, mcq_correct (strict),
 mcq_correct_released, margin_letter, margin, option_probs
 ```
 
-`question_id` = first 8 characters of scene token, first 8 of frame token, 10-character SHA-1 of the question text. Reruns append; the last record per `question_id` wins; errored records are retried. A `.drivebench.json` companion file carries the upstream fields plus `pred` for the released evaluator.
+`question_id` = first 8 characters of scene token, first 8 of frame token, 10-character SHA-1 of the question text. Reruns append; the last record per `question_id` wins; errored records are retried. A `.drivebench.json` companion file carries the upstream fields plus `pred` for the released evaluator. (`question` was added October 20; pilot records lack it and the judge falls back to the annotation file.)
+
+Judge sidecar, one per result file (`<precision>_<condition>.judge.jsonl`): `question_id, scene_token, cell, condition, precision, judge_model, judge_template, judge_template_sha, desc, reply, score, prompt_tokens, completion_tokens, latency_s, error`. Same append-and-last-wins rule.
 
 ## 14. Provenance per run
 
-`manifests/serve_<precision>.txt` (model, flags, versions, power limit, GPU name) and `manifests/machine.txt` (host facts) are written by the serve and check scripts. Pilot results under `results/pilot/` are tracked in git; full-run results are not (synced from the host after each session) and the raw files for the final report are archived with the submission.
+`manifests/serve_<precision>.txt` (model path, flags including quantization method, versions, power limit, GPU name) and `manifests/machine.txt` (host facts) are written by the serve and check scripts; `manifests/quantize_<name>.json` by the quantization script; `logs/matrix_<timestamp>.txt` by the matrix driver. Pilot results under `results/pilot/` are tracked in git; full-run results are not (synced from the host after each session) and the raw files for the final report are archived with the submission.
 
 ## Change log
 
 - 2026-10-19: first draft, after the week-5 pilot. Nothing frozen beyond what the pilot tested.
+- 2026-10-20: own-checkpoint recipe made concrete (section 1), matrix driver (6), VQA judge path and VQA flip classes (7), coverage rule mechanics (5), `question` field and judge sidecar schema (13). Nothing frozen.

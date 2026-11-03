@@ -45,3 +45,41 @@ generation:
 pilot:
   n_questions: 20
   results_dir: "results/pilot"
+
+# VQA rubric judge (scripts/08_judge_vqa.py). The released evaluator hard-codes
+# gpt-3.5-turbo; the model here is TO DECIDE with the judge budget (team item 2)
+# and is recorded in every judge record. Key: OPENAI_API_KEY in the environment.
+judge:
+  model: "gpt-3.5-turbo"       # released evaluator's model; change only with a dated PROTOCOL entry
+  base_url: null               # null = api.openai.com; set for another OpenAI-compatible judge
+  temperature: 0.0
+  max_tokens: 512              # what the released request.py intended (its 3000 default is unreachable)
+  seed: 0
+  timeout_s: 120
+  # Rubric score (0-100) at or above which a VQA answer counts as correct for
+  # flip classification. TO DECIDE on development scenes; null = VQA unassessed.
+  correct_threshold: null
+
+# Own INT4 checkpoint (scripts/quantize_awq.py). Group size and scheme are the
+# official checkpoint's; calibration uses calibration-split questions only.
+quantize:
+  base_model: "Qwen/Qwen2.5-VL-7B-Instruct"
+  revision: "cc594898137f460bfe9f0759e9844b3ce807cfb5"
+  scheme: "W4A16_ASYM"         # 4-bit weights, zero point, 16-bit activations (AutoAWQ convention)
+  group_size: 128
+  max_seq_len: 4096            # equals --max-model-len in 01_serve.sh
+  max_pixels: 200704           # equals MAX_PIXELS in 01_serve.sh so calibration sees the served token budget
+  n_samples: 0                 # 0 = every eligible calibration-split question (107)
+  condition: "clean"
+  ignore:                      # never quantized; `re:` = regex over module names
+    - "lm_head"
+    - "re:.*embed_tokens"
+    - "re:visual.*"
+    - "re:model.visual.*"
+  out_dir: "checkpoints/qwen2.5-vl-7b-awq-w4a16-g128"
+
+# Coverage minimum for reporting a cell (PROTOCOL section 5). TO DECIDE at the
+# freeze; groups below either number are reported as unassessed.
+analysis:
+  min_questions: 30
+  min_scenes: 10

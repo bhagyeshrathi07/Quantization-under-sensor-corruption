@@ -35,6 +35,8 @@ class Pair:
     ref_correct: bool
     quant_correct: bool
     flip: str
+    ref_score: float | None = None    # VQA only: judge rubric score
+    quant_score: float | None = None
 
 
 def pair_records(ref_records: list[dict], quant_records: list[dict]) -> list[Pair]:
@@ -55,6 +57,46 @@ def pair_records(ref_records: list[dict], quant_records: list[dict]) -> list[Pai
                 ref_correct=bool(a["mcq_correct"]),
                 quant_correct=bool(b["mcq_correct"]),
                 flip=classify(a, b),
+            )
+        )
+    return pairs
+
+
+def pair_vqa_records(
+    ref_records: list[dict],
+    quant_records: list[dict],
+    ref_scores: dict[str, dict],
+    quant_scores: dict[str, dict],
+    threshold: float,
+) -> list[Pair]:
+    """VQA pairing from judge sidecars (qflip.judge.load_scores). Correct =
+    rubric score >= threshold. Only harmful / beneficial / unchanged apply:
+    free-text answers almost always differ in wording, so "neutral_change" is
+    not defined and change_rate for VQA means a correctness change. Questions
+    without a score on either side are dropped; margin is not available."""
+    ref = {r["question_id"]: r for r in ref_records if (r.get("cell") or "").endswith("VQA") and not r.get("error")}
+    qnt = {r["question_id"]: r for r in quant_records if (r.get("cell") or "").endswith("VQA") and not r.get("error")}
+    pairs = []
+    for qid in sorted(set(ref) & set(qnt)):
+        rs, qs = ref_scores.get(qid, {}).get("score"), quant_scores.get(qid, {}).get("score")
+        if rs is None or qs is None:
+            continue
+        a = ref[qid]
+        rc, qc = rs >= threshold, qs >= threshold
+        flip = "harmful" if rc and not qc else "beneficial" if qc and not rc else "unchanged"
+        pairs.append(
+            Pair(
+                question_id=qid,
+                scene_token=a["scene_token"],
+                cell=a["cell"],
+                n_views=a["n_views"],
+                condition=a.get("condition", "?"),
+                margin=None,
+                ref_correct=rc,
+                quant_correct=qc,
+                flip=flip,
+                ref_score=rs,
+                quant_score=qs,
             )
         )
     return pairs
@@ -92,9 +134,21 @@ def summarize(pairs: list[Pair]) -> dict:
         "unchanged": counts["unchanged"],
         # F_h: fraction of reference-correct answers the quantized model loses
         "harmful_rate": counts["harmful"] / ref_correct if ref_correct else None,
-        # any answer change, right or wrong
+        # any answer change, right or wrong (VQA pairs: any correctness change)
         "change_rate": (n - counts["unchanged"]) / n,
+        # VQA only: mean rubric score per side, None for MCQ pairs
+        "ref_score_mean": _mean([p.ref_score for p in pairs if p.ref_score is not None]),
+        "quant_score_mean": _mean([p.quant_score for p in pairs if p.quant_score is not None]),
     }
+
+
+def _mean(values: list[float]) -> float | None:
+    return sum(values) / len(values) if values else None
+
+
+def coverage(summary: dict, min_questions: int, min_scenes: int) -> bool:
+    """PROTOCOL section 5: a group is assessed only with enough questions and scenes."""
+    return summary.get("n", 0) >= min_questions and summary.get("scenes", 0) >= min_scenes
 
 
 def bootstrap_scenes(pairs: list[Pair], n_boot: int = 2000, seed: int = 0, alpha: float = 0.05) -> dict:

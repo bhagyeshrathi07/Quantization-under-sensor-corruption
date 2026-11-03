@@ -1,4 +1,4 @@
-# Team review: scope change and decisions (September 29 – October 1, 2026; addendum October 19)
+# Team review: scope change and decisions (September 29 – October 1, 2026; addenda October 19 and 20)
 
 For Bhagyesh and Akshay. This summarizes what happened after the professor reviewed our September 8 proposal, what was changed in the repo, what has been built so far, and what still needs your sign-off. Read the "Decisions that need your confirmation" section first if you are short on time.
 
@@ -138,7 +138,7 @@ Not yet done: the image archive download (size unknown, from Google Drive), vLLM
 - Annotation fields: `scene_token`, `frame_token`, `question_type`, `question`, `answer` (ground truth), `tag`, `image_path` (dict camera to path). Model output goes in a `pred` field; our scripts write that format so the upstream scorer runs on it.
 - The paper's "Dark" condition is the `LowLight` directory in the released code.
 - The released adapter resizes every image to 224×224 before inference (see the decision above).
-- The released scorer silently drops prediction MCQ, raises on unknown tags, and only calls GPT with `--eval-gpt`. It also needs `data/visual_description.json`, which is not in the HF dataset; we still need to locate it.
+- The released scorer silently drops prediction MCQ, raises on unknown tags, and only calls GPT with `--eval-gpt`. It also needs `data/visual_description.json`, which is not in the HF dataset. *Update October 20: that file is in the toolkit repository and is now fetched automatically; and the released GPT path does not run as shipped (see the October 20 addendum).*
 - Corruption images are found by replacing `nuscenes/samples` with `corruption/<Type>` in each path, so corrupted and clean images share file names.
 - The HF dataset also has per-condition JSONs (`fog.json`, `lowlight.json`, ...). The released run script does not use them; it uses one JSON plus path replacement. What those files are for is unverified.
 
@@ -147,7 +147,7 @@ Not yet done: the image archive download (size unknown, from Google Drive), vLLM
 Please reply yes/no or propose an alternative for each.
 
 1. Stress-test conditions: clean + LowLight + Fog + NoImage. (Alternative: add CameraCrash, or use only clean + NoImage.)
-2. MCQ accuracy primary; VQA secondary and conditional on judge budget. (Alternative: budget for GPT judging of all VQA cells from the start. Needs an API key and a cost estimate from the pilot.)
+2. MCQ accuracy primary; VQA secondary and conditional on judge budget. (Alternative: budget for GPT judging of all VQA cells from the start. Needs an API key and a cost estimate from the pilot.) *October 20: the judge script exists; the full matrix is about 5.5M judge prompt tokens. Decide the judge model (released code: gpt-3.5-turbo; Mathew and Gu: GPT-5-mini) and the correctness threshold.*
 3. Energy measurement is an extension, not required.
 4. Roles as listed in section 4.
 5. Image handling: originals with a token cap (our default) versus the released 224×224 resize. This changes comparability with Mathew and Gu and DriveBench's own numbers.
@@ -193,6 +193,14 @@ See `manifests/gate_week5.md`. Short version: 7B BF16 serves six views on 24 GB;
 - `--split final|development|calibration` on the run scripts, so the full run never touches calibration or development scenes.
 - `PROTOCOL.md`: the executable protocol, every item marked frozen, pilot default, or to decide. The week-7 freeze is a pass over that file.
 - 19 offline unit tests pass. The streaming path and the KV-cache flag have not yet been exercised against the real server (next GPU session).
+
+### Built October 20 (offline, dry-run tested, no GPU yet)
+
+- `scripts/quantize_awq.py`: our own INT4 checkpoint, AWQ W4A16 asymmetric, group size 128, same algorithm as the official checkpoint, calibrated on the 107 calibration-split questions rendered exactly as the runs render them. Writes a manifest with the recipe, tool versions, and the calibration question list. `--retain` keeps chosen decoder layers at BF16 for the week-12 mitigation.
+- `scripts/run_matrix.sh`: runs the 8-run matrix unattended (start server, wait, all conditions, stop, next precision), resumable.
+- `scripts/08_judge_vqa.py`: the VQA rubric judge. The released evaluator's GPT path cannot run as shipped: its `request.py` passes a keyword its own method does not accept, so every call fails and it retries forever. Our script uses the released prompt templates verbatim, the released system line, and the released visual-description lookup, with the model name and template hash written into every record and the key taken from the environment only. `05_compare_flips.py --vqa` then pairs VQA answers at a score threshold (harmful / beneficial / unchanged).
+- Coverage rule in `05_compare_flips.py`: groups below N questions or M scenes print as UNASSESSED (item 10 sets N and M).
+- `visual_description.json` located (toolkit repository, not the HF dataset); downloaded with the annotations.
 
 ### Open items, updated
 

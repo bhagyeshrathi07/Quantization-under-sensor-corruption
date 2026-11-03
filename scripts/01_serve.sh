@@ -4,6 +4,7 @@
 #
 #   bash scripts/01_serve.sh bf16
 #   bash scripts/01_serve.sh int4
+#   INT4_MODEL=checkpoints/qwen2.5-vl-7b-awq-w4a16-g128 bash scripts/01_serve.sh int4   # own checkpoint
 #
 # Flags follow C_PROJECT_PROPOSAL.md section 4.1. Adjust MAX_PIXELS after the
 # pilot (200704 ~ 252 tokens per 1600x900 view; 401408 ~ 512 tokens).
@@ -28,9 +29,22 @@ case "$PRECISION" in
     EXTRA=(--dtype bfloat16)
     ;;
   int4)
-    MODEL="Qwen/Qwen2.5-VL-7B-Instruct-AWQ"   # official checkpoint, pilot only
+    # Official checkpoint by default (pilot). INT4_MODEL=<dir> serves our own
+    # llm-compressor checkpoint (scripts/quantize_awq.py); its config.json
+    # carries quant_method compressed-tensors, which vLLM needs told explicitly
+    # because awq_marlin would reject it. Same served name, so config and
+    # results do not change; the manifest records which checkpoint ran.
+    MODEL="${INT4_MODEL:-Qwen/Qwen2.5-VL-7B-Instruct-AWQ}"
     SERVED="qwen2.5-vl-7b-awq"
-    EXTRA=(--dtype float16 --quantization awq_marlin)
+    INT4_QUANT="${INT4_QUANT:-}"
+    if [[ -z "$INT4_QUANT" ]]; then
+      if [[ -f "$MODEL/config.json" ]] && grep -q compressed-tensors "$MODEL/config.json"; then
+        INT4_QUANT=compressed-tensors
+      else
+        INT4_QUANT=awq_marlin
+      fi
+    fi
+    EXTRA=(--dtype float16 --quantization "$INT4_QUANT")
     ;;
   *) echo "unknown precision: $PRECISION" >&2; exit 1 ;;
 esac
@@ -51,6 +65,7 @@ mkdir -p manifests
   echo "max_pixels: $MAX_PIXELS"
   echo "max_model_len: $MAX_MODEL_LEN"
   echo "kv_args: ${KV_ARGS[*]}"
+  echo "extra_args: ${EXTRA[*]}"
   echo "power_limit_w: $(nvidia-smi --query-gpu=power.limit --format=csv,noheader,nounits 2>/dev/null | head -1 || echo unknown)"
   echo "gpu: $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | head -1 || echo unknown)"
   echo "vllm: $(python -c 'import vllm; print(vllm.__version__)' 2>/dev/null || echo unknown)"

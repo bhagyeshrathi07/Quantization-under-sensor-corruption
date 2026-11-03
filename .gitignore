@@ -223,3 +223,4 @@ results/*
 !results/.gitkeep
 !results/pilot/
 .venv/
+checkpoints/

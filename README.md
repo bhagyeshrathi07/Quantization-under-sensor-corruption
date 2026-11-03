@@ -4,7 +4,7 @@
 **Team:** Ronak, Bhagyesh, and Akshay  
 **Track:** System / Deployment (supported by experimental research)  
 **Duration:** 14 weeks  
-**Prepared:** September 8, 2026. **Revised:** September 29, 2026, after instructor feedback. **Status updated:** October 19, 2026.
+**Prepared:** September 8, 2026. **Revised:** September 29, 2026, after instructor feedback. **Status updated:** October 20, 2026.
 
 ## Abstract
 
@@ -35,21 +35,26 @@ prompt.txt                         DriveBench system prompt, verbatim
 src/qflip/drivebench.py            annotations, view selection, prompt building, corruption paths, MCQ normalization
 src/qflip/client.py                vLLM OpenAI-compatible client: logprobs, option margin, streaming for TTFT
 src/qflip/runner.py                one question in, one result record out (shared by all run scripts)
-src/qflip/flips.py                 pairing, flip classes, paired bootstrap over scenes, factor grouping
+src/qflip/flips.py                 pairing (MCQ and judged VQA), flip classes, paired bootstrap over scenes, coverage rule
+src/qflip/judge.py                 DriveBench rubric judge: description lookup, prompt fill, score parsing, sidecars
+src/qflip/judge_prompts.py         released judge templates, verbatim
 src/qflip/split.py, stats.py, gpu.py, records.py
-scripts/download_drivebench.py     annotations (HF) + corruption images (Google Drive zip)
+scripts/download_drivebench.py     annotations + visual descriptions (HF, toolkit) + corruption images (Google Drive zip)
 scripts/download_clean_images.py   clean nuScenes keyframes streamed from the public AWS mirror
 scripts/00_check_machine.sh        host facts -> manifests/machine.txt
 scripts/01_serve.sh bf16|int4      vllm serve with the protocol's flags, equal KV-cache bytes
 scripts/02_smoke_request.py        one six-view request: tokens per view, logprobs, margin, memory
 scripts/03_smoke_drivebench.py     N or all questions per (precision, condition), resumable, --split
 scripts/04_scene_split.py          calibration / development / final scene manifest
-scripts/05_compare_flips.py        flips with bootstrap CIs, breakdowns by cell, views, margin, condition
+scripts/05_compare_flips.py        flips with bootstrap CIs, breakdowns by cell, views, margin, condition; --vqa; unassessed groups
 scripts/06_stability.py            three-repeat slice: nondeterminism floor
 scripts/07_profile.py              TTFT, latency percentiles, decode tok/s, peak memory per session
+scripts/08_judge_vqa.py            VQA rubric judge (released prompts, fixed model, key from the environment), resumable sidecars
+scripts/quantize_awq.py            own AWQ W4A16 checkpoint with llm-compressor, calibration-split prompts, manifest
+scripts/run_matrix.sh              serve -> all conditions -> stop, per precision; resumable; DRY_RUN=1 prints the plan
 scripts/rescore.py                 recompute MCQ fields after a rule change
 scripts/vast_setup.sh, hpc_pilot.sbatch
-tests/                             19 offline unit tests (pytest)
+tests/                             27 offline unit tests (pytest)
 ```
 
 ## Scope
@@ -60,14 +65,15 @@ tests/                             19 offline unit tests (pytest)
 
 **Removed on September 29, 2026:** the camera-based occupancy perception strand (FlashOcc-M0 in TensorRT), the full corruption matrix, and GPU energy as a required measurement. FP8, additional models, the remaining DriveBench conditions, energy, and Jetson measurements are extensions.
 
-## Status (October 19, 2026, semester week 7)
+## Status (October 20, 2026, semester week 7)
 
 **Done.**
 - Week-5 baseline gate passed on October 15 ([manifests/gate_week5.md](manifests/gate_week5.md)): BF16 7B serves six views on the 24 GB card; official AWQ INT4 serves; option-letter log-probabilities are available, so the margin analysis is feasible; 20-question LowLight run on both precisions with zero errors; BF16 p50 2.39 s versus INT4 0.91 s per question at batch size 1.
 - Two protocol findings from the pilot: the released DriveBench MCQ normalizer scores the article "a" in an explanation as option A, so a strict letter-first rule is now primary and the released rule is recorded alongside; and the DriveBench image archive contains only corrupted images, so clean nuScenes keyframes are fetched from Motional's public AWS mirror (no account; CC BY-NC-SA 4.0).
 - Analysis tooling built and unit-tested offline: paired bootstrap, stability slice, deployment profile with streaming TTFT, equal KV-cache serving, scene-split filtering.
+- Build for the final runs written offline on October 20, dry-run tested, not yet run on a GPU: own-AWQ quantization script (recipe and calibration manifest), matrix driver, VQA judge with the released rubric prompts (the released `--eval-gpt` path cannot run as shipped; see PROTOCOL section 7), coverage rule in the comparison. The toolkit's `data/visual_description.json`, needed by the planning judge prompt, was located and is fetched automatically.
 
-**In progress (weeks 6–7, freeze and build).** Protocol freeze ([PROTOCOL.md](PROTOCOL.md)), own INT4 quantization from the base checkpoint, next GPU session (clean and Fog pilots, stability, profile, streaming and KV-flag verification on vLLM 0.31).
+**In progress (weeks 6–7, freeze and build).** Protocol freeze ([PROTOCOL.md](PROTOCOL.md)), next GPU session (clean and Fog pilots, stability, profile, streaming and KV-flag verification on vLLM 0.31, first run of `quantize_awq.py`).
 
 **Not started.** The 8-run matrix on final scenes (weeks 8–9), analysis and explorer (10–11), mitigation (12), report (13–14).
 

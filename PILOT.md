@@ -63,12 +63,47 @@ python scripts/03_smoke_drivebench.py --precision int4
 python scripts/05_compare_flips.py results/pilot/bf16_clean.jsonl results/pilot/int4_clean.jsonl
 ```
 
-Runs are resumable (rerun the same command to continue). `--n 0` runs every eligible question; add `--split final` for the full run so calibration and development scenes stay out. `05_compare_flips.py` takes any number of ref/quant pairs, reports flip counts with paired bootstrap CIs over scenes, and breaks them down with `--by cell n_views margin condition`. The `.drivebench.json` output feeds the upstream scorer:
+Runs are resumable (rerun the same command to continue). `--n 0` runs every eligible question; add `--split final --out-dir results/final` for the full run so calibration and development scenes stay out. `05_compare_flips.py` takes any number of ref/quant pairs, reports flip counts with paired bootstrap CIs over scenes, breaks them down with `--by cell n_views margin condition`, and prints groups below the coverage minimum (`analysis.min_questions` / `min_scenes` in config, or `--min-n` / `--min-scenes`) as UNASSESSED. The `.drivebench.json` output feeds the upstream scorer's MCQ accuracy and language metrics:
 
 ```bash
-# in a DriveBench checkout, with data/visual_description.json present
+# in a DriveBench checkout (its GPT path does not run as shipped; use 08_judge_vqa.py for the rubric)
 PYTHONPATH=. python evaluate/eval.py /abs/path/results/pilot/bf16_clean.drivebench.json
 ```
+
+### Full matrix
+
+```bash
+DRY_RUN=1 bash scripts/run_matrix.sh                     # prints the 8 commands
+bash scripts/run_matrix.sh                               # bf16 then int4, 4 conditions, final split -> results/final
+CONDITIONS="clean Fog" SPLIT=development OUT_DIR=results/dev N=20 bash scripts/run_matrix.sh   # development pilot
+INT4_MODEL=checkpoints/qwen2.5-vl-7b-awq-w4a16-g128 bash scripts/run_matrix.sh int4            # own checkpoint
+```
+
+The driver starts `01_serve.sh` itself, waits for `/health` (up to 20 min), runs every condition, copies `manifests/serve_<p>.txt` next to the results, and stops the server before the next precision. Rerunning continues where it stopped. Run it inside `tmux`; a full precision on final scenes is roughly 1116 questions × p50 latency, about 45 min for BF16 and 20 min for INT4 per condition at pilot speeds. `RSYNC_TO=user@host:/path` syncs results after each run.
+
+### VQA judge
+
+```bash
+export OPENAI_API_KEY=...                                                  # this shell only; never in a file
+python scripts/08_judge_vqa.py results/pilot/bf16_LowLight.jsonl --dry-run   # counts and an example prompt, no key needed
+python scripts/08_judge_vqa.py results/final/bf16_clean.jsonl results/final/int4_clean.jsonl --limit 20   # cost check
+python scripts/08_judge_vqa.py results/final/*_*.jsonl --workers 8
+python scripts/05_compare_flips.py results/final/bf16_clean.jsonl results/final/int4_clean.jsonl --vqa --judge-threshold 60
+```
+
+Writes `<file>.judge.jsonl` next to each result file; resumable. The pilot's 12 LowLight VQA answers are about 13k prompt tokens per precision, so the full matrix (657 VQA questions × 8 runs) is roughly 5.5M prompt tokens plus about 300 output tokens per call. Judge model and threshold are team item 2.
+
+### Own INT4 checkpoint
+
+```bash
+uv pip install -e ".[quant]"                              # GPU host; llm-compressor, datasets, accelerate
+python scripts/quantize_awq.py --dry-run                  # manifest + calibration list, no model load
+python scripts/quantize_awq.py                            # loads bf16 on CPU, AWQ layer by layer on the GPU; ~40 GB host RAM
+INT4_MODEL=checkpoints/qwen2.5-vl-7b-awq-w4a16-g128 bash scripts/01_serve.sh int4
+python scripts/quantize_awq.py --retain "re:.*language_model\.layers\.(3|7)\..*" --out-dir checkpoints/retain-3-7   # mitigation
+```
+
+Check host RAM first (`free -g`); if under 40 GB the load needs `device_map="auto"` with disk offload, which is slow but works. The serve script detects a compressed-tensors checkpoint from its `config.json` and passes `--quantization compressed-tensors`.
 
 ## 4. Stability floor and deployment profile
 
@@ -178,7 +213,11 @@ python scripts/03_smoke_drivebench.py --precision bf16 --condition Fog
 python scripts/06_stability.py --precision bf16 --condition clean
 python scripts/07_profile.py --precision bf16 --session 1     # first real use of the streaming path
 # swap the server to int4 and repeat 03 (clean, Fog), 06, 07
-python scripts/05_compare_flips.py results/pilot/bf16_clean.jsonl results/pilot/int4_clean.jsonl results/pilot/bf16_Fog.jsonl results/pilot/int4_Fog.jsonl --by cell n_views margin condition
+python scripts/05_compare_flips.py results/pilot/bf16_clean.jsonl results/pilot/int4_clean.jsonl results/pilot/bf16_Fog.jsonl results/pilot/int4_Fog.jsonl --by cell n_views margin condition --min-n 3 --min-scenes 1
+# with the server stopped (needs the whole GPU):
+free -g && uv pip install -e ".[quant]" && python scripts/quantize_awq.py      # own checkpoint, ~30-60 min
+INT4_MODEL=checkpoints/qwen2.5-vl-7b-awq-w4a16-g128 bash scripts/01_serve.sh int4 && python scripts/02_smoke_request.py --precision int4
+uv pip freeze > manifests/requirements_frozen.txt           # version pins for the freeze
 ```
 
 Before stopping the instance: `rsync -avz vast:/workspace/qflip/results/ results/` and `rsync -avz vast:/workspace/qflip/manifests/ manifests/`, then commit `manifests/`.
