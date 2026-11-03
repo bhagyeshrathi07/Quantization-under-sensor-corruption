@@ -1,0 +1,57 @@
+{
+  "precision": "int4",
+  "condition": "clean",
+  "model": "qwen2.5-vl-7b-awq",
+  "repeats": 3,
+  "mcq_common": 25,
+  "questions_per_repeat": [
+    60,
+    60,
+    60
+  ],
+  "errors": 0,
+  "pairwise": [
+    {
+      "reps": [
+        1,
+        2
+      ],
+      "n": 25,
+      "letter_changes": 0,
+      "correctness_changes": 0,
+      "text_changes": 0
+    },
+    {
+      "reps": [
+        1,
+        3
+      ],
+      "n": 25,
+      "letter_changes": 0,
+      "correctness_changes": 0,
+      "text_changes": 0
+    },
+    {
+      "reps": [
+        2,
+        3
+      ],
+      "n": 25,
+      "letter_changes": 0,
+      "correctness_changes": 0,
+      "text_changes": 0
+    }
+  ],
+  "self_change_rate": 0.0,
+  "self_correctness_change_rate": 0.0,
+  "self_text_change_rate": 0.0,
+  "margin_range_mean": 0.00032336075710517333,
+  "margin_range_max": 0.004373188236565073,
+  "cells": {
+    "behavior/MCQ": 13,
+    "perception/MCQ": 12,
+    "perception/VQA": 12,
+    "planning/VQA": 12,
+    "prediction/VQA": 11
+  }
+}

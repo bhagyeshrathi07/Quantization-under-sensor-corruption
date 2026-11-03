@@ -96,14 +96,15 @@ Writes `<file>.judge.jsonl` next to each result file; resumable. The pilot's 12 
 ### Own INT4 checkpoint
 
 ```bash
-uv pip install -e ".[quant]"                              # GPU host; llm-compressor, datasets, accelerate
-python scripts/quantize_awq.py --dry-run                  # manifest + calibration list, no model load
-python scripts/quantize_awq.py                            # loads bf16 on CPU, AWQ layer by layer on the GPU; ~40 GB host RAM
+# separate venv: llm-compressor pins its own torch/transformers and must not touch the vLLM venv
+uv venv .venv-quant --python 3.12 && VIRTUAL_ENV=$PWD/.venv-quant uv pip install -e ".[quant]"
+.venv-quant/bin/python scripts/quantize_awq.py --dry-run  # manifest + calibration list, no model load
+TOKENIZERS_PARALLELISM=false .venv-quant/bin/python scripts/quantize_awq.py   # 8 min on the 4090 (with the server stopped)
 INT4_MODEL=checkpoints/qwen2.5-vl-7b-awq-w4a16-g128 bash scripts/01_serve.sh int4
-python scripts/quantize_awq.py --retain "re:.*language_model\.layers\.(3|7)\..*" --out-dir checkpoints/retain-3-7   # mitigation
+.venv-quant/bin/python scripts/quantize_awq.py --retain "re:.*language_model\.layers\.(3|7)\..*" --out-dir checkpoints/retain-3-7   # mitigation
 ```
 
-Check host RAM first (`free -g`); if under 40 GB the load needs `device_map="auto"` with disk offload, which is slow but works. The serve script detects a compressed-tensors checkpoint from its `config.json` and passes `--quantization compressed-tensors`.
+Measured November 3: bf16 load on CPU, 107 six-view calibration samples, 29 sequential stages, 488 s total, 11 GB GPU peak, checkpoint 6.5 GB. The warning "28 mappings were skipped due to incompatible shapes" is the per-layer `v_proj -> o_proj` balance that grouped-query attention rules out; expected. The serve script detects a compressed-tensors checkpoint from its `config.json` and passes `--quantization compressed-tensors`. Run own-checkpoint slices with `--out-dir results/pilot_ownawq` so they do not overwrite the official-AWQ files (same `int4_` prefix).
 
 ## 4. Stability floor and deployment profile
 
@@ -127,7 +128,7 @@ python scripts/04_scene_split.py    # -> manifests/scene_split.json
 
 ## Vast.ai (rented RTX 4090)
 
-Rent: filter GPU = RTX 4090, disk ≥ 100 GB, on-demand (not interruptible), reliability ≥ 98%, download speed ≥ 500 Mbps, DLPerf doesn't matter. Template: **PyTorch (Vast)** or any `nvidia/cuda:12.x` Ubuntu image; launch mode **SSH**. Add your laptop's public key under Account → Keys first. Avoid the cheapest hosts; they are often power-limited, which skews latency.
+Rent: filter GPU = RTX 4090 (24 GB; skip the 48 GB modded cards), disk ≥ 100 GB, on-demand (not interruptible), reliability ≥ 98%, download speed ≥ 500 Mbps, **Max CUDA ≥ 13.0** (vLLM wheels are cu130). DLPerf matters as a power-cap tell: about 97 means a stock 450 W card, about 74 means a capped one (the October host). Template: **PyTorch (Vast)**; launch mode **SSH**. Add your laptop's public key under Account → Keys first. Stopped instances can be destroyed by the host (happened October 2026), so sync results after every session.
 
 Then, over SSH:
 
@@ -198,7 +199,12 @@ The job refuses to start if weights are not cached (`HF_HUB_OFFLINE=1`), so the 
 
 Results and manifests land in the repo checkout under `$S`; `git add results`-style copying is not needed, rsync `results/` and `manifests/` to your laptop or commit manifests from the head node.
 
-## Next GPU session checklist (after the October 15 pilot)
+## GPU session log
+
+- **October 15 (host m:3752, 300 W cap, vLLM 0.31):** gate pilot, LowLight 20 questions both precisions. `manifests/gate_week5.md`.
+- **November 3 (host m:11851, 450 W, vLLM 0.33):** the October instance had been destroyed by its host; rebuilt from `vast_setup.sh`. Clean images, KV flag and streaming verified, clean/Fog/NoImage slices both precisions, stability, profile session 1, own AWQ checkpoint built and smoke-tested. `manifests/session1_2026-11-03.md`. Everything below in the checklist is done except the freeze.
+
+## Next GPU session checklist (written after the October 15 pilot; completed November 3)
 
 Resume the same Vast host (profiling must stay on one host), then in order:
 

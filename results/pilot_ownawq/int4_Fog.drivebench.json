@@ -1,0 +1,347 @@
+[
+  {
+    "scene_token": "2cc8ffb250c44b42a888e9185810e04c",
+    "frame_token": "d466a127beef449a96382817e792b0eb",
+    "question_type": "behavior",
+    "question": "Predict the behavior of the ego vehicle. Please select the correct answer from the following options: A. The ego vehicle is steering to the left. The ego vehicle is driving very fast. B. The ego vehicle is steering to the right. The ego vehicle is driving very fast. C. The ego vehicle is going straight. The ego vehicle is not moving. D. The ego vehicle is slightly steering to the left. The ego vehicle is driving very fast.",
+    "answer": "C",
+    "tag": [
+      0
+    ],
+    "image_path": {
+      "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n008-2018-09-18-15-26-58-0400__CAM_FRONT__1537298967912404.jpg",
+      "CAM_FRONT_LEFT": "data/nuscenes/samples/CAM_FRONT_LEFT/n008-2018-09-18-15-26-58-0400__CAM_FRONT_LEFT__1537298967904799.jpg",
+      "CAM_FRONT_RIGHT": "data/nuscenes/samples/CAM_FRONT_RIGHT/n008-2018-09-18-15-26-58-0400__CAM_FRONT_RIGHT__1537298967920482.jpg",
+      "CAM_BACK": "data/nuscenes/samples/CAM_BACK/n008-2018-09-18-15-26-58-0400__CAM_BACK__1537298967937558.jpg",
+      "CAM_BACK_LEFT": "data/nuscenes/samples/CAM_BACK_LEFT/n008-2018-09-18-15-26-58-0400__CAM_BACK_LEFT__1537298967947414.jpg",
+      "CAM_BACK_RIGHT": "data/nuscenes/samples/CAM_BACK_RIGHT/n008-2018-09-18-15-26-58-0400__CAM_BACK_RIGHT__1537298967928113.jpg"
+    },
+    "pred": "C"
+  },
+  {
+    "scene_token": "e12dee10fe2545e4ab88459ed4268bc6",
+    "frame_token": "f0efd0739e564fa69c2802faaba20a78",
+    "question_type": "perception",
+    "question": "What is the moving status of object <c1,CAM_FRONT,0.5125,0.5111>? Please select the correct answer from the following options: A. Turn left. B. Turn right. C. Going ahead.",
+    "answer": "B",
+    "tag": [
+      0
+    ],
+    "image_path": {
+      "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n015-2018-11-14-18-57-54+0800__CAM_FRONT__1542193513512460.jpg"
+    },
+    "pred": "C\n\nThe object in question appears to be a pedestrian crossing the street. Given the context of the image, it seems that the pedestrian is moving forward across the crosswalk. Therefore, the most appropriate answer is \"Going ahead.\""
+  },
+  {
+    "scene_token": "35ecd252b8ee4cbc83376148e192a803",
+    "frame_token": "c7ce8d0c255b48a9af8be3d77a3fc644",
+    "question_type": "perception",
+    "question": "What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.",
+    "answer": "There is a white commercial vehicle to the front of the ego vehicle, a black sedan to the back of the ego vehicle, a silver sedan to the back left of the ego vehicle, a white pickup truck to the back of the ego vehicle, a black SUV to the front of the ego vehicle, and a white sedan to the front left of the ego vehicle. The IDs of these objects are <c1,CAM_FRONT,0.7386,0.5936>, <c2,CAM_BACK,0.7708,0.6352>, <c3,CAM_BACK_LEFT,0.3297,0.7463>, <c4,CAM_BACK,0.5120,0.5824>, <c5,CAM_FRONT,0.5505,0.5481>, and <c6,CAM_FRONT_LEFT,0.7547,0.7006>.",
+    "tag": [
+      2
+    ],
+    "image_path": {
+      "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n008-2018-08-21-11-53-44-0400__CAM_FRONT__1534867341512404.jpg",
+      "CAM_FRONT_LEFT": "data/nuscenes/samples/CAM_FRONT_LEFT/n008-2018-08-21-11-53-44-0400__CAM_FRONT_LEFT__1534867341504799.jpg",
+      "CAM_FRONT_RIGHT": "data/nuscenes/samples/CAM_FRONT_RIGHT/n008-2018-08-21-11-53-44-0400__CAM_FRONT_RIGHT__1534867341520482.jpg",
+      "CAM_BACK": "data/nuscenes/samples/CAM_BACK/n008-2018-08-21-11-53-44-0400__CAM_BACK__1534867341537558.jpg",
+      "CAM_BACK_LEFT": "data/nuscenes/samples/CAM_BACK_LEFT/n008-2018-08-21-11-53-44-0400__CAM_BACK_LEFT__1534867341547405.jpg",
+      "CAM_BACK_RIGHT": "data/nuscenes/samples/CAM_BACK_RIGHT/n008-2018-08-21-11-53-44-0400__CAM_BACK_RIGHT__1534867341528113.jpg"
+    },
+    "pred": "In the current scene, the following important objects can be identified:\n\n1. **Vehicles**: \n   - Cars parked and moving on the street.\n   - A taxi visible in the foreground.\n   - Traffic cones placed on the road.\n\n2. **Pedestrians**:\n   - People walking on sidewalks and crossing the street.\n\n3. **Buildings**:\n   - Tall urban structures in the background.\n   - A mix of modern and older architectural styles.\n\n4. **Trees**:\n   - Lining the streets and sidewalks, providing shade.\n\n5. **Street Furniture**:\n   - Streetlights, benches, and lam"
+  },
+  {
+    "scene_token": "363bb6c0fdaf465aa54c39f082bb92c6",
+    "frame_token": "297cef22e0f143ceb1e4ef93088bcfb2",
+    "question_type": "planning",
+    "question": "What actions could the ego vehicle take based on <c1,CAM_FRONT_RIGHT,0.0120,0.4880>? Why take this action and what's the probability?",
+    "answer": "The action is to turn right. The reason is to follow the traffic rules, which is high probability.",
+    "tag": [
+      1
+    ],
+    "image_path": {
+      "CAM_FRONT_RIGHT": "data/nuscenes/samples/CAM_FRONT_RIGHT/n008-2018-08-31-11-19-57-0400__CAM_FRONT_RIGHT__1535728919870482.jpg"
+    },
+    "pred": "To determine the potential actions of the ego vehicle based on the image provided, let's analyze the scene step-by-step:\n\n### Step 1: Identify Relevant Objects\n- **Ego Vehicle**: The ego vehicle is partially visible in the lower-left corner of the image.\n- **Other Vehicles**: There are several vehicles visible in the intersection, including a truck and a car.\n- **Pedestrians**: There appear to be no pedestrians actively crossing or near the intersection.\n- **Traffic Signals**: Traffic signals are present but their status is unclear due to the foggy conditions.\n- **Buildings**: There are multi-story buildings in the background"
+  },
+  {
+    "scene_token": "00590cbfa24a430a8c274b51e1c71231",
+    "frame_token": "0dd2b3a691554932abed501d3b33310e",
+    "question_type": "prediction",
+    "question": "What object should the ego vehicle notice first when the ego vehicle is getting to the next possible location? What is the state of the object that is first noticed by the ego vehicle and what action should the ego vehicle take? What object should the ego vehicle notice second when the ego vehicle is getting to the next possible location? What is the state of the object perceived by the ego vehicle as second and what action should the ego vehicle take? What object should the ego vehicle notice third? What is the state of the object perceived by the ego vehicle as third and what action should the ego vehicle take?",
+    "answer": "Firstly, notice that white commercial vehicle at right camera. The object is stationary, so the ego vehicle should continue going ahead at the same speed. Secondly, notice that white truck at front camera. The object is going ahead, so the ego vehicle should continue going ahead at the same speed. Thirdly, notice that yellow bike at back camera. The object is stationary, so the ego vehicle should continue going ahead at the same speed.",
+    "tag": [
+      3
+    ],
+    "image_path": {
+      "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n015-2018-08-01-16-32-59+0800__CAM_FRONT__1533112780512460.jpg",
+      "CAM_FRONT_LEFT": "data/nuscenes/samples/CAM_FRONT_LEFT/n015-2018-08-01-16-32-59+0800__CAM_FRONT_LEFT__1533112780504844.jpg",
+      "CAM_FRONT_RIGHT": "data/nuscenes/samples/CAM_FRONT_RIGHT/n015-2018-08-01-16-32-59+0800__CAM_FRONT_RIGHT__1533112780520339.jpg",
+      "CAM_BACK": "data/nuscenes/samples/CAM_BACK/n015-2018-08-01-16-32-59+0800__CAM_BACK__1533112780537525.jpg",
+      "CAM_BACK_LEFT": "data/nuscenes/samples/CAM_BACK_LEFT/n015-2018-08-01-16-32-59+0800__CAM_BACK_LEFT__1533112780547423.jpg",
+      "CAM_BACK_RIGHT": "data/nuscenes/samples/CAM_BACK_RIGHT/n015-2018-08-01-16-32-59+0800__CAM_BACK_RIGHT__1533112780527893.jpg"
+    },
+    "pred": "### Analysis:\n\n#### Step-by-step reasoning:\n\n1. **Identify the first object to notice:**\n   - The first object the ego vehicle should notice is the pedestrian crossing sign (\"Road Level Crossing\") located near the gate entrance.\n   - **State:** The sign indicates a pedestrian crossing area.\n   - **Action:** The ego vehicle should reduce speed and be prepared to stop if pedestrians cross.\n\n2. **Identify the second object to notice:**\n   - After noticing the pedestrian crossing sign, the next object the ego vehicle should notice is the gate itself.\n   - **State:** The gate appears closed.\n   - **Action"
+  },
+  {
+    "scene_token": "e209e66ff7834490b212c16cb12a1ce9",
+    "frame_token": "187ecc6a2ce34e52ba02da567d21e23c",
+    "question_type": "behavior",
+    "question": "Predict the behavior of the ego vehicle. Please select the correct answer from the following options: A. The ego vehicle is steering to the right. The ego vehicle is driving slowly. B. The ego vehicle is going straight. The ego vehicle is driving slowly. C. The ego vehicle is slightly steering to the left. The ego vehicle is driving fast. D. The ego vehicle is going straight. The ego vehicle is driving with normal speed.",
+    "answer": "D",
+    "tag": [
+      0
+    ],
+    "image_path": {
+      "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n008-2018-08-29-16-04-13-0400__CAM_FRONT__1535573648662404.jpg",
+      "CAM_FRONT_LEFT": "data/nuscenes/samples/CAM_FRONT_LEFT/n008-2018-08-29-16-04-13-0400__CAM_FRONT_LEFT__1535573648654799.jpg",
+      "CAM_FRONT_RIGHT": "data/nuscenes/samples/CAM_FRONT_RIGHT/n008-2018-08-29-16-04-13-0400__CAM_FRONT_RIGHT__1535573648670482.jpg",
+      "CAM_BACK": "data/nuscenes/samples/CAM_BACK/n008-2018-08-29-16-04-13-0400__CAM_BACK__1535573648687558.jpg",
+      "CAM_BACK_LEFT": "data/nuscenes/samples/CAM_BACK_LEFT/n008-2018-08-29-16-04-13-0400__CAM_BACK_LEFT__1535573648697405.jpg",
+      "CAM_BACK_RIGHT": "data/nuscenes/samples/CAM_BACK_RIGHT/n008-2018-08-29-16-04-13-0400__CAM_BACK_RIGHT__1535573648678121.jpg"
+    },
+    "pred": "D\n\nThe images show the ego vehicle traveling through a city street with moderate traffic and no immediate indication of turning. The vehicles ahead appear to be maintaining their lanes without any signs of lane changes or abrupt movements. Given this observation, it's reasonable to conclude that the ego vehicle is likely driving straight and at its normal speed."
+  },
+  {
+    "scene_token": "1c76efe7d0b048bc815c0445eeaa76ab",
+    "frame_token": "8ae837b713ca4c17b150a15e6fcdaa49",
+    "question_type": "perception",
+    "question": "What is the moving status of object <c2,CAM_BACK,0.4750,0.5917>? Please select the correct answer from the following options: A. Turn left. B. Turn right. C. Going ahead.",
+    "answer": "C",
+    "tag": [
+      0
+    ],
+    "image_path": {
+      "CAM_BACK": "data/nuscenes/samples/CAM_BACK/n008-2018-08-28-16-57-39-0400__CAM_BACK__1535490017787558.jpg"
+    },
+    "pred": "C\n\nThe object located at coordinates <c2,CAM_BACK,0.4750,0.5917> appears to be a vehicle that is currently in the process of turning right. This can be inferred from its position relative to the lane markings and the direction it seems to be heading towards. Therefore, the correct answer is C. Going ahead, specifically turning right."
+  },
+  {
+    "scene_token": "c7b8d96173bf41dc8df8c0d16adfc71e",
+    "frame_token": "c221e48870e14532a876b0d01bab9f35",
+    "question_type": "perception",
+    "question": "What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.",
+    "answer": "There is a gray sedan to the back right of the ego vehicle, a green bus to the back of the ego vehicle, and a left turn landmark line to the front of the ego vehicle. The IDs of these objects are <c1,CAM_BACK_RIGHT,0.3547,0.7130>, <c2,CAM_BACK,0.1886,0.6361>, and <c3,CAM_FRONT,0.5000,0.9194>.",
+    "tag": [
+      2
+    ],
+    "image_path": {
+      "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n015-2018-10-08-15-52-24+0800__CAM_FRONT__1538985165612460.jpg",
+      "CAM_FRONT_LEFT": "data/nuscenes/samples/CAM_FRONT_LEFT/n015-2018-10-08-15-52-24+0800__CAM_FRONT_LEFT__1538985165604864.jpg",
+      "CAM_FRONT_RIGHT": "data/nuscenes/samples/CAM_FRONT_RIGHT/n015-2018-10-08-15-52-24+0800__CAM_FRONT_RIGHT__1538985165620339.jpg",
+      "CAM_BACK": "data/nuscenes/samples/CAM_BACK/n015-2018-10-08-15-52-24+0800__CAM_BACK__1538985165637525.jpg",
+      "CAM_BACK_LEFT": "data/nuscenes/samples/CAM_BACK_LEFT/n015-2018-10-08-15-52-24+0800__CAM_BACK_LEFT__1538985165647423.jpg",
+      "CAM_BACK_RIGHT": "data/nuscenes/samples/CAM_BACK_RIGHT/n015-2018-10-08-15-52-24+0800__CAM_BACK_RIGHT__1538985165627893.jpg"
+    },
+    "pred": "In the current scene, the following important objects can be identified:\n\n1. **Buildings**: These appear as structures in the background, possibly residential or institutional buildings. They are significant because they indicate the location is likely a populated area.\n\n2. **Trees**: There are several trees visible, which are important for understanding the environment's natural elements and potential obstructions.\n\n3. **Parking Lot**: The presence of parked cars suggests this might be a public parking area, which could influence decisions regarding parking availability and traffic flow.\n\n4. **Street Signs**: Visible signs near the road suggest regulatory information that may affect driving decisions such as speed limits or"
+  },
+  {
+    "scene_token": "f7d01e23508040c2aec430e8da13fb76",
+    "frame_token": "18a739fec6c3491ca23efc10d02cf9de",
+    "question_type": "planning",
+    "question": "What actions taken by the ego vehicle can lead to a collision with <c1,CAM_FRONT,0.7067,0.5611>?",
+    "answer": "Moderate right turn.",
+    "tag": [
+      1
+    ],
+    "image_path": {
+      "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n008-2018-08-30-15-52-26-0400__CAM_FRONT__1535659555912404.jpg"
+    },
+    "pred": "To determine what actions the ego vehicle might take that could lead to a collision with the object at coordinates [0.7067, 0.5611] in the image, let's analyze the scene:\n\n1. **Identify the Object**: The object at coordinates [0.7067, 0.5611] appears to be a pedestrian crossing the street. Pedestrians are typically moving across the road, which introduces uncertainty into their path.\n\n2. **Ego Vehicle's Perspective**: The ego vehicle is facing forward, and there are no visible obstacles directly ahead of it. However"
+  },
+  {
+    "scene_token": "08be42eb2186411d8e2201225329f1c6",
+    "frame_token": "818a1bd7b7394194a85163c8d95958a9",
+    "question_type": "prediction",
+    "question": "What object should the ego vehicle notice first when the ego vehicle is getting to the next possible location? What is the state of the object that is first noticed by the ego vehicle and what action should the ego vehicle take? What object should the ego vehicle notice second when the ego vehicle is getting to the next possible location? What is the state of the object perceived by the ego vehicle as second and what action should the ego vehicle take? What object should the ego vehicle notice third? What is the state of the object perceived by the ego vehicle as third and what action should the ego vehicle take?",
+    "answer": "Firstly, notice that black small car at left camera. The object is stationary, so the ego vehicle should turn left. Secondly, notice that black small sedan at back camera. The object is going ahead, so the ego vehicle should turn left. Thirdly, notice that black suv at left rear camera. The object is stationary, so the ego vehicle should turn left.",
+    "tag": [
+      3
+    ],
+    "image_path": {
+      "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n008-2018-09-18-13-10-39-0400__CAM_FRONT__1537290858162404.jpg",
+      "CAM_FRONT_LEFT": "data/nuscenes/samples/CAM_FRONT_LEFT/n008-2018-09-18-13-10-39-0400__CAM_FRONT_LEFT__1537290858154799.jpg",
+      "CAM_FRONT_RIGHT": "data/nuscenes/samples/CAM_FRONT_RIGHT/n008-2018-09-18-13-10-39-0400__CAM_FRONT_RIGHT__1537290858170482.jpg",
+      "CAM_BACK": "data/nuscenes/samples/CAM_BACK/n008-2018-09-18-13-10-39-0400__CAM_BACK__1537290858187559.jpg",
+      "CAM_BACK_LEFT": "data/nuscenes/samples/CAM_BACK_LEFT/n008-2018-09-18-13-10-39-0400__CAM_BACK_LEFT__1537290858197405.jpg",
+      "CAM_BACK_RIGHT": "data/nuscenes/samples/CAM_BACK_RIGHT/n008-2018-09-18-13-10-39-0400__CAM_BACK_RIGHT__1537290858178113.jpg"
+    },
+    "pred": "The scenario involves navigating through a dense foggy environment, which can obscure visibility significantly. Here's how the ego vehicle should proceed:\n\n### Step-by-step Analysis:\n\n1. **First Object to Notice:**\n   - **Object:** The black SUV parked near the curb.\n   - **State:** Parked, stationary.\n   - **Action:** The ego vehicle should slow down and maintain a safe distance while being cautious of potential sudden movements due to the fog.\n\n2. **Second Object to Notice:**\n   - **Object:** The chain-link fence.\n   - **State:** Stationary.\n   - **Action:** The ego vehicle should"
+  },
+  {
+    "scene_token": "d58468c6097c425e89671a7b3f480acf",
+    "frame_token": "72df293bddb643909f79505a90d5c14d",
+    "question_type": "behavior",
+    "question": "Predict the behavior of the ego vehicle. Please select the correct answer from the following options: A. The ego vehicle is steering to the right. The ego vehicle is driving very fast. B. The ego vehicle is going straight. The ego vehicle is driving fast. C. The ego vehicle is slightly steering to the right. The ego vehicle is driving slowly. D. The ego vehicle is slightly steering to the left. The ego vehicle is driving slowly.",
+    "answer": "B",
+    "tag": [
+      0
+    ],
+    "image_path": {
+      "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n008-2018-09-18-14-54-39-0400__CAM_FRONT__1537297448912404.jpg",
+      "CAM_FRONT_LEFT": "data/nuscenes/samples/CAM_FRONT_LEFT/n008-2018-09-18-14-54-39-0400__CAM_FRONT_LEFT__1537297448904799.jpg",
+      "CAM_FRONT_RIGHT": "data/nuscenes/samples/CAM_FRONT_RIGHT/n008-2018-09-18-14-54-39-0400__CAM_FRONT_RIGHT__1537297448920482.jpg",
+      "CAM_BACK": "data/nuscenes/samples/CAM_BACK/n008-2018-09-18-14-54-39-0400__CAM_BACK__1537297448937558.jpg",
+      "CAM_BACK_LEFT": "data/nuscenes/samples/CAM_BACK_LEFT/n008-2018-09-18-14-54-39-0400__CAM_BACK_LEFT__1537297448947405.jpg",
+      "CAM_BACK_RIGHT": "data/nuscenes/samples/CAM_BACK_RIGHT/n008-2018-09-18-14-54-39-0400__CAM_BACK_RIGHT__1537297448928113.jpg"
+    },
+    "pred": "D"
+  },
+  {
+    "scene_token": "1319a9c0288f4ff9ae32d3f33b3bae17",
+    "frame_token": "8bd5aa0baee94145bb20b13f43dbc1f3",
+    "question_type": "perception",
+    "question": "What is the moving status of object <c4,CAM_FRONT,0.5016,0.5972>? Please select the correct answer from the following options: A. Turn left. B. Turn right. C. Going ahead.",
+    "answer": "B",
+    "tag": [
+      0
+    ],
+    "image_path": {
+      "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n015-2018-09-25-11-10-38+0800__CAM_FRONT__1537845294762460.jpg"
+    },
+    "pred": "C\n\nThe object located at coordinates <c4,CAM_FRONT,0.5016,0.5972> appears to be a vehicle that is currently traveling straight ahead. There are no indications of lane changes or turns in the image. Therefore, the most accurate description of its moving status is \"Going ahead.\""
+  },
+  {
+    "scene_token": "58af378ff68b49c99aabf320dca1ee25",
+    "frame_token": "307e92d2e2e74d2095fee2527c96af1d",
+    "question_type": "perception",
+    "question": "What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.",
+    "answer": "There is a black sedan to the front of the ego vehicle, a white sedan car to the front of the ego vehicle, and a black sedan to the front left of the ego vehicle. The IDs of these objects are <c1,CAM_FRONT,0.3636,0.5620>, <c2,CAM_FRONT,0.2703,0.6000>, and <c3,CAM_FRONT_LEFT,0.7511,0.5972>.",
+    "tag": [
+      2
+    ],
+    "image_path": {
+      "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n008-2018-09-18-13-10-39-0400__CAM_FRONT__1537290667762404.jpg",
+      "CAM_FRONT_LEFT": "data/nuscenes/samples/CAM_FRONT_LEFT/n008-2018-09-18-13-10-39-0400__CAM_FRONT_LEFT__1537290667754799.jpg",
+      "CAM_FRONT_RIGHT": "data/nuscenes/samples/CAM_FRONT_RIGHT/n008-2018-09-18-13-10-39-0400__CAM_FRONT_RIGHT__1537290667770482.jpg",
+      "CAM_BACK": "data/nuscenes/samples/CAM_BACK/n008-2018-09-18-13-10-39-0400__CAM_BACK__1537290667787558.jpg",
+      "CAM_BACK_LEFT": "data/nuscenes/samples/CAM_BACK_LEFT/n008-2018-09-18-13-10-39-0400__CAM_BACK_LEFT__1537290667797405.jpg",
+      "CAM_BACK_RIGHT": "data/nuscenes/samples/CAM_BACK_RIGHT/n008-2018-09-18-13-10-39-0400__CAM_BACK_RIGHT__1537290667778113.jpg"
+    },
+    "pred": "In the current scene, the following important objects can be identified:\n\n1. **Cars**: Multiple cars are parked or moving in the area, which are crucial for understanding traffic conditions and potential hazards.\n   \n2. **Buildings**: The presence of buildings indicates urban infrastructure, which is essential for navigation and understanding the layout of the area.\n\n3. **Fences**: A chain-link fence is visible, which could indicate restricted areas or boundaries that need to be navigated carefully.\n\n4. **Streetlights**: These are important for understanding visibility conditions during nighttime or adverse weather.\n\n5. **Pedestrian Crossings**: The crosswalks suggest"
+  },
+  {
+    "scene_token": "1c76efe7d0b048bc815c0445eeaa76ab",
+    "frame_token": "5292f0009e4644acb946f0a9eaae4e37",
+    "question_type": "planning",
+    "question": "What actions could the ego vehicle take based on <c1,CAM_BACK,0.8781,0.6120>? Why take this action and what's the probability?",
+    "answer": "The action is to keep going at the same speed. The reason is that there is no safety issue, and the probability is high.",
+    "tag": [
+      1
+    ],
+    "image_path": {
+      "CAM_BACK": "data/nuscenes/samples/CAM_BACK/n008-2018-08-28-16-57-39-0400__CAM_BACK__1535490007287558.jpg"
+    },
+    "pred": "To determine the potential actions of the ego vehicle based on the provided image coordinates, let's analyze the scene step-by-step:\n\n### Step 1: Identify Relevant Objects\n- **Ego Vehicle**: Located in the foreground, partially obscured by smoke or fog.\n- **Traffic Light**: Green light is visible, indicating that the ego vehicle can proceed.\n- **Other Vehicles**: A black SUV is stopped at the intersection, and a white pickup truck is approaching from the right side.\n- **Buildings**: Multi-story buildings are visible in the background.\n- **Smoke/Fog**: Obscures visibility slightly but does not appear to block the"
+  },
+  {
+    "scene_token": "d0de3bf834b747179080898725b0f21d",
+    "frame_token": "3640145bfc1442559913fd71d345bfa7",
+    "question_type": "prediction",
+    "question": "What object should the ego vehicle notice first when the ego vehicle is getting to the next possible location? What is the state of the object that is first noticed by the ego vehicle and what action should the ego vehicle take? What object should the ego vehicle notice second when the ego vehicle is getting to the next possible location? What is the state of the object perceived by the ego vehicle as second and what action should the ego vehicle take? What object should the ego vehicle notice third? What is the state of the object perceived by the ego vehicle as third and what action should the ego vehicle take?",
+    "answer": "Firstly, notice that silver suv at front camera. The object is turning left, so the ego vehicle should turn left. Secondly, notice that white van at left camera. The object is turning left, so the ego vehicle should turn left. Thirdly, notice that roadblock at right camera. The object is a traffic sign, so the ego vehicle should turn left.",
+    "tag": [
+      3
+    ],
+    "image_path": {
+      "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n015-2018-08-03-15-31-50+0800__CAM_FRONT__1533281750862460.jpg",
+      "CAM_FRONT_LEFT": "data/nuscenes/samples/CAM_FRONT_LEFT/n015-2018-08-03-15-31-50+0800__CAM_FRONT_LEFT__1533281750854844.jpg",
+      "CAM_FRONT_RIGHT": "data/nuscenes/samples/CAM_FRONT_RIGHT/n015-2018-08-03-15-31-50+0800__CAM_FRONT_RIGHT__1533281750870339.jpg",
+      "CAM_BACK": "data/nuscenes/samples/CAM_BACK/n015-2018-08-03-15-31-50+0800__CAM_BACK__1533281750887525.jpg",
+      "CAM_BACK_LEFT": "data/nuscenes/samples/CAM_BACK_LEFT/n015-2018-08-03-15-31-50+0800__CAM_BACK_LEFT__1533281750897423.jpg",
+      "CAM_BACK_RIGHT": "data/nuscenes/samples/CAM_BACK_RIGHT/n015-2018-08-03-15-31-50+0800__CAM_BACK_RIGHT__1533281750877893.jpg"
+    },
+    "pred": "### Analysis:\n\n#### Step-by-step reasoning:\n\n1. **Identify the first object of interest:**\n   - The first object the ego vehicle should notice is the **pedestrian crossing sign** located near the center-left of the image. It indicates where pedestrians can cross safely.\n   \n2. **State of the first object:**\n   - The pedestrian crossing sign appears to be clearly visible but does not indicate any immediate danger or restriction.\n\n3. **Action required by the ego vehicle:**\n   - The ego vehicle should **slow down** if approaching the pedestrian crossing area to ensure it is safe for pedestrians to cross.\n\n4."
+  },
+  {
+    "scene_token": "cf652a711c8e40209132036a95162fed",
+    "frame_token": "751b62e2666e4144a1660fb962b2bd67",
+    "question_type": "behavior",
+    "question": "Predict the behavior of the ego vehicle. Please select the correct answer from the following options: A. The ego vehicle is going straight. The ego vehicle is driving very fast. B. The ego vehicle is steering to the left. The ego vehicle is driving with normal speed. C. The ego vehicle is going straight. The ego vehicle is not moving. D. The ego vehicle is slightly steering to the left. The ego vehicle is driving slowly.",
+    "answer": "B",
+    "tag": [
+      0
+    ],
+    "image_path": {
+      "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n015-2018-10-08-16-03-24+0800__CAM_FRONT__1538986128412462.jpg",
+      "CAM_FRONT_LEFT": "data/nuscenes/samples/CAM_FRONT_LEFT/n015-2018-10-08-16-03-24+0800__CAM_FRONT_LEFT__1538986128404844.jpg",
+      "CAM_FRONT_RIGHT": "data/nuscenes/samples/CAM_FRONT_RIGHT/n015-2018-10-08-16-03-24+0800__CAM_FRONT_RIGHT__1538986128420339.jpg",
+      "CAM_BACK": "data/nuscenes/samples/CAM_BACK/n015-2018-10-08-16-03-24+0800__CAM_BACK__1538986128437525.jpg",
+      "CAM_BACK_LEFT": "data/nuscenes/samples/CAM_BACK_LEFT/n015-2018-10-08-16-03-24+0800__CAM_BACK_LEFT__1538986128447423.jpg",
+      "CAM_BACK_RIGHT": "data/nuscenes/samples/CAM_BACK_RIGHT/n015-2018-10-08-16-03-24+0800__CAM_BACK_RIGHT__1538986128427893.jpg"
+    },
+    "pred": "D"
+  },
+  {
+    "scene_token": "74d03e3b673f4a72a3f76e1b0c7840bd",
+    "frame_token": "6e54dfd8cdf34ef7bb61e2284e9911b5",
+    "question_type": "perception",
+    "question": "What is the moving status of object <c1,CAM_FRONT,0.5261,0.5463>? Please select the correct answer from the following options: A. Going ahead. B. Turn left. C. Turn right.",
+    "answer": "A",
+    "tag": [
+      0
+    ],
+    "image_path": {
+      "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n015-2018-10-02-10-56-37+0800__CAM_FRONT__1538449267412460.jpg"
+    },
+    "pred": "A\n\nThe object located at coordinates <c1,CAM_FRONT,0.5261,0.5463> appears to be a vehicle traveling straight ahead on the road. There are no indications of turning left or right; the vehicle maintains a straight trajectory, suggesting it is \"Going ahead.\""
+  },
+  {
+    "scene_token": "f92422ed4b4e427194a4958ccf15709a",
+    "frame_token": "401cbca10866445bb48f2b1bf0418231",
+    "question_type": "perception",
+    "question": "What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.",
+    "answer": "There is a black SUV to the back of the ego vehicle, a blue car to the back of the ego vehicle, a white car to the front right of the ego vehicle, and a gray jacket pedestrian to the back right of the ego vehicle. The IDs of these objects are <c1,CAM_BACK,0.5567,0.6936>, <c2,CAM_BACK,0.1082,0.6444>, <c3,CAM_FRONT_RIGHT,0.7864,0.6463>, and <c4,CAM_BACK_RIGHT,0.3453,0.6009>.",
+    "tag": [
+      2
+    ],
+    "image_path": {
+      "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n008-2018-08-29-16-04-13-0400__CAM_FRONT__1535573956512404.jpg",
+      "CAM_FRONT_LEFT": "data/nuscenes/samples/CAM_FRONT_LEFT/n008-2018-08-29-16-04-13-0400__CAM_FRONT_LEFT__1535573956504799.jpg",
+      "CAM_FRONT_RIGHT": "data/nuscenes/samples/CAM_FRONT_RIGHT/n008-2018-08-29-16-04-13-0400__CAM_FRONT_RIGHT__1535573956520482.jpg",
+      "CAM_BACK": "data/nuscenes/samples/CAM_BACK/n008-2018-08-29-16-04-13-0400__CAM_BACK__1535573956537558.jpg",
+      "CAM_BACK_LEFT": "data/nuscenes/samples/CAM_BACK_LEFT/n008-2018-08-29-16-04-13-0400__CAM_BACK_LEFT__1535573956547405.jpg",
+      "CAM_BACK_RIGHT": "data/nuscenes/samples/CAM_BACK_RIGHT/n008-2018-08-29-16-04-13-0400__CAM_BACK_RIGHT__1535573956528113.jpg"
+    },
+    "pred": "In the current scene, the following important objects can be identified:\n\n1. **Buildings**: These include commercial buildings and office structures, which provide context about the urban environment.\n2. **Trees**: The trees add greenery to the urban setting and may influence visibility due to their height.\n3. **Traffic Lights**: These control traffic flow and are crucial for navigation.\n4. **Cars**: Various vehicles are present, including parked cars and moving vehicles, indicating active traffic conditions.\n5. **Pedestrians**: Individuals walking across the street suggest pedestrian activity and potential crosswalks.\n6. **Street Signs**: These provide directional and regulatory"
+  },
+  {
+    "scene_token": "e0b14a8e11994763acba690bbcc3f56a",
+    "frame_token": "0e364b7146c848b5a5fd73bbe05e59ed",
+    "question_type": "planning",
+    "question": "In this scenario, what are safe actions to take for the ego vehicle?",
+    "answer": "Brake gently to a stop, slightly offset to the right.",
+    "tag": [
+      1
+    ],
+    "image_path": {
+      "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n008-2018-09-18-12-07-26-0400__CAM_FRONT__1537287304412404.jpg",
+      "CAM_FRONT_LEFT": "data/nuscenes/samples/CAM_FRONT_LEFT/n008-2018-09-18-12-07-26-0400__CAM_FRONT_LEFT__1537287304404799.jpg",
+      "CAM_FRONT_RIGHT": "data/nuscenes/samples/CAM_FRONT_RIGHT/n008-2018-09-18-12-07-26-0400__CAM_FRONT_RIGHT__1537287304420482.jpg",
+      "CAM_BACK": "data/nuscenes/samples/CAM_BACK/n008-2018-09-18-12-07-26-0400__CAM_BACK__1537287304437558.jpg",
+      "CAM_BACK_LEFT": "data/nuscenes/samples/CAM_BACK_LEFT/n008-2018-09-18-12-07-26-0400__CAM_BACK_LEFT__1537287304447405.jpg",
+      "CAM_BACK_RIGHT": "data/nuscenes/samples/CAM_BACK_RIGHT/n008-2018-09-18-12-07-26-0400__CAM_BACK_RIGHT__1537287304428113.jpg"
+    },
+    "pred": "Based on the images provided, here are some safe actions that the ego vehicle should consider:\n\n### 1. **Monitor Traffic Conditions**\n   - **Image Analysis**: The environment appears foggy or smoky, reducing visibility significantly. There are vehicles visible but their positions and movements are unclear due to the haze.\n   - **Action Recommendation**: Slow down and maintain a safe distance from other vehicles. Use headlights to improve visibility as much as possible.\n\n### 2. **Avoid Blind Spots**\n   - **Image Analysis**: There is a large Ryder truck ahead, partially obscured by smoke. Other vehicles are also present but difficult to fully assess"
+  },
+  {
+    "scene_token": "21464a6831c1443db294d1b56a7a33a5",
+    "frame_token": "aab0ef8d5aa34f5290607cca8498054c",
+    "question_type": "prediction",
+    "question": "What object should the ego vehicle notice first when the ego vehicle is getting to the next possible location? What is the state of the object that is first noticed by the ego vehicle and what action should the ego vehicle take? What object should the ego vehicle notice second when the ego vehicle is getting to the next possible location? What is the state of the object perceived by the ego vehicle as second and what action should the ego vehicle take? What object should the ego vehicle notice third? What is the state of the object perceived by the ego vehicle as third and what action should the ego vehicle take?",
+    "answer": "First, notice orange and black construction sign at left camera, which is in a state of construction ahead, so the ego vehicle should maintain speed and continue forward. Second, notice gray sedan at back camera, which is in a state of left turn, so the ego vehicle should maintain speed and continue forward. Finally, notice yellow bicycle at left rear camera, which is stationary, so the ego vehicle should maintain speed and continue forward.",
+    "tag": [
+      3
+    ],
+    "image_path": {
+      "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n015-2018-09-26-11-17-24+0800__CAM_FRONT__1537932314912460.jpg",
+      "CAM_FRONT_LEFT": "data/nuscenes/samples/CAM_FRONT_LEFT/n015-2018-09-26-11-17-24+0800__CAM_FRONT_LEFT__1537932314904844.jpg",
+      "CAM_FRONT_RIGHT": "data/nuscenes/samples/CAM_FRONT_RIGHT/n015-2018-09-26-11-17-24+0800__CAM_FRONT_RIGHT__1537932314920339.jpg",
+      "CAM_BACK": "data/nuscenes/samples/CAM_BACK/n015-2018-09-26-11-17-24+0800__CAM_BACK__1537932314937525.jpg",
+      "CAM_BACK_LEFT": "data/nuscenes/samples/CAM_BACK_LEFT/n015-2018-09-26-11-17-24+0800__CAM_BACK_LEFT__1537932314948246.jpg",
+      "CAM_BACK_RIGHT": "data/nuscenes/samples/CAM_BACK_RIGHT/n015-2018-09-26-11-17-24+0800__CAM_BACK_RIGHT__1537932314927893.jpg"
+    },
+    "pred": "### Analysis:\n\n#### Step-by-step reasoning:\n\n1. **Identify the first object of interest:**\n   - The first noticeable object is the car parked on the right side of the road (Image 4). It appears stationary and does not seem to be moving.\n\n2. **Identify the second object of interest:**\n   - The second noticeable object is the pedestrian crossing sign (Image 5). It indicates where pedestrians can cross safely.\n\n3. **Identify the third object of interest:**\n   - The third noticeable object is the tree (Image 5). It is stationary and part of the roadside scenery.\n\n### Actions"
+  }
+]

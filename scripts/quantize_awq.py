@@ -117,8 +117,11 @@ def quantize(cfg: dict, questions, out_dir: Path, recipe: dict, condition: str, 
             src = None if condition == "NoImage" else condition_image_path(p, condition, cond_dir)
             images.append(Image.open(io.BytesIO(load_image_bytes(src, data_root, resize_to, noimage))).convert("RGB"))
         text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        # Keep the processor's batch dimension (input_ids is (1, seq)): the
+        # model's rope index reads input_ids.shape[1]. pixel_values has no batch
+        # dimension ((patches, 1176)), as in the llm-compressor Qwen2.5-VL example.
         enc = processor(text=[text], images=images, padding=False, max_length=int(qcfg["max_seq_len"]), truncation=True)
-        return {k: (v[0] if k in ("input_ids", "attention_mask") else v) for k, v in enc.items()}
+        return {k: v for k, v in enc.items()}
 
     print(f"[quantize] rendering {len(questions)} calibration samples ({condition})")
     ds = Dataset.from_list([render(q) for q in questions])

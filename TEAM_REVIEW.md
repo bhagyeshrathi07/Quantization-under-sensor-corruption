@@ -1,4 +1,4 @@
-# Team review: scope change and decisions (September 29 – October 1, 2026; addenda October 19 and 20)
+# Team review: scope change and decisions (September 29 – October 1, 2026; addenda October 19, 20, and November 3)
 
 For Bhagyesh and Akshay. This summarizes what happened after the professor reviewed our September 8 proposal, what was changed in the repo, what has been built so far, and what still needs your sign-off. Read the "Decisions that need your confirmation" section first if you are short on time.
 
@@ -215,3 +215,9 @@ Items 1–6 in section 8 are still open; nobody has replied. Added:
 ### Next GPU session (about 1.5 hours on the Vast host)
 
 Fetch clean images; verify streaming and the KV flag on vLLM 0.31; clean and Fog 20-question runs on both precisions; stability slice on both; profile session 1; smoke test the own-AWQ checkpoint if it exists by then. Then freeze `PROTOCOL.md`.
+
+### November 3: first full session on a replacement host
+
+The October Vast host destroyed our stopped instance (nothing unique lost; everything was in git). New host: RTX 4090 at the stock 450 W, vLLM 0.33. In one 75-minute session: clean images fetched, equal KV cache and streaming verified, clean/Fog/NoImage slices on both precisions, stability floor (zero self-changes), profile session 1 (INT4 2.4× faster, 47% less memory at equal cache), and our own AWQ checkpoint built from the base weights in 8 minutes using calibration-scene prompts only. Full numbers in `manifests/session1_2026-11-03.md`. First two flips observed: both when the model has no image and a BF16 margin under 0.25, which is the pattern the margin hypothesis predicts; 32 pairs, so no claim.
+
+We are two weeks behind the plan (the matrix was scheduled for weeks 8–9). The freeze can go ahead on the stated defaults if nobody objects by Friday November 6; the matrix takes one GPU evening after that.

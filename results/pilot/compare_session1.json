@@ -1,0 +1,204 @@
+{
+  "margin_edges": [
+    0.25,
+    0.5
+  ],
+  "n_boot": 2000,
+  "seed": 0,
+  "min_questions": 3,
+  "min_scenes": 1,
+  "mcq": {
+    "groups": {
+      "cell": [
+        {
+          "label": "behavior/MCQ",
+          "n": 12,
+          "scenes": 4,
+          "ref_acc": 0.5,
+          "quant_acc": 0.5,
+          "acc_delta": 0.0,
+          "harmful": 1,
+          "beneficial": 1,
+          "neutral_change": 0,
+          "unchanged": 10,
+          "harmful_rate": 0.16666666666666666,
+          "change_rate": 0.16666666666666666,
+          "ref_score_mean": null,
+          "quant_score_mean": null,
+          "assessed": true,
+          "ci": {
+            "harmful_rate": [
+              0.0,
+              0.3333333333333333
+            ],
+            "acc_delta": [
+              -0.25,
+              0.25
+            ],
+            "change_rate": [
+              0.0,
+              0.3333333333333333
+            ]
+          }
+        },
+        {
+          "label": "perception/MCQ",
+          "n": 12,
+          "scenes": 4,
+          "ref_acc": 0.5,
+          "quant_acc": 0.5,
+          "acc_delta": 0.0,
+          "harmful": 0,
+          "beneficial": 0,
+          "neutral_change": 0,
+          "unchanged": 12,
+          "harmful_rate": 0.0,
+          "change_rate": 0.0,
+          "ref_score_mean": null,
+          "quant_score_mean": null,
+          "assessed": true,
+          "ci": {
+            "harmful_rate": [
+              0.0,
+              0.0
+            ],
+            "acc_delta": [
+              0.0,
+              0.0
+            ],
+            "change_rate": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      ],
+      "condition": [
+        {
+          "label": "Fog",
+          "n": 8,
+          "scenes": 8,
+          "ref_acc": 0.5,
+          "quant_acc": 0.5,
+          "acc_delta": 0.0,
+          "harmful": 0,
+          "beneficial": 0,
+          "neutral_change": 0,
+          "unchanged": 8,
+          "harmful_rate": 0.0,
+          "change_rate": 0.0,
+          "ref_score_mean": null,
+          "quant_score_mean": null,
+          "assessed": true,
+          "ci": {
+            "harmful_rate": [
+              0.0,
+              0.0
+            ],
+            "acc_delta": [
+              0.0,
+              0.0
+            ],
+            "change_rate": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "label": "NoImage",
+          "n": 8,
+          "scenes": 8,
+          "ref_acc": 0.375,
+          "quant_acc": 0.375,
+          "acc_delta": 0.0,
+          "harmful": 1,
+          "beneficial": 1,
+          "neutral_change": 0,
+          "unchanged": 6,
+          "harmful_rate": 0.3333333333333333,
+          "change_rate": 0.25,
+          "ref_score_mean": null,
+          "quant_score_mean": null,
+          "assessed": true,
+          "ci": {
+            "harmful_rate": [
+              0.0,
+              1.0
+            ],
+            "acc_delta": [
+              -0.375,
+              0.375
+            ],
+            "change_rate": [
+              0.0,
+              0.625
+            ]
+          }
+        },
+        {
+          "label": "clean",
+          "n": 8,
+          "scenes": 8,
+          "ref_acc": 0.625,
+          "quant_acc": 0.625,
+          "acc_delta": 0.0,
+          "harmful": 0,
+          "beneficial": 0,
+          "neutral_change": 0,
+          "unchanged": 8,
+          "harmful_rate": 0.0,
+          "change_rate": 0.0,
+          "ref_score_mean": null,
+          "quant_score_mean": null,
+          "assessed": true,
+          "ci": {
+            "harmful_rate": [
+              0.0,
+              0.0
+            ],
+            "acc_delta": [
+              0.0,
+              0.0
+            ],
+            "change_rate": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      ]
+    },
+    "overall": {
+      "label": "all",
+      "n": 24,
+      "scenes": 8,
+      "ref_acc": 0.5,
+      "quant_acc": 0.5,
+      "acc_delta": 0.0,
+      "harmful": 1,
+      "beneficial": 1,
+      "neutral_change": 0,
+      "unchanged": 22,
+      "harmful_rate": 0.08333333333333333,
+      "change_rate": 0.08333333333333333,
+      "ref_score_mean": null,
+      "quant_score_mean": null,
+      "assessed": true,
+      "ci": {
+        "harmful_rate": [
+          0.0,
+          0.23529411764705882
+        ],
+        "acc_delta": [
+          -0.125,
+          0.125
+        ],
+        "change_rate": [
+          0.0,
+          0.20833333333333334
+        ]
+      }
+    }
+  }
+}

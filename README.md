@@ -4,11 +4,11 @@
 **Team:** Ronak, Bhagyesh, and Akshay  
 **Track:** System / Deployment (supported by experimental research)  
 **Duration:** 14 weeks  
-**Prepared:** September 8, 2026. **Revised:** September 29, 2026, after instructor feedback. **Status updated:** October 20, 2026.
+**Prepared:** September 8, 2026. **Revised:** September 29, 2026, after instructor feedback. **Status updated:** November 3, 2026.
 
 ## Abstract
 
-Quantization reduces the precision of the numbers used inside a neural network, potentially reducing memory use and inference time. Average accuracy on a benchmark may stay almost unchanged after quantization while individual answers still change, and some of those changes turn a correct driving decision into an incorrect one. This project deploys one driving-scene vision-language model, Qwen2.5-VL-7B-Instruct, in vLLM at BF16 and at INT4, runs the same DriveBench questions through both, and identifies every case in which the full-precision model is correct but the quantized model changes the answer or the driving decision. We analyze these failures by driving task, answer format, the full-precision model's confidence margin, the number of camera views, and, as a stress test, a small set of sensor-corruption conditions. We measure the latency and memory savings that INT4 provides under matched serving settings, and, if time permits, test one simple mitigation: retaining a small set of sensitive decoder layers at BF16. The contribution is a reproducible, hardware-measured, paired failure analysis of a quantized driving VLM, extending prior work that reports only aggregate scores. The study runs on one rented RTX 4090 (24 GB, power-limited to 300 W) pinned for all measurements; SJSU's course HPC is the fallback, and no Jetson is required.
+Quantization reduces the precision of the numbers used inside a neural network, potentially reducing memory use and inference time. Average accuracy on a benchmark may stay almost unchanged after quantization while individual answers still change, and some of those changes turn a correct driving decision into an incorrect one. This project deploys one driving-scene vision-language model, Qwen2.5-VL-7B-Instruct, in vLLM at BF16 and at INT4, runs the same DriveBench questions through both, and identifies every case in which the full-precision model is correct but the quantized model changes the answer or the driving decision. We analyze these failures by driving task, answer format, the full-precision model's confidence margin, the number of camera views, and, as a stress test, a small set of sensor-corruption conditions. We measure the latency and memory savings that INT4 provides under matched serving settings, and, if time permits, test one simple mitigation: retaining a small set of sensitive decoder layers at BF16. The contribution is a reproducible, hardware-measured, paired failure analysis of a quantized driving VLM, extending prior work that reports only aggregate scores. The study runs on one rented RTX 4090 (24 GB) pinned for all measurements; SJSU's course HPC is the fallback, and no Jetson is required.
 
 ## Repository contents
 
@@ -65,7 +65,7 @@ tests/                             27 offline unit tests (pytest)
 
 **Removed on September 29, 2026:** the camera-based occupancy perception strand (FlashOcc-M0 in TensorRT), the full corruption matrix, and GPU energy as a required measurement. FP8, additional models, the remaining DriveBench conditions, energy, and Jetson measurements are extensions.
 
-## Status (October 20, 2026, semester week 7)
+## Status (November 3, 2026, semester week 9)
 
 **Done.**
 - Week-5 baseline gate passed on October 15 ([manifests/gate_week5.md](manifests/gate_week5.md)): BF16 7B serves six views on the 24 GB card; official AWQ INT4 serves; option-letter log-probabilities are available, so the margin analysis is feasible; 20-question LowLight run on both precisions with zero errors; BF16 p50 2.39 s versus INT4 0.91 s per question at batch size 1.
@@ -73,9 +73,11 @@ tests/                             27 offline unit tests (pytest)
 - Analysis tooling built and unit-tested offline: paired bootstrap, stability slice, deployment profile with streaming TTFT, equal KV-cache serving, scene-split filtering.
 - Build for the final runs written offline on October 20, dry-run tested, not yet run on a GPU: own-AWQ quantization script (recipe and calibration manifest), matrix driver, VQA judge with the released rubric prompts (the released `--eval-gpt` path cannot run as shipped; see PROTOCOL section 7), coverage rule in the comparison. The toolkit's `data/visual_description.json`, needed by the planning judge prompt, was located and is fetched automatically.
 
-**In progress (weeks 6–7, freeze and build).** Protocol freeze ([PROTOCOL.md](PROTOCOL.md)), next GPU session (clean and Fog pilots, stability, profile, streaming and KV-flag verification on vLLM 0.31, first run of `quantize_awq.py`).
+- GPU session 1 on the replacement host, November 3 ([manifests/session1_2026-11-03.md](manifests/session1_2026-11-03.md)): the October instance had been destroyed by its host and was rebuilt; clean nuScenes images fetched; equal KV cache and streaming verified on vLLM 0.33; clean, Fog, NoImage 20-question slices on both precisions (zero errors; 1 harmful and 1 beneficial flip in 32 MCQ pairs, both NoImage with BF16 margin below 0.25); stability floor measured at zero self-changes; deployment profile session 1 (INT4 2.4× faster at batch 1, 47% less peak memory, equal 2 GiB KV cache); own AWQ W4A16 checkpoint built in 8 minutes and served.
 
-**Not started.** The 8-run matrix on final scenes (weeks 8–9), analysis and explorer (10–11), mitigation (12), report (13–14).
+**In progress (week 9, two weeks behind the plan).** Protocol freeze ([PROTOCOL.md](PROTOCOL.md)) pending team decisions, then the 8-run matrix on final scenes with `run_matrix.sh`.
+
+**Not started.** Profile sessions 2 and 3, VQA judging (budget decision), analysis and explorer (weeks 10–11), mitigation (12), report (13–14).
 
 **Open team decisions** are listed in [TEAM_REVIEW.md](TEAM_REVIEW.md), section 8 and the October 19 addendum.
 

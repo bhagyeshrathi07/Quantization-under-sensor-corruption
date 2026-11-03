@@ -224,3 +224,6 @@ results/*
 !results/pilot/
 .venv/
 checkpoints/
+!results/pilot_ownawq/
+!results/stability/
+!results/profile/

@@ -1,6 +1,6 @@
 # Experiment protocol (draft for the week-7 freeze)
 
-**Status: DRAFT, October 20, 2026.** Each item is marked **FROZEN** (decided and tested), **PILOT DEFAULT** (in use, expected to stand, confirm at freeze), or **TO DECIDE** (needs a development-scene pilot or a team decision). When the freeze happens, every TO DECIDE item is resolved, the date is written here, and a copy of `config/pilot.yaml` is saved as `manifests/config_frozen.yaml`. After that, changes to anything in this file require a dated entry in the change log at the bottom. Analysis of final-scene results does not begin before the freeze.
+**Status: DRAFT, November 3, 2026.** Each item is marked **FROZEN** (decided and tested), **PILOT DEFAULT** (in use, expected to stand, confirm at freeze), or **TO DECIDE** (needs a development-scene pilot or a team decision). When the freeze happens, every TO DECIDE item is resolved, the date is written here, and a copy of `config/pilot.yaml` is saved as `manifests/config_frozen.yaml`. After that, changes to anything in this file require a dated entry in the change log at the bottom. Analysis of final-scene results does not begin before the freeze.
 
 The proposal ([C_PROJECT_PROPOSAL.md](C_PROJECT_PROPOSAL.md)) states what we intend; this file states exactly how it is executed, so that a reader can rerun the study from the repository.
 
@@ -20,16 +20,16 @@ All runs use `scripts/01_serve.sh`, one precision at a time, one server per GPU.
 
 | Flag | Value | Status |
 |---|---|---|
-| vLLM / torch / transformers | 0.31.0 / 2.13.0+cu130 / 5.17.0 (pilot versions). At the freeze: `uv pip freeze > manifests/requirements_frozen.txt` on the host, and pin the same versions in `pyproject.toml` | PILOT DEFAULT |
+| vLLM / torch / transformers | 0.33.0 / 2.14.0+cu130 / 5.20.2, installed November 3 on the replacement host and captured in `manifests/requirements_frozen.txt` (the October pilot ran 0.31.0 / 2.13.0 / 5.17.0; nothing from that stack is reused). Pin these in `pyproject.toml` at the freeze | PILOT DEFAULT |
 | `--max-model-len` | 4096 | PILOT DEFAULT |
 | `--limit-mm-per-prompt` | `{"image": 6}` | FROZEN |
 | `--mm-processor-kwargs max_pixels` | 200704 (measured ~165 image tokens per 1600×900 view, ~1293 prompt tokens for six views) | TO DECIDE: keep, or raise to 401408 (~512 tokens per view) after a development-scene pilot on both precisions |
-| `--kv-cache-memory-bytes` | 2 GiB, identical for both precisions | PILOT DEFAULT (verify accepted by vLLM 0.31 at the next session) |
+| `--kv-cache-memory-bytes` | 2 GiB, identical for both precisions; verified November 3 on vLLM 0.33 (2.0 GiB reserved, 37,440 KV tokens, both precisions) | FROZEN |
 | `--max-num-seqs` | 1 (batch size 1, concurrency 1) | FROZEN |
 | `--seed` | 0 | FROZEN |
 | `--dtype` | bfloat16 for BF16; float16 with `--quantization awq_marlin` for INT4 | FROZEN |
 | Prefix caching | vLLM default (on) for quality runs; stability runs are reported with it on, and optionally once with `--no-enable-prefix-caching` | TO DECIDE |
-| Host | One pinned Vast.ai host (machine id m:3752, RTX 4090 24 GB, power limit 300 W, driver 580.178.04). All profiling sessions on this host. If the host becomes unavailable, re-run the profile on the replacement host and report both | FROZEN rule |
+| Host | One pinned Vast.ai host. Since November 3, 2026: offer m:11851 (Spain, RTX 4090 24 GB, stock 450 W power limit, driver 615.71.09); the October host m:3752 (300 W cap) destroyed the stopped instance, and its latency numbers are pilot-only. All profiling sessions on the current host. If it becomes unavailable, re-run all profile sessions on the replacement and report both | FROZEN rule |
 
 ## 3. Prompt and images
 
@@ -105,11 +105,11 @@ Paired bootstrap over scenes: resample scenes with replacement, keep every quest
 
 ## 10. Stability floor
 
-`scripts/06_stability.py`: 60 stratified development-scene questions (seed 1), three repeats per precision in the clean condition, same server settings as the quality runs. Reports `self_change_rate` (letter disagreement between repeats) and `self_correctness_change_rate`. A BF16-versus-INT4 `change_rate` below the larger of the two precisions' `self_change_rate` is reported as within the nondeterminism floor. **PILOT DEFAULT** (slice size and conditions to confirm).
+`scripts/06_stability.py`: 60 stratified development-scene questions (seed 1), three repeats per precision in the clean condition, same server settings as the quality runs. Reports `self_change_rate` (letter disagreement between repeats) and `self_correctness_change_rate`. A BF16-versus-INT4 `change_rate` below the larger of the two precisions' `self_change_rate` is reported as within the nondeterminism floor. Measured November 3 on the pinned host: zero letter, correctness, or text changes across three repeats for both precisions (25 MCQ); margin range max 0.039 BF16, 0.004 INT4 (`results/stability/`). **PILOT DEFAULT** (slice size and conditions to confirm; a repeat with `--no-enable-prefix-caching` is optional).
 
 ## 11. Deployment profile
 
-`scripts/07_profile.py`: 50 six-view development questions in fixed order, 3 warm-up requests excluded, streamed requests. Per session: TTFT p50/p95/p99, total latency p50/p95/p99, decode tokens per second, peak GPU memory sampled at 0.2 s, with the server manifest embedded. Three separate sessions per precision on the pinned host, all with `--kv-cache-memory-bytes` 2 GiB. Budgets from the proposal: p95 TTFT ≤ 2 s, median decode ≥ 15 tok/s, INT4 peak memory ≥ 25% below BF16. The pilot's memory numbers (both ~22 GB under `--gpu-memory-utilization 0.9`) are not a result. **PILOT DEFAULT.**
+`scripts/07_profile.py`: 50 six-view development questions in fixed order, 3 warm-up requests excluded, streamed requests. Per session: TTFT p50/p95/p99, total latency p50/p95/p99, decode tokens per second, peak GPU memory sampled at 0.2 s, with the server manifest embedded. Three separate sessions per precision on the pinned host, all with `--kv-cache-memory-bytes` 2 GiB. Budgets from the proposal: p95 TTFT ≤ 2 s, median decode ≥ 15 tok/s, INT4 peak memory ≥ 25% below BF16. The October pilot's memory numbers (both ~22 GB under `--gpu-memory-utilization 0.9`) are not a result. Session 1 of 3 ran November 3 on the pinned host (`results/profile/*_s1.json`, `manifests/session1_2026-11-03.md`). **PILOT DEFAULT.**
 
 ## 12. Mitigation (week 12, if time permits)
 
@@ -140,3 +140,4 @@ Judge sidecar, one per result file (`<precision>_<condition>.judge.jsonl`): `que
 
 - 2026-10-19: first draft, after the week-5 pilot. Nothing frozen beyond what the pilot tested.
 - 2026-10-20: own-checkpoint recipe made concrete (section 1), matrix driver (6), VQA judge path and VQA flip classes (7), coverage rule mechanics (5), `question` field and judge sidecar schema (13). Nothing frozen.
+- 2026-11-03: replacement host and new software versions (section 2); KV-cache flag verified and frozen; stability floor measured (10); profile session 1 done (11); own AWQ checkpoint built (1). See `manifests/session1_2026-11-03.md`.
