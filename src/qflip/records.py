@@ -27,13 +27,19 @@ def append_record(path: str | Path, rec: dict) -> None:
         f.write(json.dumps(rec) + "\n")
 
 
+def iter_raw_records(path: str | Path):
+    """Every row in file order, retries included (validation reads this; analysis
+    reads read_records)."""
+    with open(path) as f:
+        for line in f:
+            if line.strip():
+                yield json.loads(line)
+
+
 def read_records(path: str | Path) -> list[dict]:
     """All records; when a question_id appears more than once (retry after an
     error), the last record wins."""
     by_id: dict[str, dict] = {}
-    with open(path) as f:
-        for line in f:
-            if line.strip():
-                rec = json.loads(line)
-                by_id[rec["question_id"]] = rec
+    for rec in iter_raw_records(path):
+        by_id[rec["question_id"]] = rec
     return list(by_id.values())

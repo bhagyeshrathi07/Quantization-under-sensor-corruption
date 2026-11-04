@@ -12,7 +12,10 @@ Writes two files per (precision, condition):
     python scripts/03_smoke_drivebench.py --precision bf16 --n 0 --split final --out-dir results/final   # full run
 
 Question selection is deterministic (seeded), stratified so every eligible cell
-appears, and identical across precisions and conditions.
+appears, and identical across precisions and conditions. Default split is
+development; the final split needs manifests/config_frozen.yaml and refuses a
+server that does not match it. Every result file gets a .meta.json sidecar and
+a rerun refuses to append under different settings.
 """
 
 import argparse
@@ -28,6 +31,7 @@ from qflip.client import make_client  # noqa: E402
 from qflip.config import load_config  # noqa: E402
 from qflip.drivebench import load_questions  # noqa: E402
 from qflip.gpu import PeakMemorySampler  # noqa: E402
+from qflip.guard import prepare_run  # noqa: E402
 from qflip.records import append_record, load_done_ids, read_records  # noqa: E402
 from qflip.runner import read_system_prompt, run_question, select_stratified  # noqa: E402
 from qflip.split import filter_split  # noqa: E402
@@ -39,8 +43,9 @@ def main():
     ap.add_argument("--condition", default="clean")
     ap.add_argument("--config", default="config/pilot.yaml")
     ap.add_argument("--n", type=int, default=None, help="questions to run; 0 = all; default from config")
-    ap.add_argument("--split", default="all", help="scene split to draw from: all, calibration, development, final")
+    ap.add_argument("--split", default="development", help="scene split: development (default), calibration, final (needs the freeze), final_exposed, all")
     ap.add_argument("--split-file", default="manifests/scene_split.json")
+    ap.add_argument("--exclusions-file", default="manifests/scene_exclusions.json")
     ap.add_argument("--out-dir", help="results directory; default pilot.results_dir from config (results/pilot)")
     args = ap.parse_args()
 
@@ -51,10 +56,14 @@ def main():
     client = make_client(cfg)
     n = cfg["pilot"]["n_questions"] if args.n is None else args.n
 
-    questions = select_stratified(filter_split(load_questions(cfg["data"]["annotations"]), args.split, args.split_file), n)
+    questions = select_stratified(filter_split(load_questions(cfg["data"]["annotations"]), args.split, args.split_file, args.exclusions_file), n)
     system_prompt = read_system_prompt(cfg)
     out_dir = Path(args.out_dir or cfg["pilot"]["results_dir"])
     jsonl = out_dir / f"{args.precision}_{args.condition}.jsonl"
+    # Provenance sidecar, live-server check, and (final split) the freeze guard.
+    # Raises before any record is written.
+    prepare_run(cfg, config_path=args.config, precision=args.precision, condition=args.condition, split=args.split,
+                result_file=jsonl, split_file=args.split_file, exclusions_file=args.exclusions_file)
     done = load_done_ids(jsonl)
     todo = [q for q in questions if q.question_id not in done]
     print(f"{len(questions)} selected, {len(done)} done, {len(todo)} to run -> {jsonl}")

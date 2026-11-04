@@ -78,13 +78,14 @@ def test_sidecar_resume(tmp_path):
     assert load_scores(tmp_path / "missing.jsonl") == {}
 
 
-def _rec(qid, scene, cell="planning/VQA", error=None):
-    return {"question_id": qid, "scene_token": scene, "cell": cell, "n_views": 6, "condition": "clean", "error": error}
+def _rec(qid, scene, cell="planning/VQA", error=None, precision="bf16"):
+    return {"question_id": qid, "scene_token": scene, "frame_token": "f", "cell": cell, "n_views": 6, "views": ["CAM_FRONT"] * 6,
+            "condition": "clean", "precision": precision, "question": f"Q{qid}", "gt": "turn left", "error": error}
 
 
 def test_pair_vqa_records_threshold_and_classes():
     ref = [_rec("1", "s1"), _rec("2", "s1"), _rec("3", "s2"), _rec("4", "s2"), _rec("5", "s2", cell="behavior/MCQ"), _rec("6", "s3")]
-    qnt = [_rec("1", "s1"), _rec("2", "s1"), _rec("3", "s2"), _rec("4", "s2"), _rec("5", "s2", cell="behavior/MCQ"), _rec("6", "s3")]
+    qnt = [{**r, "precision": "int4"} for r in ref]
     rs = {"1": {"score": 80}, "2": {"score": 30}, "3": {"score": 70}, "4": {"score": 20}, "5": {"score": 90}, "6": {"score": 50}}
     qs = {"1": {"score": 40}, "2": {"score": 75}, "3": {"score": 65}, "4": {"score": 10}, "5": {"score": 90}, "6": {"score": None}}
     pairs = pair_vqa_records(ref, qnt, rs, qs, threshold=60)

@@ -11,6 +11,16 @@ models:
   bf16: "qwen2.5-vl-7b-bf16"
   int4: "qwen2.5-vl-7b-awq"
 
+# Serving flags; scripts/01_serve.sh reads these as its defaults (env vars
+# override for pilots; the frozen copy is enforced for final runs).
+serving:
+  max_pixels: 200704         # ~165 image tokens per 1600x900 view
+  max_model_len: 4096
+  kv_bytes: 2147483648       # 2 GiB KV cache, identical for both precisions
+  max_num_seqs: 1
+  seed: 0
+  prefix_caching: true
+
 data:
   root: "data"                                   # DriveBench layout, see docs/DATA_PREPAER.md upstream
   annotations: "data/drivebench-test.json"       # raw file from HF drive-bench/arena
@@ -78,8 +88,13 @@ quantize:
     - "re:model.visual.*"
   out_dir: "checkpoints/qwen2.5-vl-7b-awq-w4a16-g128"
 
-# Coverage minimum for reporting a cell (PROTOCOL section 5). TO DECIDE at the
-# freeze; groups below either number are reported as unassessed.
+# Analysis settings (PROTOCOL sections 5, 8, 9). Enforced against the frozen
+# copy for final-split analyses; CLI overrides are errors there.
 analysis:
-  min_questions: 30
+  min_questions: 30            # coverage: a group below this is unassessed
   min_scenes: 10
+  margin_edges: [0.25, 0.5]    # BF16 option-margin bins
+  n_boot_group: 2000           # group intervals
+  n_boot_contrast: 20000       # prespecified contrasts
+  support_min_ref_correct: 20  # contrast support: reference-correct pairs per side
+  support_min_ref_scenes: 10   # ... from at least this many scenes

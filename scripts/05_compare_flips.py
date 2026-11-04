@@ -12,6 +12,13 @@ Several conditions at once (ref quant ref quant ...), which enables --by conditi
 With judged VQA cells (sidecars from scripts/08_judge_vqa.py next to each file):
     python scripts/05_compare_flips.py ... --vqa --judge-threshold 60
 
+Every input file must carry a .meta.json sidecar (written by 03/06); sidecars
+must agree on split, inputs, and serving settings, and every record's scene must
+be in the declared population. Final-split files also require the core freeze
+and refuse CLI overrides of frozen analysis settings. --no-provenance skips the
+checks for pilot files written before sidecars existed; it never applies to
+final-split files.
+
 MCQ flip classes (strict rule: option letter at the start of the answer):
   harmful        reference correct, quantized wrong
   beneficial     reference wrong, quantized correct
@@ -34,7 +41,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from qflip.config import load_config  # noqa: E402
-from qflip.flips import bootstrap_scenes, coverage, group_by, pair_records, pair_vqa_records, summarize  # noqa: E402
+from qflip.drivebench import load_questions  # noqa: E402
+from qflip.flips import PairingError, bootstrap_scenes, coverage, group_by, pair_records, pair_vqa_records, summarize  # noqa: E402
+from qflip.freeze import load_judge_frozen  # noqa: E402
+from qflip.guard import legacy_files_check, validate_analysis_files  # noqa: E402
 from qflip.judge import load_scores, sidecar_path  # noqa: E402
 from qflip.records import read_records  # noqa: E402
 
@@ -63,12 +73,12 @@ def report(label: str, pairs, n_boot: int, seed: int, min_n: int, min_scenes: in
     return {"label": label, **s, "assessed": True, "ci": ci}
 
 
-def load_vqa_pairs(ref_path: str, quant_path: str, threshold: float):
+def load_vqa_pairs(ref_path: str, quant_path: str, threshold: float, question_text):
     ref_scores, quant_scores = load_scores(sidecar_path(ref_path)), load_scores(sidecar_path(quant_path))
     if not ref_scores or not quant_scores:
         print(f"  no judge sidecar for {ref_path} / {quant_path}; run scripts/08_judge_vqa.py first")
         return []
-    return pair_vqa_records(read_records(ref_path), read_records(quant_path), ref_scores, quant_scores, threshold)
+    return pair_vqa_records(read_records(ref_path), read_records(quant_path), ref_scores, quant_scores, threshold, question_text)
 
 
 def section(title: str, pairs, by, edges, args, min_n, min_scenes) -> dict:
@@ -87,10 +97,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("files", nargs="+", help="ref quant [ref quant ...]")
     ap.add_argument("--by", nargs="*", default=["cell", "n_views", "margin"], choices=["cell", "n_views", "margin", "condition"])
-    ap.add_argument("--margin-edges", default="0.25,0.5", help="bin edges for the BF16 option margin; freeze on dev scenes")
-    ap.add_argument("--n-boot", type=int, default=2000)
+    ap.add_argument("--margin-edges", help="bin edges for the BF16 option margin (default analysis.margin_edges)")
+    ap.add_argument("--n-boot", type=int, help="group bootstrap draws (default analysis.n_boot_group)")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--config", default="config/pilot.yaml")
+    ap.add_argument("--split-file", default="manifests/scene_split.json")
+    ap.add_argument("--exclusions-file", default="manifests/scene_exclusions.json")
+    ap.add_argument("--no-provenance", action="store_true", help="skip sidecar/population validation (pilot files from before sidecars existed; never for final)")
     ap.add_argument("--min-n", type=int, help="coverage minimum, questions per group (default analysis.min_questions)")
     ap.add_argument("--min-scenes", type=int, help="coverage minimum, scenes per group (default analysis.min_scenes)")
     ap.add_argument("--vqa", action="store_true", help="also pair judged VQA cells from the .judge.jsonl sidecars")
@@ -100,30 +113,52 @@ def main():
     args = ap.parse_args()
     if len(args.files) % 2:
         sys.exit("files must come in ref/quant pairs")
-    edges = tuple(float(x) for x in args.margin_edges.split(",") if x)
-    cfg = load_config(args.config) if Path(args.config).exists() else {}
-    an = cfg.get("analysis", {})
-    min_n = args.min_n if args.min_n is not None else an.get("min_questions", 10)
-    min_scenes = args.min_scenes if args.min_scenes is not None else an.get("min_scenes", 2)
+    cfg = load_config(args.config)
+    an = cfg["analysis"]
+    edges = tuple(float(x) for x in args.margin_edges.split(",") if x) if args.margin_edges else tuple(float(x) for x in an["margin_edges"])
+    n_boot = args.n_boot if args.n_boot is not None else an["n_boot_group"]
+    min_n = args.min_n if args.min_n is not None else an["min_questions"]
+    min_scenes = args.min_scenes if args.min_scenes is not None else an["min_scenes"]
+    args.n_boot = n_boot
+    effective = {"margin_edges": list(edges), "n_boot_group": n_boot, "min_questions": min_n, "min_scenes": min_scenes}
+
+    if args.no_provenance:
+        provenance = legacy_files_check(args.files)
+        print("EXPLORATORY: --no-provenance skips sidecar/population validation; this output is not a confirmatory result")
+    else:
+        provenance = validate_analysis_files(args.files, cfg, split_file=args.split_file, exclusions_file=args.exclusions_file, settings=effective)
+        print(f"provenance ok: split={provenance['split']} ({provenance['analysis_class']}), {len(provenance['files'])} files" + (", frozen " + provenance["frozen"]["date"] if "frozen" in provenance else ""))
+    question_text = {q.question_id: q.question for q in load_questions(cfg["data"]["annotations"])}
 
     pairs = []
     for ref_path, quant_path in zip(args.files[::2], args.files[1::2]):
-        p = pair_records(read_records(ref_path), read_records(quant_path))
+        try:
+            p = pair_records(read_records(ref_path), read_records(quant_path), question_text)
+        except PairingError as e:
+            sys.exit(f"pairing refused for {ref_path} vs {quant_path}: {e}")
         print(f"{ref_path} vs {quant_path}: {len(p)} paired MCQ")
         pairs.extend(p)
     if not pairs:
         sys.exit("no common MCQ questions")
 
-    out = {"margin_edges": edges, "n_boot": args.n_boot, "seed": args.seed, "min_questions": min_n, "min_scenes": min_scenes}
+    out = {"margin_edges": edges, "n_boot_group": n_boot, "seed": args.seed, "min_questions": min_n, "min_scenes": min_scenes, "provenance": provenance}
     out["mcq"] = section("MCQ", pairs, args.by, edges, args, min_n, min_scenes)
 
     if args.vqa:
-        threshold = args.judge_threshold if args.judge_threshold is not None else cfg.get("judge", {}).get("correct_threshold")
+        if provenance["split"] == "final":
+            jf = load_judge_frozen()
+            if jf is None or jf.get("correct_threshold") is None:
+                sys.exit("--vqa on final-split files needs manifests/judge_frozen.yaml with correct_threshold (judge protocol freeze)")
+            if args.judge_threshold is not None and args.judge_threshold != jf["correct_threshold"]:
+                sys.exit(f"--judge-threshold {args.judge_threshold} differs from the frozen judge threshold {jf['correct_threshold']}")
+            threshold = jf["correct_threshold"]
+        else:
+            threshold = args.judge_threshold if args.judge_threshold is not None else cfg.get("judge", {}).get("correct_threshold")
         if threshold is None:
             sys.exit("--vqa needs a threshold: --judge-threshold or judge.correct_threshold in config (TO DECIDE on development scenes)")
         vqa = []
         for ref_path, quant_path in zip(args.files[::2], args.files[1::2]):
-            vqa.extend(load_vqa_pairs(ref_path, quant_path, threshold))
+            vqa.extend(load_vqa_pairs(ref_path, quant_path, threshold, question_text))
         print(f"\n{len(vqa)} paired VQA at threshold {threshold}")
         if vqa:
             out["vqa"] = {"threshold": threshold, **section("VQA (judged)", vqa, [f for f in args.by if f != "margin"], edges, args, min_n, min_scenes)}

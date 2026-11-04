@@ -30,6 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from qflip.client import make_client  # noqa: E402
 from qflip.config import load_config  # noqa: E402
 from qflip.drivebench import load_questions  # noqa: E402
+from qflip.guard import prepare_run  # noqa: E402
 from qflip.records import append_record, load_done_ids, read_records  # noqa: E402
 from qflip.runner import read_system_prompt, run_question, select_stratified  # noqa: E402
 from qflip.split import filter_split  # noqa: E402
@@ -79,6 +80,7 @@ def main():
     ap.add_argument("--repeats", type=int, default=3)
     ap.add_argument("--split", default="development")
     ap.add_argument("--split-file", default="manifests/scene_split.json")
+    ap.add_argument("--exclusions-file", default="manifests/scene_exclusions.json")
     ap.add_argument("--seed", type=int, default=1, help="slice seed; differs from 03's so the slice is not the pilot set")
     ap.add_argument("--out-dir", default="results/stability")
     ap.add_argument("--report", action="store_true", help="only summarize existing repeat files")
@@ -93,10 +95,12 @@ def main():
     if not args.report:
         model = cfg["models"][args.precision]
         client = make_client(cfg)
-        questions = select_stratified(filter_split(load_questions(cfg["data"]["annotations"]), args.split, args.split_file), args.n, args.seed)
+        questions = select_stratified(filter_split(load_questions(cfg["data"]["annotations"]), args.split, args.split_file, args.exclusions_file), args.n, args.seed)
         system_prompt = read_system_prompt(cfg)
         print(f"{len(questions)} questions x {args.repeats} repeats, {args.precision} {args.condition}")
         for k, path in enumerate(files, 1):
+            prepare_run(cfg, config_path=args.config, precision=args.precision, condition=args.condition, split=args.split,
+                        result_file=path, split_file=args.split_file, exclusions_file=args.exclusions_file)
             done = load_done_ids(path)
             todo = [q for q in questions if q.question_id not in done]
             for q in tqdm(todo, desc=f"rep{k}"):

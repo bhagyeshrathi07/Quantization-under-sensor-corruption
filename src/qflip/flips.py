@@ -12,6 +12,36 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass
 
 FLIP_CLASSES = ("harmful", "beneficial", "neutral_change", "unchanged")
+PRECISIONS = ("bf16", "int4")
+
+
+class PairingError(ValueError):
+    """Reference and quantized records do not describe the same question under the same condition."""
+
+
+def check_pair(a: dict, b: dict, question_text: dict[str, str] | None = None) -> None:
+    """Raise PairingError naming the first field on which the two records of one
+    question_id disagree. Records written before the schema carried `question`
+    take it from question_text (annotation lookup)."""
+    qid = a["question_id"]
+    if (a.get("precision"), b.get("precision")) != PRECISIONS:
+        raise PairingError(f"{qid}: records must come as (reference=bf16, quantized=int4), got ({a.get('precision')!r}, {b.get('precision')!r}); a reversed order would swap harmful and beneficial")
+    qa = a.get("question") or (question_text or {}).get(qid)
+    qb = b.get("question") or (question_text or {}).get(qid)
+    checks = [
+        ("condition", a.get("condition"), b.get("condition")),
+        ("gt", a.get("mcq_gt", a.get("gt")), b.get("mcq_gt", b.get("gt"))),
+        ("question", qa, qb),
+        ("scene_token", a.get("scene_token"), b.get("scene_token")),
+        ("frame_token", a.get("frame_token"), b.get("frame_token")),
+        ("cell", a.get("cell"), b.get("cell")),
+        ("views", list(a.get("views") or []), list(b.get("views") or [])),
+    ]
+    for field, x, y in checks:
+        if x is None and y is None and field == "question":
+            raise PairingError(f"{qid}: question text missing on both sides and no annotation lookup given")
+        if x != y:
+            raise PairingError(f"{qid}: {field} differs between records: {x!r} vs {y!r}")
 
 
 def classify(ref: dict, quant: dict) -> str:
@@ -39,13 +69,15 @@ class Pair:
     quant_score: float | None = None
 
 
-def pair_records(ref_records: list[dict], quant_records: list[dict]) -> list[Pair]:
-    """Match MCQ records by question_id; records with errors on either side are dropped."""
+def pair_records(ref_records: list[dict], quant_records: list[dict], question_text: dict[str, str] | None = None) -> list[Pair]:
+    """Match MCQ records by question_id; records with errors on either side are
+    dropped. Every matched pair is validated with check_pair (PairingError)."""
     ref = {r["question_id"]: r for r in ref_records if (r.get("cell") or "").endswith("MCQ") and not r.get("error")}
     qnt = {r["question_id"]: r for r in quant_records if (r.get("cell") or "").endswith("MCQ") and not r.get("error")}
     pairs = []
     for qid in sorted(set(ref) & set(qnt)):
         a, b = ref[qid], qnt[qid]
+        check_pair(a, b, question_text)
         pairs.append(
             Pair(
                 question_id=qid,
@@ -68,6 +100,7 @@ def pair_vqa_records(
     ref_scores: dict[str, dict],
     quant_scores: dict[str, dict],
     threshold: float,
+    question_text: dict[str, str] | None = None,
 ) -> list[Pair]:
     """VQA pairing from judge sidecars (qflip.judge.load_scores). Correct =
     rubric score >= threshold. Only harmful / beneficial / unchanged apply:
@@ -82,6 +115,7 @@ def pair_vqa_records(
         if rs is None or qs is None:
             continue
         a = ref[qid]
+        check_pair(a, qnt[qid], question_text)
         rc, qc = rs >= threshold, qs >= threshold
         flip = "harmful" if rc and not qc else "beneficial" if qc and not rc else "unchanged"
         pairs.append(

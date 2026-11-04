@@ -64,16 +64,46 @@ sync_out() {
 log "matrix start: precisions=${PRECISIONS[*]} conditions=${CONDITIONS} split=${SPLIT} out=${OUT_DIR} n=${N} port=${PORT}"
 [[ "$DRY_RUN" == "1" ]] && echo "+ (dry run; nothing executed)"
 
+# Final split: the core freeze must exist and match the live config before any server starts.
+if [[ "$SPLIT" == "final" ]]; then
+  if [[ "$DRY_RUN" == "1" ]]; then
+    echo "+ python scripts/freeze_config.py --check   (required for SPLIT=final)"
+  else
+    python scripts/freeze_config.py --check || { log "final split refused: freeze check failed"; exit 1; }
+  fi
+fi
+
+port_free() { ! (ss -ltn 2>/dev/null || netstat -ltn 2>/dev/null) | grep -q ":${PORT} "; }
+served_name() { python -c "import yaml; print(yaml.safe_load(open('config/pilot.yaml'))['models']['$1'])"; }
+server_serves() { curl -sf "http://localhost:${PORT}/v1/models" | python -c "import sys,json; ids=[m['id'] for m in json.load(sys.stdin)['data']]; sys.exit(0 if '$1' in ids else 1)"; }
+
 for p in "${PRECISIONS[@]}"; do
   if [[ "$DRY_RUN" == "1" ]]; then
+    echo "+ port ${PORT} must be free"
     echo "+ bash scripts/01_serve.sh $p  > logs/serve_${p}_${STAMP}.txt 2>&1 &"
-    echo "+ wait for http://localhost:${PORT}/health"
+    echo "+ wait for http://localhost:${PORT}/health, then /v1/models must list $(served_name "$p"); manifest pid and port listener must be that server"
+    [[ "$SPLIT" == "final" ]] && echo "+ python scripts/freeze_config.py --check --serve-manifest manifests/serve_${p}.txt --precision $p"
   else
+    port_free || { log "port ${PORT} already in use: another server is running; refusing to reuse it"; exit 1; }
     log "starting server: $p"
     bash scripts/01_serve.sh "$p" > "logs/serve_${p}_${STAMP}.txt" 2>&1 &
     SERVER_PID=$!
     trap 'stop_server $SERVER_PID' EXIT
     wait_healthy "$SERVER_PID" || { tail -20 "logs/serve_${p}_${STAMP}.txt"; exit 1; }
+    want="$(served_name "$p")"
+    server_serves "$want" || { log "server on port ${PORT} does not serve ${want}"; exit 1; }
+    man_pid="$(sed -n 's/^pid: //p' "manifests/serve_${p}.txt")"
+    [[ "$man_pid" == "$SERVER_PID" ]] || { log "manifests/serve_${p}.txt pid ${man_pid:-none} is not the server this driver started (${SERVER_PID}); another 01_serve.sh overwrote it"; exit 1; }
+    listener_pid="$(ss -ltnp 2>/dev/null | grep ":${PORT} " | sed -n 's/.*pid=\([0-9]*\).*/\1/p' | head -1)"
+    [[ -n "$listener_pid" ]] || { log "cannot determine which process listens on port ${PORT} (ss -ltnp); refusing to run without listener ownership"; exit 1; }
+    listener_ppid="$(awk '/^PPid/{print $2}' "/proc/${listener_pid}/status" 2>/dev/null || true)"
+    if [[ "$listener_pid" != "$SERVER_PID" && "$listener_ppid" != "$SERVER_PID" ]]; then
+      log "port ${PORT} is held by pid ${listener_pid} (parent ${listener_ppid:-?}), not the started server ${SERVER_PID}"; exit 1
+    fi
+    if [[ "$SPLIT" == "final" ]]; then
+      python scripts/freeze_config.py --check --serve-manifest "manifests/serve_${p}.txt" --precision "$p" \
+        || { log "final split refused: server manifest differs from the freeze"; exit 1; }
+    fi
   fi
 
   for c in $CONDITIONS; do

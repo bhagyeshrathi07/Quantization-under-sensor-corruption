@@ -38,6 +38,8 @@ src/qflip/runner.py                one question in, one result record out (share
 src/qflip/flips.py                 pairing (MCQ and judged VQA), flip classes, paired bootstrap over scenes, coverage rule
 src/qflip/judge.py                 DriveBench rubric judge: description lookup, prompt fill, score parsing, sidecars
 src/qflip/judge_prompts.py         released judge templates, verbatim
+src/qflip/provenance.py            result-file sidecars (input hashes, checkpoint fingerprint), resume compatibility, live-server check
+src/qflip/freeze.py, guard.py      core freeze (frozen config + protocol snapshot) and the run/analysis guards that enforce it
 src/qflip/split.py, stats.py, gpu.py, records.py
 scripts/download_drivebench.py     annotations + visual descriptions (HF, toolkit) + corruption images (Google Drive zip)
 scripts/download_clean_images.py   clean nuScenes keyframes streamed from the public AWS mirror
@@ -46,6 +48,8 @@ scripts/01_serve.sh bf16|int4      vllm serve with the protocol's flags, equal K
 scripts/02_smoke_request.py        one six-view request: tokens per view, logprobs, margin, memory
 scripts/03_smoke_drivebench.py     N or all questions per (precision, condition), resumable, --split
 scripts/04_scene_split.py          calibration / development / final scene manifest
+scripts/exclude_exposed_scenes.py  record final scenes a pilot inspected -> manifests/scene_exclusions.json
+scripts/freeze_config.py           write / check the core freeze
 scripts/05_compare_flips.py        flips with bootstrap CIs, breakdowns by cell, views, margin, condition; --vqa; unassessed groups
 scripts/06_stability.py            three-repeat slice: nondeterminism floor
 scripts/07_profile.py              TTFT, latency percentiles, decode tok/s, peak memory per session
@@ -54,7 +58,7 @@ scripts/quantize_awq.py            own AWQ W4A16 checkpoint with llm-compressor,
 scripts/run_matrix.sh              serve -> all conditions -> stop, per precision; resumable; DRY_RUN=1 prints the plan
 scripts/rescore.py                 recompute MCQ fields after a rule change
 scripts/vast_setup.sh, hpc_pilot.sbatch
-tests/                             27 offline unit tests (pytest)
+tests/                             37 offline unit tests (pytest)
 ```
 
 ## Scope
@@ -75,7 +79,9 @@ tests/                             27 offline unit tests (pytest)
 
 - GPU session 1 on the replacement host, November 3 ([manifests/session1_2026-11-03.md](manifests/session1_2026-11-03.md)): the October instance had been destroyed by its host and was rebuilt; clean nuScenes images fetched; equal KV cache and streaming verified on vLLM 0.33; clean, Fog, NoImage 20-question slices on both precisions (zero errors; 1 harmful and 1 beneficial flip in 32 MCQ pairs, both NoImage with BF16 margin below 0.25); stability floor measured at zero self-changes; deployment profile session 1 (INT4 2.4× faster at batch 1, 47% less peak memory, equal 2 GiB KV cache); own AWQ W4A16 checkpoint built in 8 minutes and served.
 
-**In progress (week 9, two weeks behind the plan).** Protocol freeze ([PROTOCOL.md](PROTOCOL.md)) pending team decisions, then the 8-run matrix on final scenes with `run_matrix.sh`.
+- November 4 review (two rounds, [WEEK9_ANALYSIS_PLAN.md](WEEK9_ANALYSIS_PLAN.md)): the November 3 slices had drawn from the final holdout; 15 scenes are now excluded (confirmatory population 116 scenes, 838 questions), every result file carries a provenance sidecar, final-split runs and analyses are refused without a matching freeze, pairing validates eight fields, and the November 3 profile and stability numbers are reclassified as official-checkpoint reference measurements.
+
+**In progress (week 9, two weeks behind the plan).** Plan steps 2–5 (prespecified contrasts, pooled profile and tables, judge changes, freeze script run), then the core freeze, then one GPU session (own-checkpoint stability and profile, the 8-run matrix).
 
 **Not started.** Profile sessions 2 and 3, VQA judging (budget decision), analysis and explorer (weeks 10–11), mitigation (12), report (13–14).
 

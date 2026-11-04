@@ -1,11 +1,12 @@
 """Thin client for a running vLLM OpenAI-compatible server."""
 
 import math
-import os
 import time
 from dataclasses import dataclass
 
 from openai import OpenAI
+
+from qflip.provenance import effective_base_url
 
 OPTION_LETTERS = ("A", "B", "C", "D")
 
@@ -39,9 +40,9 @@ class Completion:
 
 def make_client(cfg: dict) -> OpenAI:
     s = cfg["server"]
-    # QFLIP_BASE_URL overrides the config so a batch job can pick a free port.
-    base_url = os.environ.get("QFLIP_BASE_URL", s["base_url"])
-    return OpenAI(base_url=base_url, api_key=s["api_key"], timeout=s["timeout_s"])
+    # QFLIP_BASE_URL overrides the config so a batch job can pick a free port;
+    # the run guard checks the same endpoint (qflip.provenance.effective_base_url).
+    return OpenAI(base_url=effective_base_url(cfg), api_key=s["api_key"], timeout=s["timeout_s"])
 
 
 def chat(client: OpenAI, model: str, messages: list[dict], gen: dict) -> Completion:

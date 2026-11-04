@@ -1,0 +1,277 @@
+{
+  "created": "2026-11-04T21:02:24+00:00",
+  "split_file_sha256": "4f450077b5d1809652b5a69ef58408378751e6f87cc089258375644b225979fb",
+  "entries": [
+    {
+      "scene_token": "00590cbfa24a430a8c274b51e1c71231",
+      "exposed_by": [
+        "results/pilot/bf16_Fog.jsonl",
+        "results/pilot/bf16_LowLight.jsonl",
+        "results/pilot/bf16_NoImage.jsonl",
+        "results/pilot/bf16_clean.jsonl",
+        "results/pilot/int4_Fog.jsonl",
+        "results/pilot/int4_LowLight.jsonl",
+        "results/pilot/int4_NoImage.jsonl",
+        "results/pilot/int4_clean.jsonl",
+        "results/pilot_ownawq/int4_Fog.jsonl",
+        "results/pilot_ownawq/int4_NoImage.jsonl",
+        "results/pilot_ownawq/int4_clean.jsonl"
+      ],
+      "reason": "November 3 and October 15 pilot slices were drawn with --split all (03 default at the time); these final scenes were inspected before the freeze",
+      "date": "2026-11-04"
+    },
+    {
+      "scene_token": "08be42eb2186411d8e2201225329f1c6",
+      "exposed_by": [
+        "results/pilot/bf16_Fog.jsonl",
+        "results/pilot/bf16_LowLight.jsonl",
+        "results/pilot/bf16_NoImage.jsonl",
+        "results/pilot/bf16_clean.jsonl",
+        "results/pilot/int4_Fog.jsonl",
+        "results/pilot/int4_LowLight.jsonl",
+        "results/pilot/int4_NoImage.jsonl",
+        "results/pilot/int4_clean.jsonl",
+        "results/pilot_ownawq/int4_Fog.jsonl",
+        "results/pilot_ownawq/int4_NoImage.jsonl",
+        "results/pilot_ownawq/int4_clean.jsonl"
+      ],
+      "reason": "November 3 and October 15 pilot slices were drawn with --split all (03 default at the time); these final scenes were inspected before the freeze",
+      "date": "2026-11-04"
+    },
+    {
+      "scene_token": "1319a9c0288f4ff9ae32d3f33b3bae17",
+      "exposed_by": [
+        "results/pilot/bf16_Fog.jsonl",
+        "results/pilot/bf16_LowLight.jsonl",
+        "results/pilot/bf16_NoImage.jsonl",
+        "results/pilot/bf16_clean.jsonl",
+        "results/pilot/int4_Fog.jsonl",
+        "results/pilot/int4_LowLight.jsonl",
+        "results/pilot/int4_NoImage.jsonl",
+        "results/pilot/int4_clean.jsonl",
+        "results/pilot_ownawq/int4_Fog.jsonl",
+        "results/pilot_ownawq/int4_NoImage.jsonl",
+        "results/pilot_ownawq/int4_clean.jsonl"
+      ],
+      "reason": "November 3 and October 15 pilot slices were drawn with --split all (03 default at the time); these final scenes were inspected before the freeze",
+      "date": "2026-11-04"
+    },
+    {
+      "scene_token": "1c76efe7d0b048bc815c0445eeaa76ab",
+      "exposed_by": [
+        "results/pilot/bf16_Fog.jsonl",
+        "results/pilot/bf16_LowLight.jsonl",
+        "results/pilot/bf16_NoImage.jsonl",
+        "results/pilot/bf16_clean.jsonl",
+        "results/pilot/int4_Fog.jsonl",
+        "results/pilot/int4_LowLight.jsonl",
+        "results/pilot/int4_NoImage.jsonl",
+        "results/pilot/int4_clean.jsonl",
+        "results/pilot_ownawq/int4_Fog.jsonl",
+        "results/pilot_ownawq/int4_NoImage.jsonl",
+        "results/pilot_ownawq/int4_clean.jsonl"
+      ],
+      "reason": "November 3 and October 15 pilot slices were drawn with --split all (03 default at the time); these final scenes were inspected before the freeze",
+      "date": "2026-11-04"
+    },
+    {
+      "scene_token": "21464a6831c1443db294d1b56a7a33a5",
+      "exposed_by": [
+        "results/pilot/bf16_Fog.jsonl",
+        "results/pilot/bf16_LowLight.jsonl",
+        "results/pilot/bf16_NoImage.jsonl",
+        "results/pilot/bf16_clean.jsonl",
+        "results/pilot/int4_Fog.jsonl",
+        "results/pilot/int4_LowLight.jsonl",
+        "results/pilot/int4_NoImage.jsonl",
+        "results/pilot/int4_clean.jsonl",
+        "results/pilot_ownawq/int4_Fog.jsonl",
+        "results/pilot_ownawq/int4_NoImage.jsonl",
+        "results/pilot_ownawq/int4_clean.jsonl"
+      ],
+      "reason": "November 3 and October 15 pilot slices were drawn with --split all (03 default at the time); these final scenes were inspected before the freeze",
+      "date": "2026-11-04"
+    },
+    {
+      "scene_token": "2cc8ffb250c44b42a888e9185810e04c",
+      "exposed_by": [
+        "results/pilot/bf16_Fog.jsonl",
+        "results/pilot/bf16_LowLight.jsonl",
+        "results/pilot/bf16_NoImage.jsonl",
+        "results/pilot/bf16_clean.jsonl",
+        "results/pilot/int4_Fog.jsonl",
+        "results/pilot/int4_LowLight.jsonl",
+        "results/pilot/int4_NoImage.jsonl",
+        "results/pilot/int4_clean.jsonl",
+        "results/pilot_ownawq/int4_Fog.jsonl",
+        "results/pilot_ownawq/int4_NoImage.jsonl",
+        "results/pilot_ownawq/int4_clean.jsonl"
+      ],
+      "reason": "November 3 and October 15 pilot slices were drawn with --split all (03 default at the time); these final scenes were inspected before the freeze",
+      "date": "2026-11-04"
+    },
+    {
+      "scene_token": "35ecd252b8ee4cbc83376148e192a803",
+      "exposed_by": [
+        "results/pilot/bf16_Fog.jsonl",
+        "results/pilot/bf16_LowLight.jsonl",
+        "results/pilot/bf16_NoImage.jsonl",
+        "results/pilot/bf16_clean.jsonl",
+        "results/pilot/int4_Fog.jsonl",
+        "results/pilot/int4_LowLight.jsonl",
+        "results/pilot/int4_NoImage.jsonl",
+        "results/pilot/int4_clean.jsonl",
+        "results/pilot_ownawq/int4_Fog.jsonl",
+        "results/pilot_ownawq/int4_NoImage.jsonl",
+        "results/pilot_ownawq/int4_clean.jsonl"
+      ],
+      "reason": "November 3 and October 15 pilot slices were drawn with --split all (03 default at the time); these final scenes were inspected before the freeze",
+      "date": "2026-11-04"
+    },
+    {
+      "scene_token": "363bb6c0fdaf465aa54c39f082bb92c6",
+      "exposed_by": [
+        "results/pilot/bf16_Fog.jsonl",
+        "results/pilot/bf16_LowLight.jsonl",
+        "results/pilot/bf16_NoImage.jsonl",
+        "results/pilot/bf16_clean.jsonl",
+        "results/pilot/int4_Fog.jsonl",
+        "results/pilot/int4_LowLight.jsonl",
+        "results/pilot/int4_NoImage.jsonl",
+        "results/pilot/int4_clean.jsonl",
+        "results/pilot_ownawq/int4_Fog.jsonl",
+        "results/pilot_ownawq/int4_NoImage.jsonl",
+        "results/pilot_ownawq/int4_clean.jsonl"
+      ],
+      "reason": "November 3 and October 15 pilot slices were drawn with --split all (03 default at the time); these final scenes were inspected before the freeze",
+      "date": "2026-11-04"
+    },
+    {
+      "scene_token": "58af378ff68b49c99aabf320dca1ee25",
+      "exposed_by": [
+        "results/pilot/bf16_Fog.jsonl",
+        "results/pilot/bf16_LowLight.jsonl",
+        "results/pilot/bf16_NoImage.jsonl",
+        "results/pilot/bf16_clean.jsonl",
+        "results/pilot/int4_Fog.jsonl",
+        "results/pilot/int4_LowLight.jsonl",
+        "results/pilot/int4_NoImage.jsonl",
+        "results/pilot/int4_clean.jsonl",
+        "results/pilot_ownawq/int4_Fog.jsonl",
+        "results/pilot_ownawq/int4_NoImage.jsonl",
+        "results/pilot_ownawq/int4_clean.jsonl"
+      ],
+      "reason": "November 3 and October 15 pilot slices were drawn with --split all (03 default at the time); these final scenes were inspected before the freeze",
+      "date": "2026-11-04"
+    },
+    {
+      "scene_token": "74d03e3b673f4a72a3f76e1b0c7840bd",
+      "exposed_by": [
+        "results/pilot/bf16_Fog.jsonl",
+        "results/pilot/bf16_LowLight.jsonl",
+        "results/pilot/bf16_NoImage.jsonl",
+        "results/pilot/bf16_clean.jsonl",
+        "results/pilot/int4_Fog.jsonl",
+        "results/pilot/int4_LowLight.jsonl",
+        "results/pilot/int4_NoImage.jsonl",
+        "results/pilot/int4_clean.jsonl",
+        "results/pilot_ownawq/int4_Fog.jsonl",
+        "results/pilot_ownawq/int4_NoImage.jsonl",
+        "results/pilot_ownawq/int4_clean.jsonl"
+      ],
+      "reason": "November 3 and October 15 pilot slices were drawn with --split all (03 default at the time); these final scenes were inspected before the freeze",
+      "date": "2026-11-04"
+    },
+    {
+      "scene_token": "d0de3bf834b747179080898725b0f21d",
+      "exposed_by": [
+        "results/pilot/bf16_Fog.jsonl",
+        "results/pilot/bf16_LowLight.jsonl",
+        "results/pilot/bf16_NoImage.jsonl",
+        "results/pilot/bf16_clean.jsonl",
+        "results/pilot/int4_Fog.jsonl",
+        "results/pilot/int4_LowLight.jsonl",
+        "results/pilot/int4_NoImage.jsonl",
+        "results/pilot/int4_clean.jsonl",
+        "results/pilot_ownawq/int4_Fog.jsonl",
+        "results/pilot_ownawq/int4_NoImage.jsonl",
+        "results/pilot_ownawq/int4_clean.jsonl"
+      ],
+      "reason": "November 3 and October 15 pilot slices were drawn with --split all (03 default at the time); these final scenes were inspected before the freeze",
+      "date": "2026-11-04"
+    },
+    {
+      "scene_token": "d58468c6097c425e89671a7b3f480acf",
+      "exposed_by": [
+        "results/pilot/bf16_Fog.jsonl",
+        "results/pilot/bf16_LowLight.jsonl",
+        "results/pilot/bf16_NoImage.jsonl",
+        "results/pilot/bf16_clean.jsonl",
+        "results/pilot/int4_Fog.jsonl",
+        "results/pilot/int4_LowLight.jsonl",
+        "results/pilot/int4_NoImage.jsonl",
+        "results/pilot/int4_clean.jsonl",
+        "results/pilot_ownawq/int4_Fog.jsonl",
+        "results/pilot_ownawq/int4_NoImage.jsonl",
+        "results/pilot_ownawq/int4_clean.jsonl"
+      ],
+      "reason": "November 3 and October 15 pilot slices were drawn with --split all (03 default at the time); these final scenes were inspected before the freeze",
+      "date": "2026-11-04"
+    },
+    {
+      "scene_token": "e12dee10fe2545e4ab88459ed4268bc6",
+      "exposed_by": [
+        "results/pilot/bf16_Fog.jsonl",
+        "results/pilot/bf16_LowLight.jsonl",
+        "results/pilot/bf16_NoImage.jsonl",
+        "results/pilot/bf16_clean.jsonl",
+        "results/pilot/int4_Fog.jsonl",
+        "results/pilot/int4_LowLight.jsonl",
+        "results/pilot/int4_NoImage.jsonl",
+        "results/pilot/int4_clean.jsonl",
+        "results/pilot_ownawq/int4_Fog.jsonl",
+        "results/pilot_ownawq/int4_NoImage.jsonl",
+        "results/pilot_ownawq/int4_clean.jsonl"
+      ],
+      "reason": "November 3 and October 15 pilot slices were drawn with --split all (03 default at the time); these final scenes were inspected before the freeze",
+      "date": "2026-11-04"
+    },
+    {
+      "scene_token": "e209e66ff7834490b212c16cb12a1ce9",
+      "exposed_by": [
+        "results/pilot/bf16_Fog.jsonl",
+        "results/pilot/bf16_LowLight.jsonl",
+        "results/pilot/bf16_NoImage.jsonl",
+        "results/pilot/bf16_clean.jsonl",
+        "results/pilot/int4_Fog.jsonl",
+        "results/pilot/int4_LowLight.jsonl",
+        "results/pilot/int4_NoImage.jsonl",
+        "results/pilot/int4_clean.jsonl",
+        "results/pilot_ownawq/int4_Fog.jsonl",
+        "results/pilot_ownawq/int4_NoImage.jsonl",
+        "results/pilot_ownawq/int4_clean.jsonl"
+      ],
+      "reason": "November 3 and October 15 pilot slices were drawn with --split all (03 default at the time); these final scenes were inspected before the freeze",
+      "date": "2026-11-04"
+    },
+    {
+      "scene_token": "f92422ed4b4e427194a4958ccf15709a",
+      "exposed_by": [
+        "results/pilot/bf16_Fog.jsonl",
+        "results/pilot/bf16_LowLight.jsonl",
+        "results/pilot/bf16_NoImage.jsonl",
+        "results/pilot/bf16_clean.jsonl",
+        "results/pilot/int4_Fog.jsonl",
+        "results/pilot/int4_LowLight.jsonl",
+        "results/pilot/int4_NoImage.jsonl",
+        "results/pilot/int4_clean.jsonl",
+        "results/pilot_ownawq/int4_Fog.jsonl",
+        "results/pilot_ownawq/int4_NoImage.jsonl",
+        "results/pilot_ownawq/int4_clean.jsonl"
+      ],
+      "reason": "November 3 and October 15 pilot slices were drawn with --split all (03 default at the time); these final scenes were inspected before the freeze",
+      "date": "2026-11-04"
+    }
+  ],
+  "n_excluded": 15
+}
