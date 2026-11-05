@@ -36,6 +36,7 @@ src/qflip/drivebench.py            annotations, view selection, prompt building,
 src/qflip/client.py                vLLM OpenAI-compatible client: logprobs, option margin, streaming for TTFT
 src/qflip/runner.py                one question in, one result record out (shared by all run scripts)
 src/qflip/flips.py                 pairing (MCQ and judged VQA), flip classes, paired bootstrap over scenes, coverage rule
+src/qflip/contrasts.py             the five prespecified F_h contrasts: paired scene bootstrap, raw and Bonferroni intervals, support rule
 src/qflip/judge.py                 DriveBench rubric judge: description lookup, prompt fill, score parsing, sidecars
 src/qflip/judge_prompts.py         released judge templates, verbatim
 src/qflip/provenance.py            result-file sidecars (input hashes, checkpoint fingerprint), resume compatibility, live-server check
@@ -81,7 +82,9 @@ tests/                             37 offline unit tests (pytest)
 
 - November 4 review (two rounds, [WEEK9_ANALYSIS_PLAN.md](WEEK9_ANALYSIS_PLAN.md)): the November 3 slices had drawn from the final holdout; 15 scenes are now excluded (confirmatory population 116 scenes, 838 questions), every result file carries a provenance sidecar, final-split runs and analyses are refused without a matching freeze, pairing validates eight fields, and the November 3 profile and stability numbers are reclassified as official-checkpoint reference measurements.
 
-**In progress (week 9, two weeks behind the plan).** Plan steps 2–5 (prespecified contrasts, pooled profile and tables, judge changes, freeze script run), then the core freeze, then one GPU session (own-checkpoint stability and profile, the 8-run matrix).
+- Step 1 of the plan (integrity fixes) passed four review rounds and is committed; step 2 adds the five prespecified contrasts with both intervals and the support rule (`05 --contrasts`), the views comparison as descriptive only, and PROTOCOL sections 8 and 9 rewritten to match.
+
+**In progress (week 9, two weeks behind the plan).** Plan steps 3–5 (pooled profile and tables, judge changes, freeze script run), then the core freeze, then one GPU session (own-checkpoint stability and profile, the 8-run matrix).
 
 **Not started.** Profile sessions 2 and 3, VQA judging (budget decision), analysis and explorer (weeks 10–11), mitigation (12), report (13–14).
 

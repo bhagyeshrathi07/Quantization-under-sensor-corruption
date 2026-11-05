@@ -27,7 +27,8 @@ MCQ flip classes (strict rule: option letter at the start of the answer):
 VQA pairs use the judge score against the threshold and have no neutral_change.
 
 F_h (harmful_rate) = harmful / reference-correct. CIs are percentile intervals
-from resampling scenes with replacement (default 2000 draws, seed 0). Groups
+from resampling scenes with replacement (default 2000 draws, seed 0). --contrasts
+adds the five prespecified F_h contrasts (qflip.contrasts). Groups
 below the coverage minimum (--min-n questions or --min-scenes scenes, defaults
 from config analysis:) are printed as unassessed and carry assessed=false in
 the JSON report.
@@ -41,8 +42,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from qflip.config import load_config  # noqa: E402
+from qflip.contrasts import format_contrast, prespecified_contrasts  # noqa: E402
 from qflip.drivebench import load_questions  # noqa: E402
-from qflip.flips import PairingError, bootstrap_scenes, coverage, group_by, pair_records, pair_vqa_records, summarize  # noqa: E402
+from qflip.flips import PairingError, bootstrap_scenes, coverage, group_by, merge_pairs, pair_records, pair_vqa_records, summarize  # noqa: E402
 from qflip.freeze import load_judge_frozen  # noqa: E402
 from qflip.guard import legacy_files_check, validate_analysis_files  # noqa: E402
 from qflip.judge import load_scores, sidecar_path  # noqa: E402
@@ -99,7 +101,9 @@ def main():
     ap.add_argument("--by", nargs="*", default=["cell", "n_views", "margin"], choices=["cell", "n_views", "margin", "condition"])
     ap.add_argument("--margin-edges", help="bin edges for the BF16 option margin (default analysis.margin_edges)")
     ap.add_argument("--n-boot", type=int, help="group bootstrap draws (default analysis.n_boot_group)")
-    ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--n-boot-contrast", type=int, help="contrast bootstrap draws (default analysis.n_boot_contrast)")
+    ap.add_argument("--contrasts", action="store_true", help="evaluate the five prespecified F_h contrasts (plan section 4) over the MCQ pairs, grouped by condition")
+    ap.add_argument("--seed", type=int, help="bootstrap seed (default analysis.seed; frozen on final-split files)")
     ap.add_argument("--config", default="config/pilot.yaml")
     ap.add_argument("--split-file", default="manifests/scene_split.json")
     ap.add_argument("--exclusions-file", default="manifests/scene_exclusions.json")
@@ -113,14 +117,21 @@ def main():
     args = ap.parse_args()
     if len(args.files) % 2:
         sys.exit("files must come in ref/quant pairs")
+    resolved = [str(Path(f).resolve()) for f in args.files]
+    if len(set(resolved)) != len(resolved):
+        sys.exit("the same file is given more than once; duplicated inputs are refused")
     cfg = load_config(args.config)
     an = cfg["analysis"]
+    if args.seed is None:
+        args.seed = an.get("seed", 0)
     edges = tuple(float(x) for x in args.margin_edges.split(",") if x) if args.margin_edges else tuple(float(x) for x in an["margin_edges"])
     n_boot = args.n_boot if args.n_boot is not None else an["n_boot_group"]
     min_n = args.min_n if args.min_n is not None else an["min_questions"]
     min_scenes = args.min_scenes if args.min_scenes is not None else an["min_scenes"]
     args.n_boot = n_boot
-    effective = {"margin_edges": list(edges), "n_boot_group": n_boot, "min_questions": min_n, "min_scenes": min_scenes}
+    n_boot_contrast = args.n_boot_contrast if args.n_boot_contrast is not None else an["n_boot_contrast"]
+    effective = {"margin_edges": list(edges), "n_boot_group": n_boot, "n_boot_contrast": n_boot_contrast, "seed": args.seed, "min_questions": min_n, "min_scenes": min_scenes,
+                 "support_min_ref_correct": an["support_min_ref_correct"], "support_min_ref_scenes": an["support_min_ref_scenes"]}
 
     if args.no_provenance:
         provenance = legacy_files_check(args.files)
@@ -130,19 +141,54 @@ def main():
         print(f"provenance ok: split={provenance['split']} ({provenance['analysis_class']}), {len(provenance['files'])} files" + (", frozen " + provenance["frozen"]["date"] if "frozen" in provenance else ""))
     question_text = {q.question_id: q.question for q in load_questions(cfg["data"]["annotations"])}
 
-    pairs = []
+    groups, file_ids = [], {}
     for ref_path, quant_path in zip(args.files[::2], args.files[1::2]):
+        ref_recs, quant_recs = read_records(ref_path), read_records(quant_path)
         try:
-            p = pair_records(read_records(ref_path), read_records(quant_path), question_text)
+            p = pair_records(ref_recs, quant_recs, question_text)
         except PairingError as e:
             sys.exit(f"pairing refused for {ref_path} vs {quant_path}: {e}")
         print(f"{ref_path} vs {quant_path}: {len(p)} paired MCQ")
-        pairs.extend(p)
+        groups.append(p)
+        for path, recs in ((ref_path, ref_recs), (quant_path, quant_recs)):
+            # identity from the validated sidecar, else from any record (errored included),
+            # so a file whose MCQs all errored still enters the C4 audit with an empty id set
+            ident = provenance["files"].get(str(path), {}) if provenance.get("files") else {}
+            cond, prec = ident.get("condition"), ident.get("precision")
+            if (cond is None or prec is None) and recs:
+                cond, prec = recs[0].get("condition"), recs[0].get("precision")
+            if cond is None or prec is None:
+                sys.exit(f"{path}: cannot establish condition/precision (no sidecar and no records)")
+            key = f"{cond}/{prec}"
+            if key in file_ids:
+                sys.exit(f"two input files hold {key} records; duplicated inputs are refused")
+            file_ids[key] = {r["question_id"] for r in recs if (r.get("cell") or "").endswith("MCQ") and not r.get("error")}
+    try:
+        pairs = merge_pairs(groups)
+    except PairingError as e:
+        sys.exit(f"inputs refused: {e}")
     if not pairs:
         sys.exit("no common MCQ questions")
 
-    out = {"margin_edges": edges, "n_boot_group": n_boot, "seed": args.seed, "min_questions": min_n, "min_scenes": min_scenes, "provenance": provenance}
+    out = {"margin_edges": edges, "n_boot_group": n_boot, "n_boot_contrast": n_boot_contrast, "seed": args.seed, "min_questions": min_n, "min_scenes": min_scenes,
+           "analysis_class": provenance["analysis_class"], "provenance": provenance}
     out["mcq"] = section("MCQ", pairs, args.by, edges, args, min_n, min_scenes)
+
+    if args.contrasts:
+        by_cond = {}
+        for p in pairs:
+            by_cond.setdefault(p.condition, []).append(p)
+        res = prespecified_contrasts(by_cond, effective, args.seed, file_ids)
+        print(f"\nprespecified contrasts ({out['analysis_class']}; family of {res['family_size']}, Bonferroni alpha {res['alpha_adjusted']}, {n_boot_contrast} draws, seed {args.seed}; * = adjusted interval excludes zero):")
+        for r in res["family"]:
+            print(format_contrast(r))
+        print("descriptive (not in the family):")
+        for r in res["descriptive"]:
+            print(format_contrast(r))
+            print(f"        {r['note']}")
+        out["contrasts"] = res["family"]
+        out["descriptive"] = res["descriptive"]
+        out["contrast_settings"] = {k: effective[k] for k in ("n_boot_contrast", "seed", "support_min_ref_correct", "support_min_ref_scenes")}
 
     if args.vqa:
         if provenance["split"] == "final":

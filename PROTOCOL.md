@@ -91,18 +91,21 @@ Per question, per condition, paired by `question_id` (`src/qflip/flips.py`):
 
 Factors: cell (task × format), `n_views` (1 to 6), BF16 option margin (probability of the top option letter minus the second, from first-token `top_logprobs`), condition. Margin bins: edges 0.25 and 0.5 are the pilot default; **TO DECIDE** on development scenes before the freeze.
 
-**Prespecified confirmatory comparisons (one per factor, stated here before the final run):**
+**Prespecified confirmatory contrasts (family of five on the MCQ harmful rate F_h, Δ = F_h(A) − F_h(B); `qflip.contrasts`, `05 --contrasts`; stated here before results from the remaining confirmatory population exist):**
 
-1. Margin: lowest bin versus the rest, F_h.
-2. Task: planning + behavior (decision cells) versus perception + prediction, F_h. MCQ only unless VQA is scored.
-3. Views: 1 view versus 6 views, F_h.
-4. Condition: each stress condition versus clean, F_h.
+| # | Contrast | A | B | Population |
+|---|---|---|---|---|
+| C1 | margin | BF16 margin in the lowest bin | all other bins | clean, pairs with a margin |
+| C2 | task | behavior/MCQ | perception/MCQ | clean |
+| C4a | NoImage vs clean | NoImage pairs | clean pairs | common support: ids paired without error under both |
+| C4b | LowLight vs clean | LowLight pairs | clean pairs | common support |
+| C4c | Fog vs clean | Fog pairs | clean pairs | common support |
 
-Everything else is exploratory and labeled as such.
+The views comparison (1 vs 6 views) is not in the family: in the final split every behavior MCQ has six views and every perception MCQ has one, so Δ_views = −Δ_task in every draw; it is reported as descriptive with that sentence. C1 and C2 are clean-only (amendment of 2026-11-04; the proposal's clean-primary language did not specify contrast scope). Support rule: a contrast is assessed only with ordinary coverage on both sides (section 5), at least 20 reference-correct pairs from at least 10 scenes on each side, and at least half of the contrast draws valid (a draw is invalid when either side has no reference-correct pair); otherwise `assessed: false` with the failed condition named and the point estimate still reported. The support rule is never lowered to rescue a contrast. Change rate, accuracy delta, VQA contrasts, pooled-condition versions of C1/C2, and all breakdowns are exploratory and labeled as such. **FROZEN** (family, statistic, support rule); margin edges per the row above.
 
 ## 9. Uncertainty
 
-Paired bootstrap over scenes: resample scenes with replacement, keep every question and both precisions of a resampled scene together, 2000 draws, seed 0, 95% percentile intervals for F_h, `acc_delta`, `change_rate`, and each subgroup contrast. A contrast supports the hypothesis only when its interval excludes zero. Implemented in `bootstrap_scenes`; invoked by `scripts/05_compare_flips.py`. **FROZEN.**
+Paired bootstrap over scenes: resample scenes with replacement, keep every question and both precisions of a resampled scene together, seed 0. Group intervals (F_h, `acc_delta`, `change_rate` per group): 2,000 draws, 95% percentile (`bootstrap_scenes`). Prespecified contrasts (section 8): 20,000 draws per contrast, scenes drawn from the union of both sides with every pair of a drawn scene entering on its own side; raw percentile 95% and Bonferroni-adjusted 99% (α = 0.05 / 5) intervals both stored. A contrast supports the hypothesis only when the adjusted interval excludes zero; the family stays five whatever happens to any member (`bootstrap_contrast`). Draw counts, the bootstrap seed, and support minimums live in config `analysis:` and are part of the core freeze; `05` refuses a CLI override of a frozen value on final-split files. Below half valid draws a contrast's intervals and exclusion flags are reported as unavailable, not as numbers. `05` refuses an input file given twice and any (condition, question) pair that appears in two file pairs, so repeated inputs cannot manufacture support. **FROZEN.**
 
 ## 10. Stability floor
 
@@ -152,4 +155,4 @@ Judge sidecar, one per result file (`<precision>_<condition>.judge.jsonl`): `que
 - 2026-10-19: first draft, after the week-5 pilot. Nothing frozen beyond what the pilot tested.
 - 2026-10-20: own-checkpoint recipe made concrete (section 1), matrix driver (6), VQA judge path and VQA flip classes (7), coverage rule mechanics (5), `question` field and judge sidecar schema (13). Nothing frozen.
 - 2026-11-03: replacement host and new software versions (section 2); KV-cache flag verified and frozen; stability floor measured (10); profile session 1 done (11); own AWQ checkpoint built (1). See `manifests/session1_2026-11-03.md`.
-- 2026-11-04: review found that the November 3 slices had drawn from the final split; 15 scenes excluded (section 5), run default moved to development, sidecars, live-server check, final-run guard, and freeze mechanics added (sections 14, 15); a step-1 audit closed eight guard gaps the same day (core-config hash, per-file freeze checks in `05`, pairing order, process binding of the serve manifest, seed / max_num_seqs / prefix caching in the manifest, resume record inspection, required snapshot hash); a follow-up audit added listener ownership, frozen dtype per precision, and raw-row validation shared by resume and analysis. The November 3 profile and stability numbers are official-checkpoint reference measurements, not sessions of the frozen study. Plan and acceptance criteria in `WEEK9_ANALYSIS_PLAN.md`.
+- 2026-11-04: review found that the November 3 slices had drawn from the final split; 15 scenes excluded (section 5), run default moved to development, sidecars, live-server check, final-run guard, and freeze mechanics added (sections 14, 15); a step-1 audit closed eight guard gaps the same day (core-config hash, per-file freeze checks in `05`, pairing order, process binding of the serve manifest, seed / max_num_seqs / prefix caching in the manifest, resume record inspection, required snapshot hash); a follow-up audit added listener ownership, frozen dtype per precision, and raw-row validation shared by resume and analysis. Section 8 contrasts rewritten as the family of five with the support rule; section 9 gains the contrast intervals (plan step 2). The November 3 profile and stability numbers are official-checkpoint reference measurements, not sessions of the frozen study. Plan and acceptance criteria in `WEEK9_ANALYSIS_PLAN.md`.

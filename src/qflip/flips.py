@@ -136,6 +136,22 @@ def pair_vqa_records(
     return pairs
 
 
+def merge_pairs(groups: list[list[Pair]]) -> list[Pair]:
+    """Concatenate pair lists from several file pairs, refusing any
+    (condition, question_id) that appears twice: duplicated inputs would
+    manufacture support for the contrasts."""
+    seen: dict[tuple[str, str], int] = {}
+    out = []
+    for i, g in enumerate(groups):
+        for p in g:
+            key = (p.condition, p.question_id)
+            if key in seen:
+                raise PairingError(f"{p.question_id} under {p.condition} appears in file pair {seen[key] + 1} and again in file pair {i + 1}; duplicated inputs are refused")
+            seen[key] = i
+            out.append(p)
+    return out
+
+
 def margin_bin(margin: float | None, edges: tuple[float, ...]) -> str:
     """Label like '[0.25,0.5)'; None -> 'no_margin'."""
     if margin is None:

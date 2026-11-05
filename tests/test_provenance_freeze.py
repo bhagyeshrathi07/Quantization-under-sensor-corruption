@@ -284,6 +284,10 @@ def test_final_guard_and_analysis_validation(world, tmp_path):
     assert "frozen" in ok
     with pytest.raises(FreezeError, match="margin_edges"):
         validate_analysis_files(ff, w["cfg"], split_file=w["split"], exclusions_file=w["excl"], frozen_path=frozen_path, settings={"margin_edges": [0.1, 0.5]})
+    # the bootstrap seed and the contrast settings are frozen too
+    for k, v in (("seed", 1), ("n_boot_contrast", 500), ("support_min_ref_correct", 5)):
+        with pytest.raises(FreezeError, match=f"analysis setting {k}"):
+            validate_analysis_files(ff, w["cfg"], split_file=w["split"], exclusions_file=w["excl"], frozen_path=frozen_path, settings={k: v})
     # excluded scene inside a final file -> refused
     ff[0].write_text(json.dumps({"question_id": "q", "scene_token": S[5], "precision": "bf16", "condition": "clean"}) + "\n")
     with pytest.raises(ProvenanceError, match="outside the final population"):

@@ -96,5 +96,6 @@ analysis:
   margin_edges: [0.25, 0.5]    # BF16 option-margin bins
   n_boot_group: 2000           # group intervals
   n_boot_contrast: 20000       # prespecified contrasts
+  seed: 0                      # bootstrap seed (group and contrast draws)
   support_min_ref_correct: 20  # contrast support: reference-correct pairs per side
   support_min_ref_scenes: 10   # ... from at least this many scenes

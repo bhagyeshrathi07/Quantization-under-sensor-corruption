@@ -63,7 +63,7 @@ serve_manifest (copy of manifests/serve_<precision>.txt at run start), vllm_vers
 
 ## 4. Statistics: five confirmatory contrasts
 
-**Family.** Five MCQ harmful-rate (F_h) contrasts, fixed here before any final-scene result exists:
+**Family.** Five MCQ harmful-rate (F_h) contrasts, fixed here before results from the remaining confirmatory population exist:
 
 | # | Contrast | A | B | Population |
 |---|---|---|---|---|
@@ -217,4 +217,8 @@ Follow-up audits (same day) found three remaining defects, then an address gap i
 
 Open point for the next GPU session: the `root` field of vLLM's model card is the loaded model path in the versions used so far, but this has not been observed on vLLM 0.33.0 on the new host. If it is absent the guard falls back to the pid binding alone; if it is present with a different form (for example a resolved cache path for a hub id) the comparison must be adjusted before the final run. Record the observed card in the session note.
 
-Steps 2–5 follow in order; the core freeze after them.
+Step 1 was committed after the reviewer's sign-off. Step 2 (contrasts) is implemented: `qflip.contrasts` (`bootstrap_contrast`, `prespecified_contrasts`, `common_support`, support rule), `05 --contrasts` and `--n-boot-contrast`, the schema of section 4 plus `reason_detail`, the descriptive views row with its note, `n_boot_contrast` and the support minimums in the effective settings checked against the freeze on final files; PROTOCOL sections 8 and 9 rewritten. Tests: planted effect, null, seed reproducibility, support (reason `support`, `valid_draws` 0, family length five), coverage, valid-draws rule, common support with dropped counts, views absent from the family. End to end on the pilot files (all five unassessed for coverage at n = 8, as expected).
+
+Step-2 review (November 4) found three correctness issues and two reporting corrections; all fixed with tests (61 tests): duplicated inputs (the same file twice, or the same (condition, question) in two file pairs) are refused before support is computed; the bootstrap seed now lives in config `analysis.seed`, is in the effective settings, and is checked against the freeze on final files together with the contrast draw count and support minimums; a contrast below half valid draws reports its intervals and exclusion flags as unavailable; draw counts must be positive integers; the descriptive views row carries no Bonferroni interval, no adjusted decision flag, and no decision marker; the C4 common-support audit counts ids dropped per input file (all four), taking each file's identity from its validated sidecar or, for legacy files, from any record including errored ones, so a file whose MCQs all errored keeps an empty id set; the interval rule is applied inside `bootstrap_contrast` by valid draws alone, so intervals are unavailable below half valid draws whichever support condition is reported first (62 tests). Protocol wording changed to "before results from the remaining confirmatory population exist".
+
+Remaining order: step 4 (judge code), then 3 (pooling, coverage, tables), then 5 (protocol rows, session note, freeze run); the core freeze after them.
