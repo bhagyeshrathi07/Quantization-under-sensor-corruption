@@ -57,14 +57,22 @@ pilot:
   results_dir: "results/pilot"
 
 # VQA rubric judge (scripts/08_judge_vqa.py). The released evaluator hard-codes
-# gpt-3.5-turbo; the model here is TO DECIDE with the judge budget (team item 2)
-# and is recorded in every judge record. Key: OPENAI_API_KEY in the environment.
+# gpt-3.5-turbo (shut down October 23, 2026); the model here is TO DECIDE with
+# the judge budget (team item 2, manifests/judge_cost.md) and every request
+# setting is recorded in every judge record and hashed into its resume key.
+# Key: OPENAI_API_KEY in the environment. Frozen later in manifests/judge_frozen.yaml.
 judge:
-  model: "gpt-3.5-turbo"       # released evaluator's model; change only with a dated PROTOCOL entry
-  base_url: null               # null = api.openai.com; set for another OpenAI-compatible judge
-  temperature: 0.0
+  model: null                  # TO DECIDE; null refuses to judge. Candidates and prices: manifests/judge_cost.md. Use --model for the compat check and trial
+  base_url: null               # null = https://api.openai.com/v1; always passed explicitly (OPENAI_BASE_URL ignored); part of the frozen settings and the record hash
+  # Optional request settings: null = omitted from the request (and from the hash).
+  # The released judge used temperature 0; GPT-5 models reject it unless
+  # reasoning_effort is "none" (plan section 7). Verify with 08 --compat-check.
+  temperature: null
+  top_p: null
+  reasoning_effort: null       # e.g. "none", "minimal", "low"
+  seed: null
   max_tokens: 512              # what the released request.py intended (its 3000 default is unreachable)
-  seed: 0
+  max_tokens_param: "max_tokens"   # "max_completion_tokens" for GPT-5 models (the compat check tells)
   timeout_s: 120
   # Rubric score (0-100) at or above which a VQA answer counts as correct for
   # flip classification. TO DECIDE on development scenes; null = VQA unassessed.

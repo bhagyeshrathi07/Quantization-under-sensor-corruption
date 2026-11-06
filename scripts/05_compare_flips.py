@@ -45,9 +45,9 @@ from qflip.config import load_config  # noqa: E402
 from qflip.contrasts import format_contrast, prespecified_contrasts  # noqa: E402
 from qflip.drivebench import load_questions  # noqa: E402
 from qflip.flips import PairingError, bootstrap_scenes, coverage, group_by, merge_pairs, pair_records, pair_vqa_records, summarize  # noqa: E402
-from qflip.freeze import load_judge_frozen  # noqa: E402
-from qflip.guard import legacy_files_check, validate_analysis_files  # noqa: E402
-from qflip.judge import load_scores, sidecar_path  # noqa: E402
+from qflip.freeze import FreezeError  # noqa: E402
+from qflip.guard import judge_settings_for, legacy_files_check, validate_analysis_files  # noqa: E402
+from qflip.judge import JudgeInputError, JudgeSettingsError, ensure_visual_description, load_scores, load_visual_description, production_scores, sidecar_path  # noqa: E402
 from qflip.records import read_records  # noqa: E402
 
 
@@ -75,12 +75,23 @@ def report(label: str, pairs, n_boot: int, seed: int, min_n: int, min_scenes: in
     return {"label": label, **s, "assessed": True, "ci": ci}
 
 
-def load_vqa_pairs(ref_path: str, quant_path: str, threshold: float, question_text):
+def load_vqa_pairs(ref_path: str, quant_path: str, threshold: float, settings: dict, desc_data: dict, question_text):
+    """Production VQA scores: replicate 0 whose input hash matches the current
+    answer under the (frozen or configured) judge settings, with the object
+    description derived from the hash-checked description file; everything
+    else in the sidecar is reported as stale and not used."""
     ref_scores, quant_scores = load_scores(sidecar_path(ref_path)), load_scores(sidecar_path(quant_path))
     if not ref_scores or not quant_scores:
         print(f"  no judge sidecar for {ref_path} / {quant_path}; run scripts/08_judge_vqa.py first")
         return []
-    return pair_vqa_records(read_records(ref_path), read_records(quant_path), ref_scores, quant_scores, threshold, question_text)
+    ref_recs, quant_recs = read_records(ref_path), read_records(quant_path)
+    ref_sel, ref_stale = production_scores(ref_scores, ref_recs, settings, desc_data, question_text)
+    quant_sel, quant_stale = production_scores(quant_scores, quant_recs, settings, desc_data, question_text)
+    for path, sel, stale in ((ref_path, ref_sel, ref_stale), (quant_path, quant_sel, quant_stale)):
+        print(f"  {path}: {len(sel)} usable judge scores, {len(stale)} stale")
+        for qid, reason in list(stale.items())[:3]:
+            print(f"    stale {qid}: {reason}")
+    return pair_vqa_records(ref_recs, quant_recs, ref_sel, quant_sel, threshold, question_text)
 
 
 def section(title: str, pairs, by, edges, args, min_n, min_scenes) -> dict:
@@ -112,6 +123,7 @@ def main():
     ap.add_argument("--min-scenes", type=int, help="coverage minimum, scenes per group (default analysis.min_scenes)")
     ap.add_argument("--vqa", action="store_true", help="also pair judged VQA cells from the .judge.jsonl sidecars")
     ap.add_argument("--judge-threshold", type=float, help="rubric score counted as correct (default judge.correct_threshold)")
+    ap.add_argument("--desc", default="data/visual_description.json", help="object visual descriptions (judge input, hash-checked)")
     ap.add_argument("--out", help="write the full report as JSON")
     ap.add_argument("--show-harmful", type=int, default=20, help="print up to N harmful examples")
     args = ap.parse_args()
@@ -134,7 +146,7 @@ def main():
                  "support_min_ref_correct": an["support_min_ref_correct"], "support_min_ref_scenes": an["support_min_ref_scenes"]}
 
     if args.no_provenance:
-        provenance = legacy_files_check(args.files)
+        provenance = legacy_files_check(args.files, args.split_file, args.exclusions_file)
         print("EXPLORATORY: --no-provenance skips sidecar/population validation; this output is not a confirmatory result")
     else:
         provenance = validate_analysis_files(args.files, cfg, split_file=args.split_file, exclusions_file=args.exclusions_file, settings=effective)
@@ -191,23 +203,33 @@ def main():
         out["contrast_settings"] = {k: effective[k] for k in ("n_boot_contrast", "seed", "support_min_ref_correct", "support_min_ref_scenes")}
 
     if args.vqa:
+        # Final files: the frozen judge (settings, templates, system line, threshold)
+        # and no CLI override; other files: the live config.
+        try:
+            js = judge_settings_for(provenance["split"], cfg)
+        except FreezeError as e:
+            sys.exit(f"--vqa: {e}")
+        except JudgeSettingsError as e:
+            sys.exit(f"--vqa: {e}; the judge settings decide which sidecar records are usable")
+        judge_set = js["settings"]
         if provenance["split"] == "final":
-            jf = load_judge_frozen()
-            if jf is None or jf.get("correct_threshold") is None:
-                sys.exit("--vqa on final-split files needs manifests/judge_frozen.yaml with correct_threshold (judge protocol freeze)")
-            if args.judge_threshold is not None and args.judge_threshold != jf["correct_threshold"]:
-                sys.exit(f"--judge-threshold {args.judge_threshold} differs from the frozen judge threshold {jf['correct_threshold']}")
-            threshold = jf["correct_threshold"]
+            threshold = js["correct_threshold"]
+            if args.judge_threshold is not None and args.judge_threshold != threshold:
+                sys.exit(f"--judge-threshold {args.judge_threshold} differs from the frozen judge threshold {threshold}")
         else:
-            threshold = args.judge_threshold if args.judge_threshold is not None else cfg.get("judge", {}).get("correct_threshold")
+            threshold = args.judge_threshold if args.judge_threshold is not None else js["correct_threshold"]
         if threshold is None:
             sys.exit("--vqa needs a threshold: --judge-threshold or judge.correct_threshold in config (TO DECIDE on development scenes)")
+        try:
+            desc_data = load_visual_description(ensure_visual_description(args.desc))
+        except JudgeInputError as e:
+            sys.exit(f"--vqa: {e}")
         vqa = []
         for ref_path, quant_path in zip(args.files[::2], args.files[1::2]):
-            vqa.extend(load_vqa_pairs(ref_path, quant_path, threshold, question_text))
+            vqa.extend(load_vqa_pairs(ref_path, quant_path, threshold, judge_set, desc_data, question_text))
         print(f"\n{len(vqa)} paired VQA at threshold {threshold}")
         if vqa:
-            out["vqa"] = {"threshold": threshold, **section("VQA (judged)", vqa, [f for f in args.by if f != "margin"], edges, args, min_n, min_scenes)}
+            out["vqa"] = {"threshold": threshold, "judge_settings": judge_set, **section("VQA (judged)", vqa, [f for f in args.by if f != "margin"], edges, args, min_n, min_scenes)}
             pairs = pairs + vqa
 
     harmful = [p for p in pairs if p.flip == "harmful"]

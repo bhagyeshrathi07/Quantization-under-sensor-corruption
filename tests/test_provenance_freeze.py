@@ -398,11 +398,21 @@ def test_no_provenance_refuses_final_sidecars(world, tmp_path):
     legacy = tmp_path / "pilot" / "bf16_clean.jsonl"
     legacy.parent.mkdir()
     legacy.write_text("{}\n")
-    out = legacy_files_check([legacy])
+    out = legacy_files_check([legacy], w["split"], w["excl"])
     assert out["analysis_class"] == "exploratory" and out["files"][str(legacy)]["sidecar"] is False
     ff = _final_files(w, tmp_path / "f", {"bf16": _meta(w, "bf16", split="final")})
     with pytest.raises(ProvenanceError, match="not allowed for final-split files"):
-        legacy_files_check([legacy, ff[0]])
+        legacy_files_check([legacy, ff[0]], w["split"], w["excl"])
+    # step-4 follow-up: a file with any sidecar is validated the normal way, never as legacy
+    dev = _final_files(w, tmp_path / "d", {"bf16": _meta(w, "bf16", split="development")})
+    with pytest.raises(ProvenanceError, match="has a .meta.json sidecar"):
+        legacy_files_check([legacy, dev[0]], w["split"], w["excl"])
+    # ... and a sidecar-less file holding an unexposed holdout scene is refused
+    legacy.write_text(json.dumps({"question_id": "q", "scene_token": S[8]}) + "\n")
+    with pytest.raises(ProvenanceError, match="unexposed final holdout"):
+        legacy_files_check([legacy], w["split"], w["excl"])
+    legacy.write_text(json.dumps({"question_id": "q", "scene_token": S[5]}) + "\n")  # exposed (excluded) final scene: fine
+    assert legacy_files_check([legacy], w["split"], w["excl"])["split"] == "unknown"
 
 
 def test_freeze_requires_and_checks_the_protocol_snapshot(world, tmp_path):
@@ -745,3 +755,118 @@ def test_raw_rows_validated_before_dedup_on_resume_and_analysis(world, tmp_path)
         files.append(f)
     with pytest.raises(ProvenanceError, match="has condition='Fog', sidecar says 'clean'"):
         validate_analysis_files(files, w["cfg"], split_file=w["split"], exclusions_file=w["excl"], frozen_path=tmp_path / "none.yaml")
+
+
+# ---------------- judge freeze and judging gate (step-4 review) ----------------
+
+def _judge_cfg(w, **over):
+    j = {"model": "judge-x", "temperature": 0.0, "top_p": None, "reasoning_effort": None, "seed": None, "max_tokens": 512, "max_tokens_param": "max_tokens", "correct_threshold": 60}
+    j.update(over)
+    return j
+
+
+def test_judge_freeze_binds_settings_templates_and_system_line(world, tmp_path, monkeypatch):
+    """Step-4 review item 2: a rubric edited after the freeze is detected."""
+    import qflip.judge as J
+    from qflip.freeze import build_judge_frozen, check_judge_frozen
+
+    w = world
+    jcfg = _judge_cfg(w)
+    jf = build_judge_frozen(jcfg, 60, repo_root=w["root"])
+    assert jf["judge"] == {"base_url": "https://api.openai.com/v1", "model": "judge-x", "max_tokens": 512, "max_tokens_param": "max_tokens", "temperature": 0.0}
+    assert set(jf["fingerprints"]["templates"]) == set(J.PROMPT_BY_CELL)
+    assert jf["fingerprints"]["visual_description_sha256"] == J.VISUAL_DESCRIPTION_SHA256
+    assert check_judge_frozen(jf, jcfg) == []
+    # the provider endpoint is frozen: a changed base_url (or OPENAI_BASE_URL, since the
+    # effective endpoint is always explicit) is a different judge
+    d = check_judge_frozen(jf, {**jcfg, "base_url": "http://judge.local:8001/v1"})
+    assert len(d) == 1 and d[0].startswith("judge setting base_url: live='http://judge.local:8001/v1'")
+    # a description-source update (file and recorded digest) needs a new judge freeze
+    monkeypatch.setattr(J, "VISUAL_DESCRIPTION_SHA256", "0" * 64)
+    assert check_judge_frozen(jf, jcfg) == ["object-description file digest differs from the frozen one (a description-source update needs a new judge freeze)"]
+    monkeypatch.undo()
+    assert check_judge_frozen(None) and "missing" in check_judge_frozen(None)[0]
+    with pytest.raises(FreezeError):
+        build_judge_frozen(jcfg, None)
+    # live settings or CLI model differ from the frozen judge
+    d = check_judge_frozen(jf, {**jcfg, "model": "judge-y"})
+    assert len(d) == 1 and "judge setting model" in d[0]
+    d = check_judge_frozen(jf, {**jcfg, "temperature": None, "reasoning_effort": "none"})
+    assert {x.split(":")[0] for x in d} == {"judge setting reasoning_effort", "judge setting temperature"}
+    # the planning template is edited after the freeze
+    name, text = J.PROMPT_BY_CELL["planning/VQA"]
+    monkeypatch.setitem(J.PROMPT_BY_CELL, "planning/VQA", (name, text + "\nBe lenient."))
+    d = check_judge_frozen(jf, jcfg)
+    assert len(d) == 1 and d[0].startswith("template for planning/VQA differs")
+    monkeypatch.setitem(J.PROMPT_BY_CELL, "planning/VQA", (name, text))
+    assert check_judge_frozen(jf, jcfg) == []
+    monkeypatch.setattr(J, "SYSTEM_LINE", J.SYSTEM_LINE + " Be generous.")
+    assert check_judge_frozen(jf, jcfg) == ["judge system line differs from the frozen one"]
+
+
+def test_judging_final_files_requires_both_freezes_and_refuses_overrides(world, tmp_path):
+    """Step-4 review item 1: 08 validates provenance and the frozen judge before any call."""
+    from qflip.freeze import build_judge_frozen
+    from qflip.guard import prepare_judging
+
+    w = world
+    cfg = dict(w["cfg"])
+    cfg["judge"] = _judge_cfg(w)
+    fp = _frozen(w, tmp_path)
+    jfp = tmp_path / "judge_frozen.yaml"
+    kw = dict(split_file=w["split"], exclusions_file=w["excl"], frozen_path=fp, judge_frozen_path=jfp)
+    ff = _final_files(w, tmp_path / "f", {"bf16": _meta(w, "bf16", split="final")})
+    # no judge freeze: refused, whatever the live config says
+    with pytest.raises(FreezeError, match="judge_frozen.yaml missing"):
+        prepare_judging(ff, cfg, **kw)
+    with pytest.raises(FreezeError, match="judge_frozen.yaml missing"):
+        prepare_judging(ff, cfg, cli_model="judge-y", **kw)
+    # no core freeze: refused before the judge freeze is even looked at
+    with pytest.raises(FreezeError, match="none.yaml missing"):
+        prepare_judging(ff, cfg, **{**kw, "frozen_path": tmp_path / "none.yaml"})
+    # --no-provenance never covers a final file, nor any file with a sidecar
+    with pytest.raises(ProvenanceError, match="not allowed for final-split"):
+        prepare_judging(ff, cfg, no_provenance=True, **kw)
+    devx = _final_files(w, tmp_path / "x", {"bf16": _meta(w, "bf16", split="development")})
+    with pytest.raises(ProvenanceError, match="has a .meta.json sidecar"):
+        prepare_judging(devx, cfg, no_provenance=True, **kw)
+    # a split=all sidecar whose rows include an unexposed holdout scene is refused on the exploratory path
+    allf = _final_files(w, tmp_path / "all", {"bf16": _meta(w, "bf16", split="all")})
+    with pytest.raises(ProvenanceError, match="unexposed final holdout"):
+        prepare_judging(allf, cfg, **kw)
+    with pytest.raises(ProvenanceError, match="unexposed final holdout"):
+        validate_analysis_files(allf, cfg, split_file=w["split"], exclusions_file=w["excl"], frozen_path=fp)
+    allf[0].write_text(json.dumps({"question_id": "q", "scene_token": S[3], "precision": "bf16", "condition": "clean"}) + "\n")
+    assert prepare_judging(allf, cfg, **kw)["provenance"]["split"] == "all"
+    # a development-labelled file holding a holdout scene fails the population check as before
+    bad_dev = _final_files(w, tmp_path / "bd", {"bf16": _meta(w, "bf16", split="development")})
+    with pytest.raises(ProvenanceError):
+        prepare_judging(bad_dev, cfg, **kw)
+    jfp.write_text(yaml.safe_dump(build_judge_frozen(cfg["judge"], 60, repo_root=w["root"])))
+    out = prepare_judging(ff, cfg, **kw)
+    assert out["provenance"]["split"] == "final" and out["settings"]["model"] == "judge-x" and out["correct_threshold"] == 60 and out["judge_frozen"]["git_commit"]
+    # --model or a config value that differs from the frozen judge is refused
+    with pytest.raises(FreezeError, match="judge setting model: live='judge-y'"):
+        prepare_judging(ff, cfg, cli_model="judge-y", **kw)
+    with pytest.raises(FreezeError, match="judge setting max_tokens"):
+        prepare_judging(ff, {**cfg, "judge": {**cfg["judge"], "max_tokens": 256}}, **kw)
+    # a sidecar from other serving settings is refused the same way 05 refuses it
+    _manifest(w["man"] / "serve_bf16.txt", "bf16", "Qwen/base", "abc123", max_pixels=401408)
+    bad = _final_files(w, tmp_path / "g", {"bf16": _meta(w, "bf16", split="final")})
+    _manifest(w["man"] / "serve_bf16.txt", "bf16", "Qwen/base", "abc123")
+    with pytest.raises(FreezeError, match="max_pixels"):
+        prepare_judging(bad, cfg, **kw)
+    # development files use the live config and accept --model; no files (bare probe) needs no freeze
+    dev = _final_files(w, tmp_path / "d", {"bf16": _meta(w, "bf16", split="development")})
+    dev[0].write_text(json.dumps({"question_id": "q", "scene_token": S[3], "precision": "bf16", "condition": "clean"}) + "\n")
+    out = prepare_judging(dev, cfg, cli_model="judge-y", **kw)
+    assert out["provenance"]["split"] == "development" and out["settings"]["model"] == "judge-y" and out["judge_frozen"] is None
+    out = prepare_judging([], cfg, cli_model="judge-y", **kw)
+    assert out["provenance"]["split"] is None and out["settings"]["model"] == "judge-y"
+    # legacy pilot files without sidecars need --no-provenance
+    legacy = tmp_path / "pilot" / "bf16_clean.jsonl"
+    legacy.parent.mkdir()
+    legacy.write_text("{}\n")
+    with pytest.raises(ProvenanceError, match="no .meta.json sidecar"):
+        prepare_judging([legacy], cfg, **kw)
+    assert prepare_judging([legacy], cfg, no_provenance=True, **kw)["provenance"]["analysis_class"] == "exploratory"

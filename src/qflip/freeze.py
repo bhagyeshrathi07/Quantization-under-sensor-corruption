@@ -200,3 +200,71 @@ def blocking_open_items(text: str) -> list[tuple[int | None, str]]:
 def load_judge_frozen(path: str | Path = JUDGE_FROZEN_PATH) -> dict | None:
     p = Path(path)
     return yaml.safe_load(p.read_text()) if p.exists() else None
+
+
+# ---------------------------------------------------------------- judge freeze
+
+
+def build_judge_frozen(jcfg: dict, correct_threshold: float, repo_root: str | Path = ".", validation: dict | None = None) -> dict:
+    """The judge protocol freeze: request settings as sent, the correctness
+    threshold, and fingerprints of the system line and every template. Written
+    after development validation (plan section 7)."""
+    from qflip.judge import judge_fingerprints, judge_settings
+
+    if correct_threshold is None:
+        raise FreezeError("the judge freeze needs correct_threshold (decided on development scenes)")
+    rev, dirty = git_revision(repo_root)
+    return {
+        "frozen": {"date": datetime.now(timezone.utc).isoformat(timespec="seconds"), "git_commit": rev, "git_dirty": dirty},
+        "judge": judge_settings(jcfg),
+        "correct_threshold": correct_threshold,
+        "fingerprints": judge_fingerprints(),
+        "validation": validation or {},
+    }
+
+
+def check_judge_frozen(jf: dict | None, jcfg: dict | None = None) -> list[str]:
+    """Differences between the judge freeze and the live code (system line,
+    templates) and, when `jcfg` is given, the live judge settings. Empty list =
+    the frozen judge is the one this code and config would run."""
+    from qflip.judge import JudgeSettingsError, judge_fingerprints, judge_settings
+
+    if jf is None:
+        return [f"{JUDGE_FROZEN_PATH} missing (judge protocol freeze)"]
+    diffs = []
+    if jf.get("correct_threshold") is None:
+        diffs.append("correct_threshold missing from the judge freeze")
+    if not jf.get("judge"):
+        diffs.append("`judge` block (model and request settings) missing from the judge freeze")
+        frozen_settings = None
+    else:
+        try:
+            frozen_settings = judge_settings(jf["judge"])
+        except JudgeSettingsError as e:
+            diffs.append(f"frozen judge settings invalid: {e}")
+            frozen_settings = None
+        else:
+            if frozen_settings != jf["judge"]:
+                diffs.append(f"frozen judge settings are not canonical: {jf['judge']} vs {frozen_settings}")
+    live = judge_fingerprints()
+    fp = jf.get("fingerprints") or {}
+    if fp.get("system_line_sha256") != live["system_line_sha256"]:
+        diffs.append("judge system line differs from the frozen one")
+    frozen_t = fp.get("templates") or {}
+    for cell, sha in live["templates"].items():
+        if cell not in frozen_t:
+            diffs.append(f"template for {cell} not fingerprinted in the judge freeze")
+        elif frozen_t[cell] != sha:
+            diffs.append(f"template for {cell} differs from the frozen one ({sha} vs frozen {frozen_t[cell]})")
+    if fp.get("visual_description_sha256") != live["visual_description_sha256"]:
+        diffs.append("object-description file digest differs from the frozen one (a description-source update needs a new judge freeze)")
+    if jcfg is not None and frozen_settings is not None:
+        try:
+            live_settings = judge_settings(jcfg)
+        except JudgeSettingsError as e:
+            diffs.append(f"live judge settings: {e}")
+        else:
+            for k in sorted(set(live_settings) | set(frozen_settings)):
+                if live_settings.get(k) != frozen_settings.get(k):
+                    diffs.append(f"judge setting {k}: live={live_settings.get(k)!r} frozen={frozen_settings.get(k)!r} (overrides are not allowed on final-split files)")
+    return diffs

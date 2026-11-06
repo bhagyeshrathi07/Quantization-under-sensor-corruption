@@ -4,7 +4,8 @@ freeze guard, and analysis-side population checks."""
 
 from pathlib import Path
 
-from qflip.freeze import FROZEN_PATH, FreezeError, check_config, check_meta_against_frozen, check_serve_manifest, load_frozen
+from qflip.freeze import FROZEN_PATH, JUDGE_FROZEN_PATH, FreezeError, check_config, check_judge_frozen, check_meta_against_frozen, check_serve_manifest, load_frozen, load_judge_frozen
+from qflip.judge import judge_settings
 from qflip.provenance import (
     PRECISION_FIELDS,
     ProvenanceError,
@@ -19,6 +20,7 @@ from qflip.provenance import (
     parse_serve_manifest,
     sha256_file,
 )
+from qflip.records import iter_raw_records
 from qflip.split import DEFAULT_EXCLUSIONS_FILE, DEFAULT_SPLIT_FILE, scenes_for
 
 
@@ -87,15 +89,30 @@ def prepare_run(
     return meta
 
 
-def legacy_files_check(files: list[str | Path]) -> dict:
-    """`--no-provenance` is for pilot files written before sidecars existed.
-    A file whose sidecar declares the final split is never analyzed this way,
-    and whatever comes out is labeled exploratory."""
+def holdout_check(files: list[str | Path], split_file: str | Path = DEFAULT_SPLIT_FILE, exclusions_file: str | Path = DEFAULT_EXCLUSIONS_FILE) -> None:
+    """No row of these files may come from the unexposed final holdout: files
+    carrying such scenes are handled only as final-split files under the
+    freezes, never on an exploratory path."""
+    holdout = scenes_for("final", split_file, exclusions_file)
+    for f in files:
+        hit = {r["scene_token"] for r in iter_raw_records(f) if r.get("scene_token") in holdout}
+        if hit:
+            raise ProvenanceError(f"{f} contains {len(hit)} scene(s) of the unexposed final holdout; such files are judged or analyzed only as final-split files under the freezes")
+
+
+def legacy_files_check(files: list[str | Path], split_file: str | Path = DEFAULT_SPLIT_FILE, exclusions_file: str | Path = DEFAULT_EXCLUSIONS_FILE) -> dict:
+    """`--no-provenance` is for pilot files written before sidecars existed:
+    only sidecar-less files qualify (a file with a sidecar is validated the
+    normal way), none of their rows may come from the final holdout, and
+    whatever comes out is labeled exploratory."""
     for f in files:
         m = load_meta(f)
         if m is not None and m.get("split") == "final":
             raise ProvenanceError(f"{f} declares split=final; --no-provenance is not allowed for final-split files (run without it, with the freeze in place)")
-    return {"split": "unknown", "analysis_class": "exploratory", "files": {str(f): {"sidecar": load_meta(f) is not None} for f in files}}
+        if m is not None:
+            raise ProvenanceError(f"{f} has a .meta.json sidecar; --no-provenance is only for files without one (run without it)")
+    holdout_check(files, split_file, exclusions_file)
+    return {"split": "unknown", "analysis_class": "exploratory", "files": {str(f): {"sidecar": False} for f in files}}
 
 
 def validate_analysis_files(
@@ -136,6 +153,9 @@ def validate_analysis_files(
     allowed = None if split == "all" else scenes_for(split, split_file, exclusions_file)
     for f in files:
         check_records_against_meta(f, metas[str(f)], allowed)
+    if split == "all":
+        # an unrestricted run is exploratory; it must not touch the holdout
+        holdout_check(files, split_file, exclusions_file)
     out = {
         "split": split,
         "analysis_class": "confirmatory" if split == "final" else "exploratory",
@@ -156,3 +176,47 @@ def validate_analysis_files(
             raise FreezeError("final-split analysis refused; differences from the freeze:\n  " + "\n  ".join(diffs))
         out["frozen"] = frozen["frozen"]
     return out
+
+
+def judge_settings_for(split: str | None, cfg: dict, cli_model: str | None = None, judge_frozen_path: str | Path = JUDGE_FROZEN_PATH) -> dict:
+    """Judge request settings for files of `split`. Final-split files take the
+    frozen judge (manifests/judge_frozen.yaml), whose fingerprints must match
+    the live templates and system line and whose settings the live config and
+    any CLI override must equal; other splits use the live config."""
+    jcfg = dict(cfg.get("judge") or {})
+    if cli_model:
+        jcfg["model"] = cli_model
+    if split != "final":
+        return {"settings": judge_settings(jcfg), "correct_threshold": jcfg.get("correct_threshold"), "judge_frozen": None}
+    jf = load_judge_frozen(judge_frozen_path)
+    diffs = check_judge_frozen(jf, jcfg)
+    if diffs:
+        raise FreezeError("final-split judging refused; judge freeze:\n  " + "\n  ".join(diffs))
+    return {"settings": judge_settings(jf["judge"]), "correct_threshold": jf["correct_threshold"], "judge_frozen": jf["frozen"]}
+
+
+def prepare_judging(
+    files: list[str | Path],
+    cfg: dict,
+    *,
+    cli_model: str | None = None,
+    no_provenance: bool = False,
+    split_file: str | Path = DEFAULT_SPLIT_FILE,
+    exclusions_file: str | Path = DEFAULT_EXCLUSIONS_FILE,
+    frozen_path: str | Path = FROZEN_PATH,
+    judge_frozen_path: str | Path = JUDGE_FROZEN_PATH,
+) -> dict:
+    """What 08 must establish before any judge call that carries result data:
+    the files' provenance and population (the same validation as 05) and the
+    judge settings those files may be judged with. Final-split files need the
+    core freeze and the judge freeze; no file at all (a bare compat probe)
+    needs neither."""
+    if not files:
+        prov = {"split": None, "analysis_class": "exploratory", "files": {}}
+    elif no_provenance:
+        prov = legacy_files_check(files, split_file, exclusions_file)
+    else:
+        prov = validate_analysis_files(files, cfg, split_file=split_file, exclusions_file=exclusions_file, frozen_path=frozen_path)
+    if files and prov["split"] != "final":
+        holdout_check(files, split_file, exclusions_file)  # whatever the sidecar says, the rows decide
+    return {"provenance": prov, **judge_settings_for(prov["split"], cfg, cli_model, judge_frozen_path)}

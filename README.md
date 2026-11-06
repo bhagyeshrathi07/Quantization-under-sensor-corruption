@@ -51,15 +51,16 @@ scripts/03_smoke_drivebench.py     N or all questions per (precision, condition)
 scripts/04_scene_split.py          calibration / development / final scene manifest
 scripts/exclude_exposed_scenes.py  record final scenes a pilot inspected -> manifests/scene_exclusions.json
 scripts/freeze_config.py           write / check the core freeze
+scripts/freeze_judge.py            write / check the judge freeze (settings, threshold, template and system-line hashes)
 scripts/05_compare_flips.py        flips with bootstrap CIs, breakdowns by cell, views, margin, condition; --vqa; unassessed groups
 scripts/06_stability.py            three-repeat slice: nondeterminism floor
 scripts/07_profile.py              TTFT, latency percentiles, decode tok/s, peak memory per session
-scripts/08_judge_vqa.py            VQA rubric judge (released prompts, fixed model, key from the environment), resumable sidecars
+scripts/08_judge_vqa.py            VQA rubric judge (released prompts, settings hashed into each record, --compat-check, replicates), resumable sidecars
 scripts/quantize_awq.py            own AWQ W4A16 checkpoint with llm-compressor, calibration-split prompts, manifest
 scripts/run_matrix.sh              serve -> all conditions -> stop, per precision; resumable; DRY_RUN=1 prints the plan
 scripts/rescore.py                 recompute MCQ fields after a rule change
 scripts/vast_setup.sh, hpc_pilot.sbatch
-tests/                             37 offline unit tests (pytest)
+tests/                             73 offline unit tests (pytest)
 ```
 
 ## Scope
@@ -82,9 +83,9 @@ tests/                             37 offline unit tests (pytest)
 
 - November 4 review (two rounds, [WEEK9_ANALYSIS_PLAN.md](WEEK9_ANALYSIS_PLAN.md)): the November 3 slices had drawn from the final holdout; 15 scenes are now excluded (confirmatory population 116 scenes, 838 questions), every result file carries a provenance sidecar, final-split runs and analyses are refused without a matching freeze, pairing validates eight fields, and the November 3 profile and stability numbers are reclassified as official-checkpoint reference measurements.
 
-- Step 1 of the plan (integrity fixes) passed four review rounds and is committed; step 2 adds the five prespecified contrasts with both intervals and the support rule (`05 --contrasts`), the views comparison as descriptive only, and PROTOCOL sections 8 and 9 rewritten to match.
+- Steps 1 and 2 of the plan are committed: integrity fixes (four review rounds), then the five prespecified contrasts with both intervals and the support rule (`05 --contrasts`), the views comparison as descriptive only, PROTOCOL sections 8 and 9 rewritten (two review rounds). Step 4 (judge, November 5): optional request settings, `input_sha256` and `replicate` as the record key, production scores bound to the current answer and judge settings, `08 --compat-check`, measured usage, and the cost note [manifests/judge_cost.md](manifests/judge_cost.md) with current prices; after review, `08` validates provenance and both freezes before any call and the judge freeze binds the rubric templates by hash. The judge model itself is still the team's decision.
 
-**In progress (week 9, two weeks behind the plan).** Plan steps 3–5 (pooled profile and tables, judge changes, freeze script run), then the core freeze, then one GPU session (own-checkpoint stability and profile, the 8-run matrix).
+**In progress (week 9, two weeks behind the plan).** Plan steps 3 and 5 (pooled profile, coverage and tables; protocol rows and freeze script run), then the core freeze, then one GPU session (own-checkpoint stability and profile, the 8-run matrix, judge compat check and trial).
 
 **Not started.** Profile sessions 2 and 3, VQA judging (budget decision), analysis and explorer (weeks 10–11), mitigation (12), report (13–14).
 
