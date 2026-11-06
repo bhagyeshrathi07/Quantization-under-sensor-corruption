@@ -49,6 +49,8 @@ from qflip.freeze import FreezeError  # noqa: E402
 from qflip.guard import judge_settings_for, legacy_files_check, validate_analysis_files  # noqa: E402
 from qflip.judge import JudgeInputError, JudgeSettingsError, ensure_visual_description, load_scores, load_visual_description, production_scores, sidecar_path  # noqa: E402
 from qflip.records import read_records  # noqa: E402
+from qflip.report import condition_rows, coverage_report, harmful_examples  # noqa: E402
+from qflip.split import SPLITS, filter_split  # noqa: E402
 
 
 def fmt_ci(ci):
@@ -59,8 +61,9 @@ def report(label: str, pairs, n_boot: int, seed: int, min_n: int, min_scenes: in
     s = summarize(pairs)
     assessed = coverage(s, min_n, min_scenes)
     if not assessed:
-        print(f"  {label:24s} n={s.get('n', 0)} scenes={s.get('scenes', 0)}  UNASSESSED (below {min_n} questions or {min_scenes} scenes)")
-        return {"label": label, **s, "assessed": False}
+        reason = f"coverage: {s.get('n', 0)} questions from {s.get('scenes', 0)} scenes, below {min_n} / {min_scenes}"
+        print(f"  {label:24s} n={s.get('n', 0)} scenes={s.get('scenes', 0)}  UNASSESSED ({reason})")
+        return {"label": label, **s, "assessed": False, "reason": reason}
     ci = bootstrap_scenes(pairs, n_boot=n_boot, seed=seed)
     hr = f"{s['harmful_rate']:.3f}" if s["harmful_rate"] is not None else "n/a"
     score = ""
@@ -151,7 +154,16 @@ def main():
     else:
         provenance = validate_analysis_files(args.files, cfg, split_file=args.split_file, exclusions_file=args.exclusions_file, settings=effective)
         print(f"provenance ok: split={provenance['split']} ({provenance['analysis_class']}), {len(provenance['files'])} files" + (", frozen " + provenance["frozen"]["date"] if "frozen" in provenance else ""))
-    question_text = {q.question_id: q.question for q in load_questions(cfg["data"]["annotations"])}
+    questions = load_questions(cfg["data"]["annotations"])
+    question_text = {q.question_id: q.question for q in questions}
+    # eligible questions per cell in the declared population (None when the files carry no population)
+    eligible_by_cell = None
+    if provenance["split"] in SPLITS:
+        eligible_by_cell = {}
+        for q in filter_split(questions, provenance["split"], args.split_file, args.exclusions_file):
+            if q.cell is not None:
+                eligible_by_cell[q.cell] = eligible_by_cell.get(q.cell, 0) + 1
+    records_by_file = {}
 
     groups, file_ids = [], {}
     for ref_path, quant_path in zip(args.files[::2], args.files[1::2]):
@@ -162,6 +174,7 @@ def main():
             sys.exit(f"pairing refused for {ref_path} vs {quant_path}: {e}")
         print(f"{ref_path} vs {quant_path}: {len(p)} paired MCQ")
         groups.append(p)
+        pair_conditions = []
         for path, recs in ((ref_path, ref_recs), (quant_path, quant_recs)):
             # identity from the validated sidecar, else from any record (errored included),
             # so a file whose MCQs all errored still enters the C4 audit with an empty id set
@@ -175,16 +188,24 @@ def main():
             if key in file_ids:
                 sys.exit(f"two input files hold {key} records; duplicated inputs are refused")
             file_ids[key] = {r["question_id"] for r in recs if (r.get("cell") or "").endswith("MCQ") and not r.get("error")}
+            pair_conditions.append(cond)
+        if pair_conditions[0] != pair_conditions[1]:
+            sys.exit(f"{ref_path} ({pair_conditions[0]}) and {quant_path} ({pair_conditions[1]}) are not the same condition")
+        records_by_file[pair_conditions[0]] = (ref_recs, quant_recs)
     try:
         pairs = merge_pairs(groups)
     except PairingError as e:
         sys.exit(f"inputs refused: {e}")
     if not pairs:
-        sys.exit("no common MCQ questions")
+        print("WARNING: no common MCQ questions in any file pair; coverage is still written, every group is unassessed")
 
     out = {"margin_edges": edges, "n_boot_group": n_boot, "n_boot_contrast": n_boot_contrast, "seed": args.seed, "min_questions": min_n, "min_scenes": min_scenes,
            "analysis_class": provenance["analysis_class"], "provenance": provenance}
-    out["mcq"] = section("MCQ", pairs, args.by, edges, args, min_n, min_scenes)
+    # the per-condition headline (T2) is always written, whatever --by says, with an
+    # n = 0 row for every validated input condition that produced no pair
+    by_factors = list(args.by) + (["condition"] if "condition" not in args.by else [])
+    out["mcq"] = section("MCQ", pairs, by_factors, edges, args, min_n, min_scenes)
+    out["mcq"]["groups"]["condition"] = condition_rows(out["mcq"]["groups"]["condition"], list(records_by_file), min_n, min_scenes)
 
     if args.contrasts:
         by_cond = {}
@@ -200,7 +221,7 @@ def main():
             print(f"        {r['note']}")
         out["contrasts"] = res["family"]
         out["descriptive"] = res["descriptive"]
-        out["contrast_settings"] = {k: effective[k] for k in ("n_boot_contrast", "seed", "support_min_ref_correct", "support_min_ref_scenes")}
+        out["contrast_settings"] = {k: effective[k] for k in ("n_boot_contrast", "seed", "support_min_ref_correct", "support_min_ref_scenes")} | {"family_size": res["family_size"], "alpha_adjusted": res["alpha_adjusted"]}
 
     if args.vqa:
         # Final files: the frozen judge (settings, templates, system line, threshold)
@@ -228,9 +249,19 @@ def main():
         for ref_path, quant_path in zip(args.files[::2], args.files[1::2]):
             vqa.extend(load_vqa_pairs(ref_path, quant_path, threshold, judge_set, desc_data, question_text))
         print(f"\n{len(vqa)} paired VQA at threshold {threshold}")
-        if vqa:
-            out["vqa"] = {"threshold": threshold, "judge_settings": judge_set, **section("VQA (judged)", vqa, [f for f in args.by if f != "margin"], edges, args, min_n, min_scenes)}
-            pairs = pairs + vqa
+        # the VQA section exists whenever --vqa was asked for, empty pair list included,
+        # so every condition keeps its (possibly n = 0) unassessed headline row
+        out["vqa"] = {"threshold": threshold, "judge_settings": judge_set, **section("VQA (judged)", vqa, [f for f in by_factors if f != "margin"], edges, args, min_n, min_scenes)}
+        out["vqa"]["groups"]["condition"] = condition_rows(out["vqa"]["groups"]["condition"], list(records_by_file), min_n, min_scenes)
+        pairs = pairs + vqa
+
+    # coverage per condition (from the validated file identity) and cell, over every pair of that condition (MCQ, plus judged VQA when present)
+    out["coverage"] = coverage_report(records_by_file, pairs, eligible_by_cell, min_n, min_scenes)
+    out["harmful_examples"] = harmful_examples(pairs)
+    print("\ncoverage per cell:")
+    for cond, cells in out["coverage"].items():
+        for cell, c in cells.items():
+            print(f"  {cond:9s} {cell:15s} eligible={c['eligible'] if c['eligible'] is not None else 'n/a':>4} present {c['present_ref']}/{c['present_quant']} errored {c['errored_ref']}/{c['errored_quant']} paired={c['paired']} unpaired={c['unpaired']} scenes={c['scenes']} {'assessed' if c['assessed'] else 'UNASSESSED'}")
 
     harmful = [p for p in pairs if p.flip == "harmful"]
     if harmful and args.show_harmful:

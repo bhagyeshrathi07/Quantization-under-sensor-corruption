@@ -61,6 +61,34 @@ def prepare_run(
     config), requires the served alias, binds the manifest to the running
     process (pid, command line, port) and, when the server reports the model
     it loaded, requires it to be the manifest's model."""
+    meta = validate_server_and_freeze(cfg, config_path=config_path, precision=precision, condition=condition, split=split, split_file=split_file,
+                                      exclusions_file=exclusions_file, manifests_dir=manifests_dir, base_url=base_url, check_live_server=check_live_server,
+                                      frozen_path=frozen_path, require_freeze=(split == "final"))
+    allowed = None if split == "all" else scenes_for(split, split_file, exclusions_file)
+    ensure_meta(result_file, meta, allowed_scenes=allowed)
+    return meta
+
+
+def validate_server_and_freeze(
+    cfg: dict,
+    *,
+    config_path: str | Path,
+    precision: str,
+    condition: str,
+    split: str,
+    split_file: str | Path = DEFAULT_SPLIT_FILE,
+    exclusions_file: str | Path = DEFAULT_EXCLUSIONS_FILE,
+    manifests_dir: str | Path = "manifests",
+    base_url: str | None = None,
+    check_live_server: bool = True,
+    frozen_path: str | Path = FROZEN_PATH,
+    require_freeze: bool = False,
+) -> dict:
+    """The server binding every measurement needs (manifest present, served
+    alias at the client's effective endpoint, listener owned by the manifest's
+    process, loaded model when reported) and, when required, the core freeze
+    (config and serve manifest equal to the frozen study). Returns the
+    provenance block (the sidecar's compatibility fields)."""
     served = cfg["models"][precision]
     manifest = Path(manifests_dir) / f"serve_{precision}.txt"
     if not manifest.exists():
@@ -70,9 +98,9 @@ def prepare_run(
         url = base_url or effective_base_url(cfg)
         check_server(url, served, expect_model=man.get("model"))
         check_server_process(man, url)
-    if split == "final":
+    if require_freeze:
         final_guard(cfg, precision, manifest, split_file, exclusions_file, frozen_path)
-    meta = build_run_meta(
+    return build_run_meta(
         split=split,
         precision=precision,
         condition=condition,
@@ -84,9 +112,13 @@ def prepare_run(
         serve_manifest_path=manifest,
         served_model_name=served,
     )
-    allowed = None if split == "all" else scenes_for(split, split_file, exclusions_file)
-    ensure_meta(result_file, meta, allowed_scenes=allowed)
-    return meta
+
+
+def prepare_measurement(cfg: dict, *, study: bool = True, **kw) -> dict:
+    """07's guard, before the warm-up requests: the server binding always, and
+    the core freeze unless the session is declared exploratory (`study=False`),
+    in which case the file is marked and never pooled into the study."""
+    return validate_server_and_freeze(cfg, require_freeze=study, **kw)
 
 
 def holdout_check(files: list[str | Path], split_file: str | Path = DEFAULT_SPLIT_FILE, exclusions_file: str | Path = DEFAULT_EXCLUSIONS_FILE) -> None:

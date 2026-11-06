@@ -67,6 +67,8 @@ class Pair:
     flip: str
     ref_score: float | None = None    # VQA only: judge rubric score
     quant_score: float | None = None
+    ref_answer: str | None = None     # MCQ only: option letter under the strict rule
+    quant_answer: str | None = None
 
 
 def pair_records(ref_records: list[dict], quant_records: list[dict], question_text: dict[str, str] | None = None) -> list[Pair]:
@@ -89,6 +91,8 @@ def pair_records(ref_records: list[dict], quant_records: list[dict], question_te
                 ref_correct=bool(a["mcq_correct"]),
                 quant_correct=bool(b["mcq_correct"]),
                 flip=classify(a, b),
+                ref_answer=a.get("mcq_pred_strict"),
+                quant_answer=b.get("mcq_pred_strict"),
             )
         )
     return pairs

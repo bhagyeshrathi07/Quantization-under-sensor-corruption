@@ -757,6 +757,43 @@ def test_raw_rows_validated_before_dedup_on_resume_and_analysis(world, tmp_path)
         validate_analysis_files(files, w["cfg"], split_file=w["split"], exclusions_file=w["excl"], frozen_path=tmp_path / "none.yaml")
 
 
+# ---------------- measurement guard (07, step-3 review item 3) ----------------
+
+def test_profile_sessions_are_bound_to_the_server_and_the_freeze(world, tmp_path):
+    from qflip.guard import prepare_measurement
+
+    w = world
+    kw = dict(config_path=w["cfg_path"], precision="int4", condition="clean", split="development", split_file=w["split"], exclusions_file=w["excl"],
+              manifests_dir=w["man"], check_live_server=False, frozen_path=tmp_path / "config_frozen.yaml")
+    # study session without the core freeze: refused before any request
+    with pytest.raises(FreezeError, match="config_frozen.yaml missing"):
+        prepare_measurement(w["cfg"], **kw)
+    # exploratory session: server binding only, marked by the caller
+    meta = prepare_measurement(w["cfg"], study=False, **kw)
+    assert meta["precision"] == "int4" and meta["checkpoint_fingerprint"].startswith("sha256:")
+    fp = _frozen(w, tmp_path)
+    meta = prepare_measurement(w["cfg"], **{**kw, "frozen_path": fp})
+    assert meta["checkpoint_fingerprint"] == yaml.safe_load(fp.read_text())["models_frozen"]["int4"]["checkpoint_fingerprint"]
+    # a server on the official checkpoint is refused for a study session
+    _manifest(w["man"] / "serve_int4.txt", "int4", "Qwen/Qwen2.5-VL-7B-Instruct-AWQ", extra="--dtype float16 --quantization awq_marlin")
+    with pytest.raises(FreezeError, match="model: server='Qwen/Qwen2.5-VL-7B-Instruct-AWQ'"):
+        prepare_measurement(w["cfg"], **{**kw, "frozen_path": fp})
+    _manifest(w["man"] / "serve_int4.txt", "int4", str(w["ckpt"]))
+    # follow-up item 1: the producer's own INT4 metadata (local checkpoint, revision null) pools
+    from qflip.report import pool_profiles, profile_summary
+
+    assert meta["model_revision"] is None
+    reqs = [{"question_id": "q1", "error": None, "ttft_s": 0.5, "latency_s": 2.0, "decode_tok_s": 30.0, "prompt_tokens": 1000, "completion_tokens": 60}]
+    session = {"file": "int4_clean_s1.json", "precision": "int4", "condition": "clean", "session": 1, "split": "development", "n": 1, "views": 6, "warmup": 3, "study": True,
+               "gpu_peak_mib": 12000, "provenance": meta, "host": {"hostname": "h", "gpu_name": "g"}, "summary": profile_summary(reqs), "requests": reqs}
+    assert pool_profiles([session])["precisions"]["int4"]["provenance"]["checkpoint_fingerprint"] == meta["checkpoint_fingerprint"]
+    # no manifest at all: refused even for an exploratory session
+    (w["man"] / "serve_int4.txt").unlink()
+    with pytest.raises(ProvenanceError, match="serve_int4.txt missing"):
+        prepare_measurement(w["cfg"], study=False, **kw)
+    _manifest(w["man"] / "serve_int4.txt", "int4", str(w["ckpt"]))
+
+
 # ---------------- judge freeze and judging gate (step-4 review) ----------------
 
 def _judge_cfg(w, **over):
