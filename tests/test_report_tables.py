@@ -69,7 +69,7 @@ def _session(prec, k, ttft, peak, host="h1", fingerprint="sha256:own", file=None
         prov = {k_: f"v-{k_}" for k_ in COMPAT_FIELDS}
         prov.update({"split": "development", "precision": prec, "condition": "clean", "served_model_name": f"qwen-{prec}", "model_path_or_id": f"/ckpt/{prec}",
                      "checkpoint_fingerprint": fingerprint, "quantization": "none" if prec == "bf16" else "compressed-tensors", "dtype": "bfloat16" if prec == "bf16" else "float16",
-                     "max_pixels": "200704", "kv_args": kv, "vllm_version": "0.33.0"})
+                     "max_pixels": "200704", "kv_args": kv, "vllm_version": "0.33.0", "torch_version": "2.14.0", "transformers_version": "5.20.2", "compressed_tensors_version": "0.17.0"})
         s["provenance"] = prov
     return s
 
@@ -136,6 +136,17 @@ def test_pool_profiles_refuses_mixed_setups_duplicates_and_unprovenanced_files()
         pool_profiles(base + [_session("int4", 1, [0.3], 10000, host="h2")])
     with pytest.raises(ProfileError, match="not comparable.*workload.question_ids"):
         pool_profiles(base + [_session("int4", 1, [0.3, 0.3], 10000)])
+    # runtime versions are compatibility fields: each one, drifted alone, blocks pooling within
+    # a precision and the comparison across precisions
+    for field in ("vllm_version", "torch_version", "transformers_version", "compressed_tensors_version"):
+        drifted = copy.deepcopy(base[1])
+        drifted["provenance"][field] = "99.0.0"
+        with pytest.raises(ProfileError, match=field):
+            pool_profiles([base[0], drifted])
+        other = _session("int4", 1, [0.3], 10000)
+        other["provenance"][field] = "99.0.0"
+        with pytest.raises(ProfileError, match=f"not comparable.*{field}"):
+            pool_profiles(base + [other])
     # step-3 review item 5: an all-error session keeps its counts, verdicts become n/a, nothing raises
     out = pool_profiles([_session("bf16", 1, [0.5, 0.6], 20000, errors=2), _session("int4", 1, [0.3, 0.3], 10000)])
     b = out["precisions"]["bf16"]["pooled"]

@@ -22,7 +22,7 @@ Working documents:
 
 | File | Purpose |
 |---|---|
-| [PROTOCOL.md](PROTOCOL.md) | Exact execution protocol: checkpoints, serving flags, prompt, scoring rules, flip classes, statistics, record schema. Draft until the week-7 freeze; each item marked frozen, pilot default, or to decide. |
+| [PROTOCOL.md](PROTOCOL.md) | Exact execution protocol: checkpoints, serving flags, prompt, scoring rules, flip classes, statistics, record schema, provenance and freeze mechanics. Ready for the core freeze since November 6; the judge protocol is frozen separately. |
 | [PILOT.md](PILOT.md) | Runbook: setup, data, serve, smoke test, runs, stability, profile, Vast.ai and HPC notes. |
 | [TEAM_REVIEW.md](TEAM_REVIEW.md) | Summary for teammates of the scope change, every decision and its reason, and the items that still need sign-off. |
 | [manifests/gate_week5.md](manifests/gate_week5.md) | Week-5 baseline gate: pilot measurements and the findings that changed the protocol. |
@@ -43,6 +43,7 @@ src/qflip/provenance.py            result-file sidecars (input hashes, checkpoin
 src/qflip/freeze.py, guard.py      core freeze (frozen config + protocol snapshot) and the run/analysis guards that enforce it
 src/qflip/report.py                coverage per cell, harmful examples, pooled deployment profile (pooling rule)
 src/qflip/tables.py                report tables T1-T7 as markdown; formatting only
+src/qflip/versions.py              the one runtime-version collector (module __version__, build tag kept) for the serve manifest and the freeze
 src/qflip/split.py, stats.py, gpu.py, records.py
 scripts/download_drivebench.py     annotations + visual descriptions (HF, toolkit) + corruption images (Google Drive zip)
 scripts/download_clean_images.py   clean nuScenes keyframes streamed from the public AWS mirror
@@ -52,7 +53,8 @@ scripts/02_smoke_request.py        one six-view request: tokens per view, logpro
 scripts/03_smoke_drivebench.py     N or all questions per (precision, condition), resumable, --split
 scripts/04_scene_split.py          calibration / development / final scene manifest
 scripts/exclude_exposed_scenes.py  record final scenes a pilot inspected -> manifests/scene_exclusions.json
-scripts/freeze_config.py           write / check the core freeze
+scripts/freeze_config.py           write / check the core freeze (pins, exact runtime builds, checkpoint fingerprint, snapshot)
+scripts/runtime_versions.py        serve-manifest version lines from qflip.versions (called by 01_serve.sh)
 scripts/freeze_judge.py            write / check the judge freeze (settings, threshold, template and system-line hashes)
 scripts/05_compare_flips.py        flips with bootstrap CIs, breakdowns, contrasts, coverage per cell, harmful examples; --vqa; --out JSON
 scripts/06_stability.py            three-repeat slice: nondeterminism floor
@@ -63,7 +65,7 @@ scripts/quantize_awq.py            own AWQ W4A16 checkpoint with llm-compressor,
 scripts/run_matrix.sh              serve -> all conditions -> stop, per precision; resumable; DRY_RUN=1 prints the plan
 scripts/rescore.py                 recompute MCQ fields after a rule change
 scripts/vast_setup.sh, hpc_pilot.sbatch
-tests/                             81 offline unit tests (pytest)
+tests/                             85 offline unit tests (pytest)
 ```
 
 ## Scope
@@ -82,13 +84,13 @@ tests/                             81 offline unit tests (pytest)
 - Analysis tooling built and unit-tested offline: paired bootstrap, stability slice, deployment profile with streaming TTFT, equal KV-cache serving, scene-split filtering.
 - Build for the final runs written offline on October 20, dry-run tested, not yet run on a GPU: own-AWQ quantization script (recipe and calibration manifest), matrix driver, VQA judge with the released rubric prompts (the released `--eval-gpt` path cannot run as shipped; see PROTOCOL section 7), coverage rule in the comparison. The toolkit's `data/visual_description.json`, needed by the planning judge prompt, was located and is fetched automatically.
 
-- GPU session 1 on the replacement host, November 3 ([manifests/session1_2026-11-03.md](manifests/session1_2026-11-03.md)): the October instance had been destroyed by its host and was rebuilt; clean nuScenes images fetched; equal KV cache and streaming verified on vLLM 0.33; clean, Fog, NoImage 20-question slices on both precisions (zero errors; 1 harmful and 1 beneficial flip in 32 MCQ pairs, both NoImage with BF16 margin below 0.25); stability floor measured at zero self-changes; deployment profile session 1 (INT4 2.4× faster at batch 1, 47% less peak memory, equal 2 GiB KV cache); own AWQ W4A16 checkpoint built in 8 minutes and served.
+- GPU session 1 on the replacement host, November 3 ([manifests/session1_2026-11-03.md](manifests/session1_2026-11-03.md)): the October instance had been destroyed by its host and was rebuilt; clean nuScenes images fetched; equal KV cache and streaming verified on vLLM 0.33; clean, Fog, NoImage 20-question slices on both precisions (zero errors; 1 harmful and 1 beneficial flip in 24 MCQ pairs, both NoImage with BF16 margin below 0.25; exploratory, and these scenes are now excluded from the confirmatory population); official-checkpoint reference measurements, kept under `results/reference_official/` and not pooled into the study: MCQ stability at zero self-changes with VQA text varying in 6 of 35 BF16 and 1 of 35 INT4 repeats, and a deployment profile (INT4 2.4× faster at batch 1, 47% less peak memory, equal 2 GiB KV cache); own AWQ W4A16 checkpoint built in 8 minutes and served.
 
 - November 4 review (two rounds, [WEEK9_ANALYSIS_PLAN.md](WEEK9_ANALYSIS_PLAN.md)): the November 3 slices had drawn from the final holdout; 15 scenes are now excluded (confirmatory population 116 scenes, 838 questions), every result file carries a provenance sidecar, final-split runs and analyses are refused without a matching freeze, pairing validates eight fields, and the November 3 profile and stability numbers are reclassified as official-checkpoint reference measurements.
 
 - Steps 1 and 2 of the plan are committed: integrity fixes (four review rounds), then the five prespecified contrasts with both intervals and the support rule (`05 --contrasts`), the views comparison as descriptive only, PROTOCOL sections 8 and 9 rewritten (two review rounds). Step 4 (judge, November 5): optional request settings, `input_sha256` and `replicate` as the record key, production scores bound to the current answer and judge settings, `08 --compat-check`, measured usage, and the cost note [manifests/judge_cost.md](manifests/judge_cost.md) with current prices; after review, `08` validates provenance and both freezes before any call and the judge freeze binds the rubric templates by hash. The judge model itself is still the team's decision. Step 3 (November 6): `05` writes coverage per cell and harmful examples, `07 --report --out` pools profile sessions under the plan's rule, and `09_tables.py` formats T1–T7.
 
-**In progress (week 9, two weeks behind the plan).** Plan step 5 (protocol rows, session-note corrections, freeze script run), then the core freeze, then one GPU session (own-checkpoint stability and profile, the 8-run matrix, judge compat check and trial).
+**In progress (week 9, two weeks behind the plan).** The protocol is ready for the core freeze (every row outside the judge and mitigation sections is FROZEN; `freeze_config.py` dry-run passes). Next: one GPU session that writes the freeze on the host and runs own-checkpoint stability, profile ×3, the 8-run matrix, and the judge compat check and trial.
 
 **Not started.** Profile sessions 2 and 3, VQA judging (budget decision), analysis and explorer (weeks 10–11), mitigation (12), report (13–14).
 

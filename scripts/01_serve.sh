@@ -92,8 +92,9 @@ mkdir -p manifests
   echo "pid: $$"
   echo "power_limit_w: $(nvidia-smi --query-gpu=power.limit --format=csv,noheader,nounits 2>/dev/null | head -1 || echo unknown)"
   echo "gpu: $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | head -1 || echo unknown)"
-  echo "vllm: $(python -c 'import vllm; print(vllm.__version__)' 2>/dev/null || echo unknown)"
-  echo "transformers: $(python -c 'import transformers; print(transformers.__version__)' 2>/dev/null || echo unknown)"
+  # the four pinned serving packages (PROTOCOL section 2), through the same collector the
+  # freeze uses (module __version__, build tag kept); the freeze check requires every one
+  python "$(dirname "$0")/runtime_versions.py"
 } | tee "manifests/serve_${PRECISION}.txt"
 
 exec vllm serve "$MODEL" \

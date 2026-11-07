@@ -47,7 +47,12 @@ COMPAT_FIELDS = (
     "max_num_seqs",
     "prefix_caching",
     "vllm_version",
+    "torch_version",
+    "transformers_version",
+    "compressed_tensors_version",
 )
+# serve-manifest line -> sidecar field, for the four pinned serving packages
+VERSION_FIELDS = {"vllm": "vllm_version", "torch": "torch_version", "transformers": "transformers_version", "compressed_tensors": "compressed_tensors_version"}
 # Fields that legitimately differ between the two precisions of one comparison.
 PRECISION_FIELDS = ("precision", "served_model_name", "model_path_or_id", "model_revision", "checkpoint_fingerprint", "quantization", "dtype")
 HISTORY_FIELDS = ("created", "config_sha256", "code_revision", "code_dirty", "host", "serve_manifest", "serve_date", "server_pid", "server_port")
@@ -167,6 +172,9 @@ def build_run_meta(
         "max_num_seqs": m.get("max_num_seqs"),
         "prefix_caching": m.get("prefix_caching"),
         "vllm_version": m.get("vllm"),
+        "torch_version": m.get("torch"),
+        "transformers_version": m.get("transformers"),
+        "compressed_tensors_version": m.get("compressed_tensors"),
         # history
         "created": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "config_sha256": sha256_file(config_path),

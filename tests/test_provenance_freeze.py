@@ -40,7 +40,7 @@ def _manifest(path: Path, precision: str, model: str, revision: str = "", extra:
         f"date: {date}\nprecision: {precision}\nmodel: {model}\nrevision: {revision}\nserved_model_name: qwen-{precision}\n"
         f"max_pixels: {max_pixels}\nmax_model_len: 4096\nkv_args: --kv-cache-memory-bytes {kv}\nseed: {seed}\nmax_num_seqs: {max_num_seqs}\n"
         f"prefix_caching: {prefix_caching}\nextra_args: {extra}\nport: {port}\n" + (f"pid: {pid}\n" if pid else "")
-        + f"power_limit_w: 450.00\ngpu: RTX 4090\nvllm: 0.33.0\ntransformers: 5.20.2\n"
+        + f"power_limit_w: 450.00\ngpu: RTX 4090\nvllm: 0.33.0\ntorch: 2.14.0\ntransformers: 5.20.2\ncompressed_tensors: 0.17.0\n"
     )
     return path
 
@@ -70,6 +70,7 @@ def world(tmp_path):
     man = tmp_path / "manifests"
     man.mkdir()
     (man / "PROTOCOL_frozen.md").write_text("## 2. Serving\n\n| a | 1 | FROZEN |\n")
+    (man / "requirements_frozen.txt").write_text("compressed-tensors==0.17.0\ntorch==2.14.0\ntransformers==5.20.2\nvllm==0.33.0\nnumpy==2.3.0\n")
     _manifest(man / "serve_bf16.txt", "bf16", "Qwen/base", "abc123")
     _manifest(man / "serve_int4.txt", "int4", str(ckpt))
     return {"cfg": cfg, "cfg_path": cfg_path, "split": split, "excl": excl, "ckpt": ckpt, "man": man, "root": tmp_path}
@@ -213,7 +214,7 @@ def test_protocol_open_items_parse_statuses_not_prose():
 
 def test_freeze_build_check_and_serve_manifest(world):
     w = world
-    frozen = build_frozen(w["cfg"], w["split"], w["excl"], str(w["ckpt"]), repo_root=w["root"], protocol_snapshot=w["man"] / "PROTOCOL_frozen.md")
+    frozen = build_frozen(w["cfg"], w["split"], w["excl"], str(w["ckpt"]), repo_root=w["root"], requirements_file=w["man"] / "requirements_frozen.txt", protocol_snapshot=w["man"] / "PROTOCOL_frozen.md")
     assert frozen["models_frozen"]["int4"]["checkpoint_fingerprint"].startswith("sha256:")
     assert "judge" not in frozen["core"] and set(core_config(w["cfg"])) >= {"serving", "analysis"}
     assert check_config(w["cfg"], frozen, w["split"], w["excl"]) == []
@@ -244,7 +245,7 @@ def test_final_guard_and_analysis_validation(world, tmp_path):
     # no freeze -> refused
     with pytest.raises(FreezeError, match="missing"):
         final_guard(w["cfg"], "bf16", w["man"] / "serve_bf16.txt", w["split"], w["excl"], frozen_path)
-    frozen_path.write_text(yaml.safe_dump(build_frozen(w["cfg"], w["split"], w["excl"], str(w["ckpt"]), repo_root=w["root"], protocol_snapshot=w["man"] / "PROTOCOL_frozen.md")))
+    frozen_path.write_text(yaml.safe_dump(build_frozen(w["cfg"], w["split"], w["excl"], str(w["ckpt"]), repo_root=w["root"], requirements_file=w["man"] / "requirements_frozen.txt", protocol_snapshot=w["man"] / "PROTOCOL_frozen.md")))
     assert final_guard(w["cfg"], "bf16", w["man"] / "serve_bf16.txt", w["split"], w["excl"], frozen_path)["frozen"]
     # official-checkpoint server when the freeze names the own checkpoint -> refused
     official = _manifest(w["man"] / "serve_int4.txt", "int4", "Qwen/Qwen2.5-VL-7B-Instruct-AWQ", extra="--dtype float16 --quantization awq_marlin")
@@ -304,7 +305,7 @@ def test_freeze_config_cli(world, tmp_path):
     protocol = repo / "PROTOCOL.md"
     protocol.write_text("## 2. Serving\n\n| a | 1 | TO DECIDE |\n\n## Change log\n")
     base = [sys.executable, str(ROOT / "scripts/freeze_config.py"), "--config", str(w["cfg_path"]), "--split-file", str(w["split"]), "--exclusions-file", str(w["excl"]),
-            "--protocol", str(protocol), "--frozen", str(repo / "config_frozen.yaml"), "--snapshot", str(repo / "PROTOCOL_frozen.md"), "--int4-model", str(w["ckpt"])]
+            "--protocol", str(protocol), "--frozen", str(repo / "config_frozen.yaml"), "--snapshot", str(repo / "PROTOCOL_frozen.md"), "--int4-model", str(w["ckpt"]), "--requirements", str(w["man"] / "requirements_frozen.txt"), "--runtime", "pins"]
     r = subprocess.run(base, cwd=repo, capture_output=True, text=True)
     assert r.returncode == 1 and "section 2: a" in r.stdout
     protocol.write_text("## 2. Serving\n\n| a | 1 | FROZEN |\n\n## 7. Scoring\n\n| VQA | j | TO DECIDE |\n\n## Change log\n")
@@ -328,7 +329,7 @@ def test_freeze_config_cli(world, tmp_path):
 
 def _frozen(w, tmp_path):
     fp = tmp_path / "config_frozen.yaml"
-    fp.write_text(yaml.safe_dump(build_frozen(w["cfg"], w["split"], w["excl"], str(w["ckpt"]), repo_root=w["root"], protocol_snapshot=w["man"] / "PROTOCOL_frozen.md")))
+    fp.write_text(yaml.safe_dump(build_frozen(w["cfg"], w["split"], w["excl"], str(w["ckpt"]), repo_root=w["root"], requirements_file=w["man"] / "requirements_frozen.txt", protocol_snapshot=w["man"] / "PROTOCOL_frozen.md")))
     return fp
 
 
@@ -419,13 +420,13 @@ def test_freeze_requires_and_checks_the_protocol_snapshot(world, tmp_path):
     """Review item 8: the snapshot path is stored, its hash required, and edits detected."""
     w = world
     snap = w["man"] / "PROTOCOL_frozen.md"
-    frozen = build_frozen(w["cfg"], w["split"], w["excl"], str(w["ckpt"]), repo_root=w["root"], protocol_snapshot=snap)
+    frozen = build_frozen(w["cfg"], w["split"], w["excl"], str(w["ckpt"]), repo_root=w["root"], requirements_file=w["man"] / "requirements_frozen.txt", protocol_snapshot=snap)
     assert frozen["frozen"]["protocol_snapshot"] == str(snap) and len(frozen["frozen"]["protocol_snapshot_sha256"]) == 64
     assert check_config(w["cfg"], frozen, w["split"], w["excl"]) == []
     snap.write_text(snap.read_text() + "\n| b | 2 | FROZEN |\n")
     assert any(d.startswith("protocol_snapshot_sha256") for d in check_config(w["cfg"], frozen, w["split"], w["excl"]))
     with pytest.raises(FreezeError, match="snapshot .* missing"):
-        build_frozen(w["cfg"], w["split"], w["excl"], str(w["ckpt"]), repo_root=w["root"], protocol_snapshot=tmp_path / "nope.md")
+        build_frozen(w["cfg"], w["split"], w["excl"], str(w["ckpt"]), repo_root=w["root"], requirements_file=w["man"] / "requirements_frozen.txt", protocol_snapshot=tmp_path / "nope.md")
     frozen["frozen"].pop("protocol_snapshot")
     frozen["frozen"]["protocol_snapshot_sha256"] = None
     assert any(d.startswith("protocol_snapshot:") for d in check_config(w["cfg"], frozen, w["split"], w["excl"]))
@@ -439,7 +440,7 @@ def test_freeze_config_cli_custom_snapshot_is_fingerprinted(world, tmp_path):
     protocol.write_text("## 2. Serving\n\n| a | 1 | FROZEN |\n\n## Change log\n")
     snap = repo / "custom_snapshot.md"
     base = [sys.executable, str(ROOT / "scripts/freeze_config.py"), "--config", str(w["cfg_path"]), "--split-file", str(w["split"]), "--exclusions-file", str(w["excl"]),
-            "--protocol", str(protocol), "--frozen", str(repo / "config_frozen.yaml"), "--snapshot", str(snap), "--int4-model", str(w["ckpt"]), "--allow-dirty"]
+            "--protocol", str(protocol), "--frozen", str(repo / "config_frozen.yaml"), "--snapshot", str(snap), "--int4-model", str(w["ckpt"]), "--requirements", str(w["man"] / "requirements_frozen.txt"), "--allow-dirty", "--runtime", "pins"]
     r = subprocess.run(base, cwd=repo, capture_output=True, text=True)
     assert r.returncode == 0, r.stdout + r.stderr
     frozen = yaml.safe_load((repo / "config_frozen.yaml").read_text())
@@ -907,3 +908,208 @@ def test_judging_final_files_requires_both_freezes_and_refuses_overrides(world, 
     with pytest.raises(ProvenanceError, match="no .meta.json sidecar"):
         prepare_judging([legacy], cfg, **kw)
     assert prepare_judging([legacy], cfg, no_provenance=True, **kw)["provenance"]["analysis_class"] == "exploratory"
+
+
+# ---------------- step-5 review: versions, git state, quantization environment ----------------
+
+def test_serving_versions_are_frozen_and_enforced(world, tmp_path):
+    """Step-5 review item 1: the freeze records the pinned serving versions and
+    every serve manifest and sidecar must report them; the pin file is fingerprinted."""
+    from qflip.freeze import check_meta_against_frozen, pinned_versions
+
+    w = world
+    req = w["man"] / "requirements_frozen.txt"
+    assert pinned_versions(req) == {"compressed-tensors": "0.17.0", "torch": "2.14.0", "transformers": "5.20.2", "vllm": "0.33.0"}
+    fp = _frozen(w, tmp_path)
+    frozen = yaml.safe_load(fp.read_text())
+    assert frozen["versions"]["vllm"] == "0.33.0" and frozen["frozen"]["requirements_sha256"]
+    assert check_config(w["cfg"], frozen, w["split"], w["excl"]) == []
+    assert check_serve_manifest(parse_serve_manifest(w["man"] / "serve_int4.txt"), "int4", frozen) == []
+    # each of the four packages, varied on its own in the serve manifest, is refused; a missing
+    # or unknown line is refused too (follow-up: torch and compressed-tensors included)
+    man = w["man"] / "serve_int4.txt"
+    good = man.read_text()
+    lines = {"vllm": "vllm: 0.33.0", "torch": "torch: 2.14.0", "transformers": "transformers: 5.20.2", "compressed_tensors": "compressed_tensors: 0.17.0"}
+    pkg = {"vllm": "vllm", "torch": "torch", "transformers": "transformers", "compressed_tensors": "compressed-tensors"}
+    for key, line in lines.items():
+        man.write_text(good.replace(line, f"{key}: 99.0.0"))
+        d = check_serve_manifest(parse_serve_manifest(man), "int4", frozen)
+        assert d == [f"{pkg[key]}: server='99.0.0' frozen build={line.split(': ')[1]!r}"], (key, d)
+        man.write_text(good.replace(line, f"{key}: unknown"))
+        assert check_serve_manifest(parse_serve_manifest(man), "int4", frozen) == [f"{pkg[key]}: server reports no version (frozen build {line.split(': ')[1]!r})"]
+        man.write_text(good.replace(line + "\n", ""))
+        assert check_serve_manifest(parse_serve_manifest(man), "int4", frozen) == [f"{pkg[key]}: server reports no version (frozen build {line.split(': ')[1]!r})"]
+    man.write_text(good)
+    # ... and in a result file's sidecar, through the real producer: resume compatibility,
+    # final analysis and pooling all read these fields
+    from qflip.provenance import compat_diff
+
+    meta = _meta(w, "int4", split="final")
+    assert {meta[k] for k in ("vllm_version", "torch_version", "transformers_version", "compressed_tensors_version")} == {"0.33.0", "2.14.0", "5.20.2", "0.17.0"}
+    assert check_meta_against_frozen(meta, frozen) == []
+    for key in lines:
+        man.write_text(good.replace(lines[key], f"{key}: 99.0.0"))
+        drifted = _meta(w, "int4", split="final")
+        assert check_meta_against_frozen(drifted, frozen) == [f"{pkg[key]}: file='99.0.0' frozen build={lines[key].split(': ')[1]!r}"], key
+        assert compat_diff(meta, drifted) == [f"{key}_version"]
+        man.write_text(good.replace(lines[key] + "\n", ""))
+        assert f"{pkg[key]}: file reports no version" in check_meta_against_frozen(_meta(w, "int4", split="final"), frozen)[0]
+    man.write_text(good)
+    ff = _final_files(w, tmp_path / "v", {"int4": {**meta, "transformers_version": "99.0.0"}})
+    with pytest.raises(FreezeError, match="transformers: file='99.0.0'"):
+        validate_analysis_files(ff, w["cfg"], split_file=w["split"], exclusions_file=w["excl"], frozen_path=fp)
+    # the pin file edited after the freeze
+    req.write_text(req.read_text().replace("vllm==0.33.0", "vllm==0.34.0"))
+    assert any(x.startswith("requirements_sha256") for x in check_config(w["cfg"], frozen, w["split"], w["excl"]))
+    req.unlink()
+    with pytest.raises(FreezeError, match="missing"):
+        pinned_versions(req)
+    req.write_text("numpy==2.3.0\nvllm==0.33.0\ntransformers==5.20.2\n")
+    with pytest.raises(FreezeError, match="pins no version for \\['torch', 'compressed-tensors'\\]"):
+        pinned_versions(req)
+
+
+def test_runtime_builds_keep_the_cuda_tag_and_pins_the_public_version(world, tmp_path):
+    """Step-5 follow-up: the host reports torch 2.14.0+cu130 while the pin says
+    2.14.0; the freeze records the exact runtime builds, requires their public
+    version to equal the pin, and compares every report to the build."""
+    from qflip.freeze import check_builds_against_pins, check_meta_against_frozen, runtime_from_manifest, split_version
+
+    w = world
+    assert split_version("2.14.0+cu130") == ("2.14.0", "cu130") and split_version("0.33.0") == ("0.33.0", "")
+    host = {"vllm": "0.33.0", "torch": "2.14.0+cu130", "transformers": "5.20.2", "compressed-tensors": "0.17.0"}
+    kw = dict(repo_root=w["root"], requirements_file=w["man"] / "requirements_frozen.txt", protocol_snapshot=w["man"] / "PROTOCOL_frozen.md")
+    frozen = build_frozen(w["cfg"], w["split"], w["excl"], str(w["ckpt"]), runtime=host, **kw)
+    assert frozen["versions"]["torch"] == "2.14.0" and frozen["builds"]["torch"] == "2.14.0+cu130"
+    # a runtime whose public version is not the pin cannot be frozen
+    with pytest.raises(FreezeError, match="torch: runtime '2.15.0\\+cu130' is not the pinned '2.14.0'"):
+        build_frozen(w["cfg"], w["split"], w["excl"], str(w["ckpt"]), runtime={**host, "torch": "2.15.0+cu130"}, **kw)
+    assert check_builds_against_pins({**host, "vllm": "0.34.0"}, frozen["versions"]) == ["vllm: runtime '0.34.0' is not the pinned '0.33.0'"]
+    # the documented host build passes the manifest check; the untagged version, another CUDA build, and another version fail
+    man = w["man"] / "serve_int4.txt"
+    good = man.read_text().replace("torch: 2.14.0\n", "torch: 2.14.0+cu130\n")
+    man.write_text(good)
+    assert check_serve_manifest(parse_serve_manifest(man), "int4", frozen) == []
+    assert runtime_from_manifest(parse_serve_manifest(man)) == host
+    for bad in ("2.14.0", "2.14.0+cu128", "2.14.1+cu130"):
+        man.write_text(good.replace("torch: 2.14.0+cu130", f"torch: {bad}"))
+        assert check_serve_manifest(parse_serve_manifest(man), "int4", frozen) == [f"torch: server={bad!r} frozen build='2.14.0+cu130'"], bad
+    # ... and the sidecar produced from that manifest
+    man.write_text(good)
+    meta = _meta(w, "int4", split="final")
+    assert meta["torch_version"] == "2.14.0+cu130" and check_meta_against_frozen(meta, frozen) == []
+    assert check_meta_against_frozen({**meta, "torch_version": "2.14.0"}, frozen) == ["torch: file='2.14.0' frozen build='2.14.0+cu130'"]
+    with pytest.raises(FreezeError, match="reports no version for \\['torch'\\]"):
+        runtime_from_manifest({**parse_serve_manifest(man), "torch": "unknown"})
+    _manifest(man, "int4", str(w["ckpt"]))
+    # the CLI records the builds from a serve manifest
+    repo = w["root"]
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    protocol = repo / "PROTOCOL.md"
+    protocol.write_text("## 2. Serving\n\n| a | 1 | FROZEN |\n\n## Change log\n")
+    man.write_text(good)
+    cmd = [sys.executable, str(ROOT / "scripts/freeze_config.py"), "--config", str(w["cfg_path"]), "--split-file", str(w["split"]), "--exclusions-file", str(w["excl"]),
+           "--protocol", str(protocol), "--frozen", str(repo / "config_frozen.yaml"), "--snapshot", str(repo / "PROTOCOL_frozen.md"), "--int4-model", str(w["ckpt"]),
+           "--requirements", str(w["man"] / "requirements_frozen.txt"), "--allow-dirty", "--runtime", f"manifest:{man}"]
+    r = subprocess.run(cmd, cwd=repo, capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout + r.stderr
+    out = yaml.safe_load((repo / "config_frozen.yaml").read_text())
+    assert out["builds"]["torch"] == "2.14.0+cu130" and "runtime builds" in r.stdout
+    r = subprocess.run(cmd + ["--check", "--serve-manifest", str(man), "--precision", "int4"], cwd=repo, capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout
+    man.write_text(good.replace("torch: 2.14.0+cu130", "torch: 2.14.0"))
+    r = subprocess.run(cmd + ["--check", "--serve-manifest", str(man), "--precision", "int4"], cwd=repo, capture_output=True, text=True)
+    assert r.returncode == 1 and "torch: server='2.14.0' frozen build='2.14.0+cu130'" in r.stdout
+    _manifest(man, "int4", str(w["ckpt"]))
+
+
+def test_freeze_records_the_verified_git_state_and_the_quantization_env(world, tmp_path):
+    """Step-5 review item 2 (and the quantization environment): the recorded
+    dirty flag is the caller's verified pre-write state; the quantize manifest
+    binds the environment that built the checkpoint."""
+    w = world
+    qm = w["man"] / "quantize_ckpt.json"
+    qm.write_text(json.dumps({"tool_versions": {"llmcompressor": "0.15.0", "compressed_tensors": "0.20.1", "transformers": "5.21.0", "torch": "2.14.1+cu130"}}))
+    frozen = build_frozen(w["cfg"], w["split"], w["excl"], str(w["ckpt"]), repo_root=w["root"], requirements_file=w["man"] / "requirements_frozen.txt",
+                          protocol_snapshot=w["man"] / "PROTOCOL_frozen.md", git_state=("abc123def", False), quantize_manifest=qm)
+    assert frozen["frozen"]["git_commit"] == "abc123def" and frozen["frozen"]["git_dirty"] is False
+    assert frozen["models_frozen"]["int4"]["quantization_env"]["llmcompressor"] == "0.15.0" and frozen["models_frozen"]["int4"]["quantize_manifest_sha256"]
+    with pytest.raises(FreezeError, match="quantize manifest"):
+        build_frozen(w["cfg"], w["split"], w["excl"], str(w["ckpt"]), repo_root=w["root"], requirements_file=w["man"] / "requirements_frozen.txt",
+                     protocol_snapshot=w["man"] / "PROTOCOL_frozen.md", quantize_manifest=tmp_path / "none.json")
+    # the CLI: a clean repo stays recorded as clean although the snapshot and the frozen file appear
+    repo = w["root"]
+    git = ["git", "-c", "user.email=t@t", "-c", "user.name=t"]
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    protocol = repo / "PROTOCOL.md"
+    protocol.write_text("## 2. Serving\n\n| a | 1 | FROZEN |\n\n## Change log\n")
+    subprocess.run(git + ["add", "-A"], cwd=repo, check=True)
+    subprocess.run(git + ["commit", "-q", "-m", "init"], cwd=repo, check=True)
+    cmd = [sys.executable, str(ROOT / "scripts/freeze_config.py"), "--config", str(w["cfg_path"]), "--split-file", str(w["split"]), "--exclusions-file", str(w["excl"]),
+           "--protocol", str(protocol), "--frozen", str(repo / "config_frozen.yaml"), "--snapshot", str(repo / "PROTOCOL_frozen.md"), "--int4-model", str(w["ckpt"]),
+           "--requirements", str(w["man"] / "requirements_frozen.txt"), "--quantize-manifest", str(qm), "--runtime", "pins"]
+    r = subprocess.run(cmd, cwd=repo, capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout + r.stderr
+    out = yaml.safe_load((repo / "config_frozen.yaml").read_text())
+    assert out["frozen"]["git_dirty"] is False and "quantization env" in r.stdout and out["models_frozen"]["int4"]["quantization_env"]["llmcompressor"] == "0.15.0"
+    r = subprocess.run(cmd + ["--check"], cwd=repo, capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout
+
+
+def _fake_runtime(site: Path, versions: dict[str, tuple[str, str]]) -> None:
+    """Importable stub packages whose module __version__ carries a build tag
+    the distribution metadata lacks (the torch wheel situation)."""
+    from qflip.versions import SERVING_MODULES
+
+    for key, (imp, dist) in SERVING_MODULES.items():
+        meta_v, mod_v = versions[key]
+        (site / imp).mkdir(parents=True)
+        (site / imp / "__init__.py").write_text(f'__version__ = "{mod_v}"\n')
+        info = site / f"{dist.replace('-', '_')}-{meta_v}.dist-info"
+        info.mkdir()
+        (info / "METADATA").write_text(f"Metadata-Version: 2.1\nName: {dist}\nVersion: {meta_v}\n")
+
+
+def test_serve_manifest_and_runtime_auto_share_one_collector(world, tmp_path):
+    """Step-5 follow-up: distribution metadata says torch 2.14.0, the module
+    says 2.14.0+cu130; the serve manifest and --runtime auto must both record
+    the module's string, so the freeze built by auto accepts the manifest."""
+    site = tmp_path / "site"
+    _fake_runtime(site, {"vllm": ("0.33.0", "0.33.0"), "torch": ("2.14.0", "2.14.0+cu130"), "transformers": ("5.20.2", "5.20.2"), "compressed_tensors": ("0.17.0", "0.17.0")})
+    env = {**os.environ, "PYTHONPATH": f"{site}{os.pathsep}{ROOT / 'src'}"}
+    # the two sources disagree in that environment
+    probe = subprocess.run([sys.executable, "-c", "from importlib import metadata; import torch; print(metadata.version('torch'), torch.__version__)"], env=env, capture_output=True, text=True, check=True)
+    assert probe.stdout.split() == ["2.14.0", "2.14.0+cu130"]
+    # the collector (what 01_serve.sh prints) and installed_versions() (what --runtime auto records) agree on the module string
+    lines = subprocess.run([sys.executable, str(ROOT / "scripts/runtime_versions.py")], env=env, capture_output=True, text=True, check=True).stdout.splitlines()
+    assert lines == ["vllm: 0.33.0", "torch: 2.14.0+cu130", "transformers: 5.20.2", "compressed_tensors: 0.17.0"]
+    auto = subprocess.run([sys.executable, "-c", "import json; from qflip.freeze import installed_versions; print(json.dumps(installed_versions()))"], env=env, capture_output=True, text=True, check=True)
+    assert json.loads(auto.stdout) == {"vllm": "0.33.0", "torch": "2.14.0+cu130", "transformers": "5.20.2", "compressed-tensors": "0.17.0"}
+    # end to end: a manifest written from those lines passes the freeze that --runtime auto wrote
+    w = world
+    man = w["man"] / "serve_int4.txt"
+    head = "".join(line + "\n" for line in man.read_text().splitlines() if line.split(":")[0] not in ("vllm", "torch", "transformers", "compressed_tensors"))
+    man.write_text(head + "\n".join(lines) + "\n")
+    repo = w["root"]
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    protocol = repo / "PROTOCOL.md"
+    protocol.write_text("## 2. Serving\n\n| a | 1 | FROZEN |\n\n## Change log\n")
+    cmd = [sys.executable, str(ROOT / "scripts/freeze_config.py"), "--config", str(w["cfg_path"]), "--split-file", str(w["split"]), "--exclusions-file", str(w["excl"]),
+           "--protocol", str(protocol), "--frozen", str(repo / "config_frozen.yaml"), "--snapshot", str(repo / "PROTOCOL_frozen.md"), "--int4-model", str(w["ckpt"]),
+           "--requirements", str(w["man"] / "requirements_frozen.txt"), "--allow-dirty"]
+    r = subprocess.run(cmd, cwd=repo, env=env, capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert yaml.safe_load((repo / "config_frozen.yaml").read_text())["builds"]["torch"] == "2.14.0+cu130"
+    r = subprocess.run(cmd + ["--check", "--serve-manifest", str(man), "--precision", "int4"], cwd=repo, env=env, capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout
+    # when the packages cannot be imported, the default collector refuses rather than guessing;
+    # simulated with shadowing stubs that raise on import, so the case does not depend on what the machine has installed
+    broken = tmp_path / "broken"
+    for key, (imp, _dist) in __import__("qflip.versions", fromlist=["SERVING_MODULES"]).SERVING_MODULES.items():
+        (broken / imp).mkdir(parents=True)
+        (broken / imp / "__init__.py").write_text('raise ImportError("simulated: not installed")\n')
+    env_broken = {**os.environ, "PYTHONPATH": f"{broken}{os.pathsep}{ROOT / 'src'}"}
+    assert subprocess.run([sys.executable, str(ROOT / "scripts/runtime_versions.py")], env=env_broken, capture_output=True, text=True, check=True).stdout.splitlines() == ["vllm: unknown", "torch: unknown", "transformers: unknown", "compressed_tensors: unknown"]
+    r = subprocess.run(cmd, cwd=repo, env=env_broken, capture_output=True, text=True)
+    assert r.returncode == 1 and "not importable in this environment: ['vllm', 'torch', 'transformers', 'compressed-tensors']" in r.stdout + r.stderr
+    _manifest(man, "int4", str(w["ckpt"]))

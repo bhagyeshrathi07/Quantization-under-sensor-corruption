@@ -31,6 +31,12 @@ __all__ = ["CORE_SECTIONS", "core_config"]
 
 FROZEN_PATH = Path("manifests/config_frozen.yaml")
 PROTOCOL_SNAPSHOT = Path("manifests/PROTOCOL_frozen.md")
+# Pinned serving environment (PROTOCOL section 2); the freeze records these
+# versions and every serve manifest and sidecar must report them.
+REQUIREMENTS_FROZEN = Path("manifests/requirements_frozen.txt")
+SERVING_PACKAGES = ("vllm", "torch", "transformers", "compressed-tensors")
+# serve-manifest line (and sidecar field stem) -> pinned package name
+MANIFEST_VERSION_KEYS = {"vllm": "vllm", "torch": "torch", "transformers": "transformers", "compressed_tensors": "compressed-tensors"}
 JUDGE_FROZEN_PATH = Path("manifests/judge_frozen.yaml")
 # The dtype each precision must run in (PROTOCOL section 2); frozen per model.
 EXPECTED_DTYPE = {"bf16": "bfloat16", "int4": "float16"}
@@ -40,6 +46,61 @@ OPEN_ALLOWED_SECTIONS = {7, 12}
 
 class FreezeError(RuntimeError):
     pass
+
+
+def pinned_versions(requirements_file: str | Path = REQUIREMENTS_FROZEN) -> dict:
+    """`name==version` pins of the serving packages from the frozen requirements file."""
+    p = Path(requirements_file)
+    if not p.exists():
+        raise FreezeError(f"{p} missing; the freeze records the pinned serving versions from it")
+    out = {}
+    for line in p.read_text().splitlines():
+        line = line.strip()
+        if "==" in line and not line.startswith("#"):
+            name, ver = line.split("==", 1)
+            if name.strip().lower() in SERVING_PACKAGES:
+                out[name.strip().lower()] = ver.strip()
+    missing = [k for k in SERVING_PACKAGES if k not in out]
+    if missing:
+        raise FreezeError(f"{p} pins no version for {missing}")
+    return out
+
+
+def split_version(v: str) -> tuple[str, str]:
+    """PEP 440 public version and local build tag: '2.14.0+cu130' -> ('2.14.0', 'cu130')."""
+    public, _, local = str(v).partition("+")
+    return public, local
+
+
+def installed_versions() -> dict:
+    """Exact versions of the four serving packages in this interpreter's
+    environment, through the collector 01_serve.sh uses for the manifest
+    (qflip.versions: module __version__, local build tag included, e.g.
+    torch 2.14.0+cu130 where the distribution metadata says 2.14.0)."""
+    from qflip.versions import collect
+
+    found = collect()
+    out = {MANIFEST_VERSION_KEYS[key]: v for key, v in found.items() if v}
+    missing = [MANIFEST_VERSION_KEYS[key] for key, v in found.items() if not v]
+    if missing:
+        raise FreezeError(f"serving packages not importable in this environment: {missing}; run the freeze in the serving venv on the host, or pass --runtime manifest:<serve manifest> / --runtime pins (dry runs only)")
+    return out
+
+
+def runtime_from_manifest(manifest: dict) -> dict:
+    """Exact versions as a serve manifest reports them."""
+    out = {pkg: manifest.get(key) for key, pkg in MANIFEST_VERSION_KEYS.items()}
+    missing = [pkg for pkg, v in out.items() if v in (None, "", "unknown")]
+    if missing:
+        raise FreezeError(f"serve manifest reports no version for {missing}")
+    return out
+
+
+def check_builds_against_pins(builds: dict, pins: dict) -> list[str]:
+    """The runtime build's public version must equal the pin; the local build
+    tag (CUDA build) is kept as the build identity the study runs on."""
+    return [f"{pkg}: runtime {builds.get(pkg)!r} is not the pinned {pins[pkg]!r}" for pkg in SERVING_PACKAGES
+            if pkg not in builds or split_version(builds[pkg])[0] != split_version(pins[pkg])[0]]
 
 
 def input_fingerprints(cfg: dict, split_file: str | Path, exclusions_file: str | Path, protocol_snapshot: str | Path) -> dict:
@@ -53,27 +114,67 @@ def input_fingerprints(cfg: dict, split_file: str | Path, exclusions_file: str |
     }
 
 
-def build_frozen(cfg: dict, split_file: str | Path, exclusions_file: str | Path, int4_model_path: str, repo_root: str | Path = ".", protocol_snapshot: str | Path = PROTOCOL_SNAPSHOT) -> dict:
+def build_frozen(
+    cfg: dict,
+    split_file: str | Path,
+    exclusions_file: str | Path,
+    int4_model_path: str,
+    repo_root: str | Path = ".",
+    protocol_snapshot: str | Path = PROTOCOL_SNAPSHOT,
+    requirements_file: str | Path = REQUIREMENTS_FROZEN,
+    git_state: tuple[str, bool] | None = None,
+    quantize_manifest: str | Path | None = None,
+    runtime: dict | None = None,
+) -> dict:
+    """The core freeze. `git_state` is the (commit, dirty) pair verified by the
+    caller before it wrote the snapshot, so the recorded flag describes the
+    tree the freeze was taken from, not the tree after the snapshot appeared.
+    `quantize_manifest` (scripts/quantize_awq.py's JSON) records the separate
+    quantization environment that built the INT4 checkpoint. `runtime` is the
+    exact version of each serving package as installed on the host (local
+    build tag included); its public part must equal the pin, and every serve
+    manifest and sidecar is then compared to it exactly. None (dry runs)
+    takes the pins themselves as the builds."""
     if not Path(protocol_snapshot).exists():
         raise FreezeError(f"protocol snapshot {protocol_snapshot} missing; the freeze requires its hash")
-    rev, dirty = git_revision(repo_root)
+    rev, dirty = git_state if git_state is not None else git_revision(repo_root)
+    versions = pinned_versions(requirements_file)
+    builds = dict(runtime) if runtime is not None else dict(versions)
+    bad = check_builds_against_pins(builds, versions)
+    if bad:
+        raise FreezeError("runtime versions do not match the pins:\n  " + "\n  ".join(bad))
     q = cfg["quantize"]
+    int4 = {
+        "path": int4_model_path,
+        "checkpoint_fingerprint": checkpoint_fingerprint(int4_model_path),
+        "quantization": "compressed-tensors",
+        "dtype": EXPECTED_DTYPE["int4"],
+    }
+    if quantize_manifest is not None:
+        qm = Path(quantize_manifest)
+        if not qm.exists():
+            raise FreezeError(f"quantize manifest {qm} missing")
+        import json
+
+        data = json.loads(qm.read_text())
+        int4["quantize_manifest"] = str(qm)
+        int4["quantize_manifest_sha256"] = sha256_file(qm)
+        int4["quantization_env"] = data.get("tool_versions") or {}
     return {
         "frozen": {
             "date": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "git_commit": rev,
             "git_dirty": dirty,
             "protocol_snapshot": str(protocol_snapshot),
+            "requirements_file": str(requirements_file),
+            "requirements_sha256": sha256_file(requirements_file),
             **input_fingerprints(cfg, split_file, exclusions_file, protocol_snapshot),
         },
+        "versions": versions,
+        "builds": builds,
         "models_frozen": {
             "bf16": {"id": q["base_model"], "revision": q["revision"], "dtype": EXPECTED_DTYPE["bf16"]},
-            "int4": {
-                "path": int4_model_path,
-                "checkpoint_fingerprint": checkpoint_fingerprint(int4_model_path),
-                "quantization": "compressed-tensors",
-                "dtype": EXPECTED_DTYPE["int4"],
-            },
+            "int4": int4,
         },
         "core": core_config(cfg),
     }
@@ -101,6 +202,37 @@ def check_config(cfg: dict, frozen: dict, split_file: str | Path, exclusions_fil
     for k, v in fp.items():
         if frozen["frozen"].get(k) != v:
             diffs.append(f"{k}: live={str(v)[:12]} frozen={str(frozen['frozen'].get(k))[:12]}")
+    req = frozen["frozen"].get("requirements_file")
+    if not req or "versions" not in frozen:
+        diffs.append("versions: the freeze records no pinned serving versions; re-run scripts/freeze_config.py")
+    elif not Path(req).exists():
+        diffs.append(f"requirements_file: {req} missing")
+    elif sha256_file(req) != frozen["frozen"].get("requirements_sha256"):
+        diffs.append(f"requirements_sha256: {req} changed since the freeze")
+    return diffs
+
+
+def check_versions(reported: dict, frozen: dict, label: str) -> list[str]:
+    """Every serving package must be reported (serve manifest lines `vllm`,
+    `torch`, `transformers`, `compressed_tensors`; sidecar fields `*_version`)
+    and equal the frozen build exactly, local build tag included (the build
+    is the pin's public version plus the host's tag, e.g. torch
+    2.14.0+cu130). `reported` is keyed by manifest line name."""
+    fv = frozen.get("versions")
+    if not fv:
+        return ["versions: the freeze records no pinned serving versions; re-run scripts/freeze_config.py"]
+    builds = frozen.get("builds") or fv
+    diffs = []
+    for key, pkg in MANIFEST_VERSION_KEYS.items():
+        want = builds.get(pkg) or fv.get(pkg)
+        if want is None:
+            diffs.append(f"{pkg}: the freeze pins no version; re-run scripts/freeze_config.py")
+            continue
+        got = reported.get(key)
+        if got in (None, "", "unknown"):
+            diffs.append(f"{pkg}: {label} reports no version (frozen build {want!r})")
+        elif got != want:
+            diffs.append(f"{pkg}: {label}={got!r} frozen build={want!r}")
     return diffs
 
 
@@ -149,6 +281,7 @@ def check_serve_manifest(manifest: dict, precision: str, frozen: dict) -> list[s
     quant, dtype = quant_and_dtype(manifest.get("extra_args", ""))
     fp = checkpoint_fingerprint(manifest["model"]) if precision == "int4" and manifest.get("model") and Path(manifest["model"]).is_dir() else None
     diffs += _check_model({"model": manifest.get("model"), "revision": manifest.get("revision") or None}, precision, frozen, fp, quant, dtype)
+    diffs += check_versions({k: manifest.get(k) for k in MANIFEST_VERSION_KEYS}, frozen, "server")
     return diffs
 
 
@@ -165,6 +298,7 @@ def check_meta_against_frozen(meta: dict, frozen: dict) -> list[str]:
         if meta.get(k) != v:
             diffs.append(f"{k}: file={meta.get(k)!r} frozen={v!r}")
     diffs += _check_model({"model": meta.get("model_path_or_id"), "revision": meta.get("model_revision")}, meta["precision"], frozen, meta.get("checkpoint_fingerprint"), meta.get("quantization"), meta.get("dtype"))
+    diffs += check_versions({k: meta.get(f"{k}_version") for k in MANIFEST_VERSION_KEYS}, frozen, "file")
     return diffs
 
 
