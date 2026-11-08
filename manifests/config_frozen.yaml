@@ -1,0 +1,103 @@
+frozen:
+  date: '2026-11-08T00:06:06+00:00'
+  git_commit: 7dfd13889e92f943ebae6d4792ccc597e6dcaa9d
+  git_dirty: false
+  protocol_snapshot: manifests/PROTOCOL_frozen.md
+  requirements_file: manifests/requirements_frozen.txt
+  requirements_sha256: 7a6db2399fabc8f57c7564fb06dd7774b5e22531a9bb503469af08fe661d5bc6
+  split_sha256: 4f450077b5d1809652b5a69ef58408378751e6f87cc089258375644b225979fb
+  exclusions_sha256: 9a26a05ec3e2b1da947628f84a176f6f70aece7950a579193fbf1a533902512f
+  annotations_sha256: 50ee8295313b70810bdd7f04d4953b5f5d5d45b2da1a291e87fc108b4df270de
+  prompt_sha256: 24044483e7f02a628e8f17dfc8a1f54aafbcb43e98d0b5e53e7815c415d6fbd3
+  core_config_sha256: b16bd628eae2e112909e489df0f08219c2951858c460a93f4b668cb2d73b8950
+  protocol_snapshot_sha256: cbeb1c6ffc9c9c1e84a226ee948ab9b76c5f6ac5086d93a5c72547208f931996
+versions:
+  compressed-tensors: 0.17.0
+  torch: 2.14.0
+  transformers: 5.20.2
+  vllm: 0.33.0
+builds:
+  vllm: 0.33.0
+  torch: 2.14.0+cu130
+  transformers: 5.20.2
+  compressed-tensors: 0.17.0
+models_frozen:
+  bf16:
+    id: Qwen/Qwen2.5-VL-7B-Instruct
+    revision: cc594898137f460bfe9f0759e9844b3ce807cfb5
+    dtype: bfloat16
+  int4:
+    path: checkpoints/qwen2.5-vl-7b-awq-w4a16-g128
+    checkpoint_fingerprint: sha256:2bb17c5214a52fe263dd879f2fd4956564906a97d1b6d0b51cf60a1a5d54347c
+    quantization: compressed-tensors
+    dtype: float16
+    quantize_manifest: manifests/quantize_qwen2.5-vl-7b-awq-w4a16-g128.json
+    quantize_manifest_sha256: aaa9f980f59cfb1416df46b853f11247b996f0716fac9eb1deca2e4ada841ff5
+    quantization_env:
+      llmcompressor: 0.15.0
+      compressed_tensors: 0.20.1
+      transformers: 5.21.0
+      torch: 2.14.1+cu130
+      datasets: 5.1.0
+core:
+  server:
+    base_url: http://localhost:8000/v1
+    api_key: EMPTY
+    timeout_s: 300
+  models:
+    bf16: qwen2.5-vl-7b-bf16
+    int4: qwen2.5-vl-7b-awq
+  data:
+    root: data
+    annotations: data/drivebench-test.json
+    conditions:
+      clean: null
+      NoImage: null
+      LowLight: LowLight
+      Fog: Fog
+  prompt:
+    system_file: prompt.txt
+    mcq_suffix: ' Begin your answer with the option letter.'
+  images:
+    resize_to: null
+    noimage_size:
+    - 224
+    - 224
+  generation:
+    temperature: 0.0
+    max_tokens: 128
+    top_logprobs: 5
+    seed: 0
+  serving:
+    max_pixels: 200704
+    max_model_len: 4096
+    kv_bytes: 2147483648
+    max_num_seqs: 1
+    seed: 0
+    prefix_caching: true
+  quantize:
+    base_model: Qwen/Qwen2.5-VL-7B-Instruct
+    revision: cc594898137f460bfe9f0759e9844b3ce807cfb5
+    scheme: W4A16_ASYM
+    group_size: 128
+    max_seq_len: 4096
+    max_pixels: 200704
+    n_samples: 0
+    condition: clean
+    ignore:
+    - lm_head
+    - re:.*embed_tokens
+    - re:visual.*
+    - re:model.visual.*
+    out_dir: checkpoints/qwen2.5-vl-7b-awq-w4a16-g128
+  analysis:
+    min_questions: 30
+    min_scenes: 10
+    margin_edges:
+    - 0.25
+    - 0.5
+    n_boot_group: 2000
+    n_boot_contrast: 20000
+    seed: 0
+    support_min_ref_correct: 20
+    support_min_ref_scenes: 10
