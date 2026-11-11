@@ -3,8 +3,14 @@
 freeze: it binds the judge request settings as sent, the correctness
 threshold, and fingerprints of the system line and every rubric template.
 
-    python scripts/freeze_judge.py --threshold 60 --note "40x3 noise: ..."   # after development validation
-    python scripts/freeze_judge.py --check                                   # live code and config equal the freeze
+    python scripts/freeze_judge.py --threshold 60 --records results/dev/*.judge.jsonl --note "40x3 noise: ..."   # after development validation
+    python scripts/freeze_judge.py --check                                                                     # live code and config equal the freeze
+
+The freeze also binds the backend identity: the config description
+(`judge.backend`: provider, upstream model, local revision, thinking control)
+and the one response model id the validation records carry under the frozen
+settings. A local judge needs `judge.backend.revision`, checked against
+manifests/serve_judge.txt.
 
 Final-split judging (08) and final-split VQA analysis (05 --vqa) refuse
 without this file or when the live templates, system line, or settings differ.
@@ -19,8 +25,8 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from qflip.config import load_config  # noqa: E402
-from qflip.freeze import JUDGE_FROZEN_PATH, FreezeError, build_judge_frozen, check_judge_frozen, load_judge_frozen  # noqa: E402
-from qflip.judge import JudgeSettingsError  # noqa: E402
+from qflip.freeze import JUDGE_FROZEN_PATH, JUDGE_MANIFEST_PATH, FreezeError, build_judge_frozen, check_judge_frozen, load_judge_frozen  # noqa: E402
+from qflip.judge import JudgeSettingsError, load_scores  # noqa: E402
 
 
 def main():
@@ -29,6 +35,8 @@ def main():
     ap.add_argument("--frozen", default=str(JUDGE_FROZEN_PATH))
     ap.add_argument("--threshold", type=float, help="correctness threshold decided on development scenes (default judge.correct_threshold)")
     ap.add_argument("--note", action="append", default=[], help="validation note (noise floor, threshold agreement); repeatable")
+    ap.add_argument("--records", nargs="*", default=[], help="judge sidecars of the development validation (noise test, threshold sample); their response model id is frozen")
+    ap.add_argument("--judge-manifest", default=str(JUDGE_MANIFEST_PATH), help="serve manifest of a local judge")
     ap.add_argument("--check", action="store_true")
     args = ap.parse_args()
     cfg = load_config(args.config)
@@ -45,12 +53,15 @@ def main():
     if Path(args.frozen).exists():
         sys.exit(f"{args.frozen} exists; a changed judge protocol is a new dated freeze (remove the old file deliberately and record it in the PROTOCOL change log)")
     threshold = args.threshold if args.threshold is not None else jcfg.get("correct_threshold")
+    if not args.records:
+        sys.exit("--records <judge sidecars of the development validation> is required: the freeze binds the response model id they carry")
+    records = [r for f in args.records for r in load_scores(f).values()]
     try:
-        frozen = build_judge_frozen(jcfg, threshold, validation={"notes": args.note})
+        frozen = build_judge_frozen(jcfg, threshold, validation={"notes": args.note, "records": args.records}, records=records, manifest_path=args.judge_manifest)
     except (FreezeError, JudgeSettingsError) as e:
         sys.exit(str(e))
     Path(args.frozen).write_text(yaml.safe_dump(frozen, sort_keys=False))
-    print(f"wrote {args.frozen}: model {frozen['judge']['model']}, threshold {threshold}, templates {len(frozen['fingerprints']['templates'])}")
+    print(f"wrote {args.frozen}: model {frozen['judge']['model']}, backend {frozen['backend']}, threshold {threshold}, templates {len(frozen['fingerprints']['templates'])}, extractor {frozen['fingerprints']['extractor']['version']}")
 
 
 if __name__ == "__main__":

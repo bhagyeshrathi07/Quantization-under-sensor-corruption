@@ -4,20 +4,20 @@ freeze guard, and analysis-side population checks."""
 
 from pathlib import Path
 
-from qflip.freeze import FROZEN_PATH, JUDGE_FROZEN_PATH, FreezeError, check_config, check_judge_frozen, check_meta_against_frozen, check_serve_manifest, load_frozen, load_judge_frozen
-from qflip.judge import judge_settings
+from qflip.freeze import FROZEN_PATH, JUDGE_FROZEN_PATH, JUDGE_MANIFEST_PATH, FreezeError, check_config, check_judge_frozen, check_judge_manifest, check_meta_against_frozen, check_serve_manifest, load_frozen, load_judge_frozen, read_judge_manifest
+from qflip.judge import judge_backend, judge_settings
 from qflip.provenance import (
-    PRECISION_FIELDS,
-    ProvenanceError,
     build_run_meta,
-    check_server,
     check_records_against_meta,
+    check_server,
     check_server_process,
     compat_diff,
     effective_base_url,
     ensure_meta,
     load_meta,
     parse_serve_manifest,
+    PRECISION_FIELDS,
+    ProvenanceError,
     sha256_file,
 )
 from qflip.records import iter_raw_records
@@ -210,21 +210,43 @@ def validate_analysis_files(
     return out
 
 
+def check_judge_server(settings: dict, backend: dict, manifest_path: str | Path = JUDGE_MANIFEST_PATH, proc_root: str | Path = "/proc") -> int:
+    """A local judge's running server, bound the way the study servers are:
+    the serve manifest names the frozen revision and model; the endpoint lists
+    the served alias and its model card's `root` is the manifest's model; the
+    manifest pid is alive, its command line names the model, the port and the
+    frozen revision, and it (or a descendant) owns the LISTEN socket. Returns
+    the pid."""
+    diffs = check_judge_manifest(backend, manifest_path)
+    if diffs:
+        raise FreezeError("local judge identity:\n  " + "\n  ".join(diffs))
+    man = read_judge_manifest(manifest_path)
+    check_server(settings["base_url"], settings["model"], expect_model=man.get("model"))
+    pid = check_server_process(man, settings["base_url"], proc_root)
+    argv = [a.decode(errors="replace") for a in (Path(proc_root) / str(pid) / "cmdline").read_bytes().split(b"\0") if a]
+    revs = [argv[i + 1] for i, a in enumerate(argv[:-1]) if a == "--revision"]
+    if revs != [man["revision"]]:
+        raise ProvenanceError(f"judge server pid {pid} command line revision {revs} is not the manifest revision {man['revision']!r}")
+    return pid
+
+
 def judge_settings_for(split: str | None, cfg: dict, cli_model: str | None = None, judge_frozen_path: str | Path = JUDGE_FROZEN_PATH) -> dict:
-    """Judge request settings for files of `split`. Final-split files take the
-    frozen judge (manifests/judge_frozen.yaml), whose fingerprints must match
-    the live templates and system line and whose settings the live config and
-    any CLI override must equal; other splits use the live config."""
+    """Judge request settings and backend description for files of `split`.
+    Final-split files take the frozen judge (manifests/judge_frozen.yaml),
+    whose fingerprints must match the live templates, system line and
+    extractor and whose settings and backend the live config and any CLI
+    override must equal; other splits use the live config."""
     jcfg = dict(cfg.get("judge") or {})
     if cli_model:
         jcfg["model"] = cli_model
     if split != "final":
-        return {"settings": judge_settings(jcfg), "correct_threshold": jcfg.get("correct_threshold"), "judge_frozen": None}
+        return {"settings": judge_settings(jcfg), "backend": judge_backend(jcfg), "correct_threshold": jcfg.get("correct_threshold"), "judge_frozen": None}
     jf = load_judge_frozen(judge_frozen_path)
     diffs = check_judge_frozen(jf, jcfg)
     if diffs:
         raise FreezeError("final-split judging refused; judge freeze:\n  " + "\n  ".join(diffs))
-    return {"settings": judge_settings(jf["judge"]), "correct_threshold": jf["correct_threshold"], "judge_frozen": jf["frozen"]}
+    # the frozen backend carries the config description plus the response model observed during validation
+    return {"settings": judge_settings(jf["judge"]), "backend": dict(jf.get("backend") or {}), "correct_threshold": jf["correct_threshold"], "judge_frozen": jf["frozen"]}
 
 
 def prepare_judging(

@@ -74,10 +74,62 @@ def test_prompt_build_and_description_requirement():
 
 
 def test_extract_score_and_messages():
+    from qflip.judge import extract_score_rule, extractor_fingerprint, rescore
+
     assert extract_score("...\nTotal Score: 85\n\nBrief Summary: fine") == 85
     assert extract_score("Total Score:100") == 100
     assert extract_score("no score here") is None
     assert extract_score("") is None
+    assert extract_score_rule("Total Score: 85") == (85, "released")
+    # markdown variants seen from the local open-weights judge (November 8 trial)
+    assert extract_score_rule("**Total Score:** 15/100\n\n**Brief Summary:** x") == (15, "markdown")
+    assert extract_score_rule("**Total Score:** **0**\n\n**Brief Summary:**") == (0, "markdown")
+    assert extract_score_rule("| **Total Score** | **16/100** | note |") == (16, "markdown")
+    assert extract_score_rule("**Total Score:** 19 / 100") == (19, "markdown")
+    assert extract_score_rule("**Total Score:** **4 out of 100**") == (4, "markdown")
+    assert extract_score_rule("**Total Score:** 2\u202f/\u202f100") == (2, "markdown")
+    assert extract_score_rule("**Total Score:** 0 + 0 + 5 + 5 + 8 + 8 = **26**") == (26, "arithmetic")
+    assert extract_score_rule("**Total Score:** 0\u202f+\u202f0\u202f+\u202f5\u202f=\u202f5 ") == (5, "arithmetic")
+    assert extract_score_rule("Total Score: 250") == (None, None)  # not a 0..100 score
+    assert extract_score_rule("**Total Score:** pending") == (None, None)
+    # session-2 review item 1: the unbolded sum used to return its first term (0) under the released regex
+    assert extract_score_rule("Total Score: 0 + 5 + 8 = 13") == (13, "arithmetic")
+    # follow-up review item 3 (v4): the whole expression must be consumed; no empty side, trailing operator,
+    # unbalanced delimiter or decimal
+    assert extract_score_rule("Total Score: 13 =") == (None, None)
+    assert extract_score_rule("Total Score: = 13") == (None, None)
+    assert extract_score_rule("Total Score: 0 + 5 + 8 = 13 +") == (None, None)
+    assert extract_score_rule("Total Score: 13 (0 + 5 + 8") == (None, None)
+    assert extract_score_rule("Total Score: 13 ((0 + 5 + 8)") == (None, None)
+    assert extract_score_rule("Total Score: 99.5") == (None, None)
+    assert extract_score_rule("**Total Score:** 99,5/100") == (None, None)
+    assert extract_score_rule("Total Score: 85.") == (85, "released")  # a full stop is not a decimal
+    assert extract_score_rule("Total Score: 85 (good coverage of 3 objects)") == (85, "released")  # operator-free parentheses are prose
+    assert extract_score_rule("Total Score: 26 points (0 + 5 + 8 + 13)") == (26, "arithmetic")
+    assert extract_score_rule("Total Score: 0 + 5 + 8 = 13") == extract_score_rule("**Total Score:** 0 + 5 + 8 = **13**")
+    assert extract_score_rule("Total Score: 13 (0 + 5 + 8)") == (13, "arithmetic")
+    assert extract_score_rule("Total Score: 13 = 0 + 5 + 8") == (13, "arithmetic")
+    assert extract_score_rule("Total Score: 26 points (0 + 5 + 8 + 13)") == (26, "arithmetic")
+    assert extract_score_rule("Total Score: 0 + 5 + 8") == (None, None)  # incomplete sum: never the first term
+    assert extract_score_rule("**Total Score:** 0 + 5 + 8 =") == (None, None)
+    assert extract_score_rule("Total Score: 0 + 5 + 8 = 14") == (None, None)  # inconsistent sum
+    assert extract_score_rule("Total Score: 13 (0 + 5 + 9)") == (None, None)
+    assert extract_score_rule("Total Score: 15/100 (out of 100)") == (15, "released")  # digit-free parentheses are not arithmetic
+    assert extract_score_rule("Total Score: 15/100") == (15, "released")
+    fp = extractor_fingerprint()
+    assert fp["version"] == "4" and len(fp["sha256"]) == 64
+    # re-reading a stored record changes score fields only; the reply is kept; no reply, no change
+    old = {"reply": "Total Score: 0 + 5 + 8 = 13", "score": 0, "score_rule": "released", "error": None, "usage": {"prompt_tokens": 1}}
+    new = rescore(old)
+    assert new["score"] == 13 and new["score_rule"] == "arithmetic" and new["extractor_version"] == "4" and new["reply"] == old["reply"] and new["usage"] == old["usage"]
+    # no reply, no score, whatever number the record carried (follow-up review item 4)
+    assert rescore({"reply": "", "score": None, "error": "timeout"}) == {"reply": "", "score": None, "score_rule": None, "error": "timeout", "extractor_version": "4"}
+    assert rescore({"reply": "", "score": 99, "score_rule": "released", "error": None})["score"] is None
+    assert rescore({"score": 99})["error"] == "empty reply"
+    assert rescore({"reply": "Total Score: 0 + 5 + 8", "score": 0, "score_rule": "released"})["error"] == "no Total Score in reply"
+    # a reply rejected at write time (other backend) never regains its score
+    rej = rescore({"reply": "Total Score: 36", "score": None, "error": "backend identity: x", "rejected": "backend identity: x"})
+    assert rej["score"] is None and rej["error"] == "backend identity: x" and rej["reply"] == "Total Score: 36"
     m = judge_messages("PROMPT")
     assert len(m) == 1 and m[0]["role"] == "user" and m[0]["content"].startswith("You are an evaluator") and m[0]["content"].endswith("\nPROMPT")
 
@@ -166,9 +218,10 @@ def _rec(qid, scene, cell="planning/VQA", error=None, precision="bf16", pred="go
 DESC_DATA = {s: DESC["scene"] for s in ("s1", "s2", "s3", "s4")}
 
 
-def _judged(rec, settings, replicate=0, score=80, desc="white sedan car.", pred=None):
+def _judged(rec, settings, replicate=0, score=80, desc="white sedan car.", pred=None, **extra):
+    """A judge record as 08 writes it: with the reply the score was read from."""
     h = judge_input_hash(rec["cell"], rec["question"], rec["gt"], pred if pred is not None else rec["pred"], desc, settings)
-    return {"question_id": rec["question_id"], "replicate": replicate, "input_sha256": h, "desc": desc, "score": score}
+    return {"question_id": rec["question_id"], "replicate": replicate, "input_sha256": h, "desc": desc, "score": score, "reply": f"Total Score: {score}\n\nBrief Summary: x", "score_rule": "released", **extra}
 
 
 def test_production_scores_use_replicate_zero_matching_current_answer_and_settings():
@@ -263,7 +316,7 @@ class _FakeClient:
             err = Exception(f"Unsupported parameter: {sorted(bad)[0]}")
             err.status_code = 400
             raise err
-        return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=self.reply))], usage=self.usage)
+        return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=self.reply))], usage=self.usage, model="judge-x-2026-01", id="chatcmpl-1", system_fingerprint="fp_a", created=1794100000)
 
 
 def test_request_judge_records_measured_usage_and_sends_only_set_params():
@@ -273,6 +326,9 @@ def test_request_judge_records_measured_usage_and_sends_only_set_params():
     assert res["score"] == 77 and res["error"] is None
     assert res["usage"] == {"prompt_tokens": 900, "completion_tokens": 180, "total_tokens": 1080, "reasoning_tokens": 0}
     assert set(c.calls[0]) == {"model", "messages", "max_tokens", "temperature", "reasoning_effort"}
+    # the provider's own identity of the reply is recorded (the judge freeze binds response_model)
+    assert res["response_model"] == "judge-x-2026-01" and res["response_id"] == "chatcmpl-1" and res["system_fingerprint"] == "fp_a" and res["created"] == 1794100000
+    assert res["requested_at"].endswith("+00:00") and res["extractor_version"] == "4"
     # a 4xx is not retried
     c2 = _FakeClient(rejects={"temperature"})
     res2 = request_judge(c2, request_body(s, "P"), retries=3)
@@ -315,3 +371,172 @@ def test_coverage_rule():
     assert not coverage({"n": 29, "scenes": 10}, 30, 10)
     assert not coverage({"n": 30, "scenes": 9}, 30, 10)
     assert not coverage({"n": 0}, 1, 1)
+
+
+def test_cli_base_url_override_reaches_settings_and_key_variable(tmp_path):
+    """Non-OpenAI judges: --base-url overrides judge.base_url for development
+    trials; JUDGE_API_KEY (or OPENAI_API_KEY) supplies the key; the endpoint is
+    in the settings the hash covers."""
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    import yaml
+
+    root = Path(__file__).resolve().parents[1]
+    cfg = yaml.safe_load((root / "config/pilot.yaml").read_text())
+    cfg_path = tmp_path / "cfg.yaml"
+    cfg_path.write_text(yaml.safe_dump(cfg))
+    env = {k: v for k, v in os.environ.items() if k not in ("JUDGE_API_KEY", "OPENAI_API_KEY")}
+    cmd = [sys.executable, str(root / "scripts/08_judge_vqa.py"), "--compat-check", "--model", "deepseek-chat", "--base-url", "https://api.deepseek.com/v1", "--config", str(cfg_path)]
+    r = subprocess.run(cmd, cwd=root, env=env, capture_output=True, text=True)
+    assert r.returncode == 1 and "JUDGE_API_KEY (or OPENAI_API_KEY) is not set" in r.stdout + r.stderr
+    # with a key the client is built for the given endpoint (the probe then fails to connect to the fake host, before any data leaves)
+    r = subprocess.run(cmd[:-2] + ["--base-url", "http://127.0.0.1:9/v1", "--config", str(cfg_path)], cwd=root, env={**env, "JUDGE_API_KEY": "x"}, capture_output=True, text=True)
+    assert "judge model: deepseek-chat at http://127.0.0.1:9/v1" in r.stdout
+    s1 = judge_settings({**CFG, "base_url": "https://api.deepseek.com/v1"})
+    s2 = judge_settings({**CFG, "base_url": "http://localhost:8001/v1"})
+    assert s1["base_url"] != s2["base_url"] and judge_input_hash("prediction/VQA", "Q", "gt", "pred", None, s1) != judge_input_hash("prediction/VQA", "Q", "gt", "pred", None, s2)
+
+
+def test_production_scores_reread_replies_and_bind_backend_identity():
+    """Session-2 review item 2: the stored number is never trusted; the reply is
+    re-read under the current extractor. Item 3 and follow-up item 1: the frozen
+    backend (description and response model) decides which records count, with
+    the predicate resume and the freeze use. Follow-up item 4: no reply, no score."""
+    from qflip.judge import record_backend_status
+
+    s = judge_settings(CFG)
+    recs = [_rec("a", "s1"), _rec("b", "s1"), _rec("c", "s2"), _rec("d", "s2"), _rec("e", "s3"), _rec("f", "s3"), _rec("g", "s4")]
+    desc_a = {"provider": "proxy P", "upstream_model": "vendor/A"}
+    rows = [
+        _judged(recs[0], s, 0, 0, reply="Total Score: 0 + 5 + 8 = 13", response_model="judge-x-2026-01", judge_backend=desc_a),  # scored 0 by the old parser
+        _judged(recs[1], s, 0, 0, reply="Total Score: 0 + 5 + 8", response_model="judge-x-2026-01", judge_backend=desc_a),       # incomplete sum: no score now
+        _judged(recs[2], s, 0, 40, response_model="judge-x-2026-01", judge_backend=desc_a),
+        _judged(recs[3], s, 0, 50, response_model="judge-x-2026-02", judge_backend=desc_a),                                       # another response model
+        _judged(recs[4], s, 0, 60, response_model="judge-x-2026-01", judge_backend={"provider": "proxy P", "upstream_model": "vendor/B"}),  # another description
+        _judged(recs[5], s, 0, 99, reply=""),                                                                                     # stored 99 with no reply
+        _judged(recs[6], s, 0, 36, reply="Total Score: 36", rejected="backend identity: x", response_model="judge-x-2026-01", judge_backend=desc_a),
+    ]
+    scores = {score_key(r): r for r in rows}
+    selected, stale = production_scores(scores, recs, s, DESC_DATA)
+    assert selected["a"]["score"] == 13 and selected["a"]["score_recorded"] == 0 and selected["a"]["score_rule"] == "arithmetic"
+    assert selected["c"]["score"] == 40 and "score_recorded" not in selected["c"]
+    assert stale["b"] == "stored reply yields no score under the current extractor"
+    assert {"d", "e"} <= set(selected)  # no backend given: development analysis under the live settings
+    assert stale["f"] == "no usable reply (empty reply)" and stale["g"] == "no usable reply (backend identity: x)"
+    frozen = {**desc_a, "response_model": "judge-x-2026-01", "validation_records": 3}
+    selected, stale = production_scores(scores, recs, s, DESC_DATA, backend=frozen)
+    assert set(selected) == {"a", "c"}
+    assert stale["d"] == "backend identity: response model 'judge-x-2026-02' differs from the frozen 'judge-x-2026-01'"
+    assert stale["e"].startswith("backend description differs: record {'provider': 'proxy P', 'upstream_model': 'vendor/B'}")
+    # the predicate itself: an old record without a description equals an empty description, never an invented one
+    assert record_backend_status({"score": 1}, {}) is None and record_backend_status({"score": 1}, None) is None
+    assert record_backend_status({"score": 1}, {"upstream_model": "vendor/A"}).startswith("backend description differs: record {}")
+    assert record_backend_status({"judge_backend": desc_a, "response_model": "m"}, {**desc_a, "response_model": "m"}) is None
+    assert record_backend_status({"judge_backend": desc_a}, {**desc_a, "response_model": "m"}).startswith("backend identity: response model None")
+
+
+def test_reparse_rewrites_sidecar_scores_in_place_and_cli(tmp_path):
+    """08 --reparse re-reads every stored reply without a call or key; the
+    stored trial records of November 8 read identically under extractor 3."""
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    from qflip.judge import extract_score_rule
+
+    root = Path(__file__).resolve().parents[1]
+    for f in sorted((root / "results/stability").glob("*_rep1.judge.jsonl")):
+        for line in f.read_text().splitlines():
+            r = json.loads(line)
+            assert extract_score_rule(r["reply"]) == (r["score"], r.get("score_rule")), (f, r["question_id"], r["judge_model"])
+    res = tmp_path / "x.jsonl"
+    res.write_text(json.dumps({"question_id": "a"}) + "\n")
+    side = tmp_path / "x.judge.jsonl"
+    rows = [
+        {"question_id": "a", "reply": "Total Score: 0 + 5 + 8 = 13", "score": 0, "score_rule": "released", "error": None, "usage": {"prompt_tokens": 9}},
+        {"question_id": "b", "reply": "Total Score: 0 + 5 + 8", "score": 0, "score_rule": "released", "error": None},
+        {"question_id": "c", "reply": "**Total Score:** 7/100", "score": None, "score_rule": None, "error": "no Total Score in reply"},
+        {"question_id": "d", "reply": "", "score": None, "error": "timeout"},
+        {"question_id": "e", "reply": "Total Score: 36", "score": None, "score_rule": None, "error": "backend identity: other", "rejected": "backend identity: other"},
+    ]
+    side.write_text("".join(json.dumps(r) + "\n" for r in rows))
+    env = {k: v for k, v in __import__("os").environ.items() if k not in ("JUDGE_API_KEY", "OPENAI_API_KEY")}
+    r = subprocess.run([sys.executable, str(root / "scripts/08_judge_vqa.py"), "--reparse", str(res)], cwd=root, env=env, capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert "5 records re-read under extractor 4: 3 changed (score or rule), 1 newly scored, 1 no longer scored" in r.stdout
+    out = [json.loads(line) for line in side.read_text().splitlines()]
+    assert [o.get("score") for o in out] == [13, None, 7, None, None]
+    assert out[0]["score_rule"] == "arithmetic" and out[0]["usage"] == {"prompt_tokens": 9} and out[0]["extractor_version"] == "4"
+    assert out[1]["error"] == "no Total Score in reply" and out[2]["error"] is None
+    assert out[3] == {**rows[3], "score_rule": None, "extractor_version": "4"}
+    assert out[4]["score"] is None and out[4]["error"] == "backend identity: other" and out[4]["reply"] == "Total Score: 36"  # rejected stays rejected
+
+
+def test_resume_counts_only_records_written_under_the_expected_backend(tmp_path, capsys):
+    """Follow-up review item 1: a scored record whose response model or backend
+    description is not the expected one is judged again, not skipped."""
+    import importlib.util
+    from pathlib import Path
+
+    spec = importlib.util.spec_from_file_location("judge08", Path(__file__).resolve().parents[1] / "scripts/08_judge_vqa.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    s = judge_settings(CFG)
+    rec = _rec("a", "s1", cell="prediction/VQA")
+    res = tmp_path / "bf16_clean.jsonl"
+    res.write_text(json.dumps(rec) + "\n")
+    side = tmp_path / "bf16_clean.judge.jsonl"
+    side.write_text(json.dumps({**_judged(rec, s, 0, 40, desc=None), "response_model": "judge-x-2026-02", "judge_settings": s}) + "\n")
+
+    def todo(expected):
+        mod.judge_file(res, s, None, None, ("prediction/VQA",), 1, None, True, 0, {}, backend_description(expected), expected)
+        return capsys.readouterr().out.splitlines()[0]
+
+    from qflip.judge import backend_description
+
+    assert "1 scored under the current key, 0 to judge" in todo(None)
+    assert "1 scored under the current key, 0 to judge" in todo({})
+    assert "0 scored under the current key, 1 to judge" in todo({"response_model": "judge-x-2026-01"})
+    assert "0 scored under the current key, 1 to judge" in todo({"upstream_model": "vendor/A"})
+    # third pass, item 1: a stored score whose reply no longer parses is not "done" either
+    side.write_text(json.dumps({**_judged(rec, s, 0, 13, desc=None, reply="Total Score: 13 ="), "judge_settings": s}) + "\n")
+    assert "0 scored under the current key, 1 to judge" in todo(None)
+
+
+def test_summary_after_a_limited_run_counts_only_usable_records(tmp_path, capsys):
+    """Third pass, item 2: after switching backend and re-judging one of two
+    answers with --limit 1, the summary must not count the untouched record of
+    the old backend as scored; it is stale, the other is pending."""
+    import importlib.util
+    from pathlib import Path
+
+    from qflip.judge import backend_description
+
+    spec = importlib.util.spec_from_file_location("judge08b", Path(__file__).resolve().parents[1] / "scripts/08_judge_vqa.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    s = judge_settings(CFG)
+    recs = [_rec("a", "s1", cell="prediction/VQA"), _rec("b", "s1", cell="prediction/VQA")]
+    res = tmp_path / "bf16_clean.jsonl"
+    res.write_text("".join(json.dumps(r) + "\n" for r in recs))
+    side = tmp_path / "bf16_clean.judge.jsonl"
+    old_a = {"provider": "P", "upstream_model": "vendor/A"}
+    side.write_text("".join(json.dumps({**_judged(r, s, 0, 90, desc=None, judge_backend=old_a, response_model="A-1"), "judge_settings": s, "cell": r["cell"]}) + "\n" for r in recs))
+    new_b = {"provider": "P", "upstream_model": "vendor/B"}
+    client = _FakeClient(reply="Total Score: 10\n\nBrief Summary: x")
+    out = mod.judge_file(res, s, client, None, ("prediction/VQA",), 1, 1, False, 0, {}, backend_description(new_b), new_b)
+    text = capsys.readouterr().out
+    assert len(client.calls) == 1 and out["scored"] == 1 and out["stale"] == 1 and out["pending"] == 0
+    assert "scored 1, stale 1, pending 0" in text and "stale 1: backend description differs" in text
+    assert "prediction/VQA  n=   1 mean=  10.0" in text  # the old 90 is not averaged in
+    # the second call judges the remaining answer; nothing pending or stale under B afterwards
+    out = mod.judge_file(res, s, client, None, ("prediction/VQA",), 1, 1, False, 0, {}, backend_description(new_b), new_b)
+    assert len(client.calls) == 2 and out["scored"] == 2 and out["stale"] == 0
+    # with --limit leaving one answer untouched and no old record for it, that answer is pending
+    side.write_text(json.dumps({**_judged(recs[0], s, 0, 13, desc=None, reply="Total Score: 13 =", judge_backend=new_b, response_model="B-1"), "judge_settings": s, "cell": "prediction/VQA"}) + "\n")
+    client = _FakeClient(reply="Total Score: 10")
+    out = mod.judge_file(res, s, client, None, ("prediction/VQA",), 1, 1, False, 0, {}, backend_description(new_b), new_b)
+    assert len(client.calls) == 1 and out == {**out, "scored": 1, "stale": 0, "pending": 1}  # a re-judged, b pending

@@ -803,6 +803,16 @@ def _judge_cfg(w, **over):
     return j
 
 
+def _val_records(jcfg, response_model="judge-x-2026-01", n=3, score=70):
+    """Scored validation records under the config's settings, as 08 writes them."""
+    from qflip.judge import judge_settings
+
+    from qflip.judge import backend_description
+
+    s = judge_settings(jcfg)
+    return [{"question_id": f"q{i}", "replicate": 0, "input_sha256": f"{i:064x}", "judge_settings": s, "judge_backend": backend_description(jcfg.get("backend")), "reply": f"Total Score: {score}", "score": score, "response_model": response_model} for i in range(n)]
+
+
 def test_judge_freeze_binds_settings_templates_and_system_line(world, tmp_path, monkeypatch):
     """Step-4 review item 2: a rubric edited after the freeze is detected."""
     import qflip.judge as J
@@ -810,8 +820,9 @@ def test_judge_freeze_binds_settings_templates_and_system_line(world, tmp_path, 
 
     w = world
     jcfg = _judge_cfg(w)
-    jf = build_judge_frozen(jcfg, 60, repo_root=w["root"])
+    jf = build_judge_frozen(jcfg, 60, repo_root=w["root"], records=_val_records(jcfg))
     assert jf["judge"] == {"base_url": "https://api.openai.com/v1", "model": "judge-x", "max_tokens": 512, "max_tokens_param": "max_tokens", "temperature": 0.0}
+    assert jf["backend"] == {"response_model": "judge-x-2026-01", "validation_records": 3}
     assert set(jf["fingerprints"]["templates"]) == set(J.PROMPT_BY_CELL)
     assert jf["fingerprints"]["visual_description_sha256"] == J.VISUAL_DESCRIPTION_SHA256
     assert check_judge_frozen(jf, jcfg) == []
@@ -825,7 +836,7 @@ def test_judge_freeze_binds_settings_templates_and_system_line(world, tmp_path, 
     monkeypatch.undo()
     assert check_judge_frozen(None) and "missing" in check_judge_frozen(None)[0]
     with pytest.raises(FreezeError):
-        build_judge_frozen(jcfg, None)
+        build_judge_frozen(jcfg, None, records=_val_records(jcfg))
     # live settings or CLI model differ from the frozen judge
     d = check_judge_frozen(jf, {**jcfg, "model": "judge-y"})
     assert len(d) == 1 and "judge setting model" in d[0]
@@ -880,7 +891,7 @@ def test_judging_final_files_requires_both_freezes_and_refuses_overrides(world, 
     bad_dev = _final_files(w, tmp_path / "bd", {"bf16": _meta(w, "bf16", split="development")})
     with pytest.raises(ProvenanceError):
         prepare_judging(bad_dev, cfg, **kw)
-    jfp.write_text(yaml.safe_dump(build_judge_frozen(cfg["judge"], 60, repo_root=w["root"])))
+    jfp.write_text(yaml.safe_dump(build_judge_frozen(cfg["judge"], 60, repo_root=w["root"], records=_val_records(cfg["judge"]))))
     out = prepare_judging(ff, cfg, **kw)
     assert out["provenance"]["split"] == "final" and out["settings"]["model"] == "judge-x" and out["correct_threshold"] == 60 and out["judge_frozen"]["git_commit"]
     # --model or a config value that differs from the frozen judge is refused
@@ -1113,3 +1124,202 @@ def test_serve_manifest_and_runtime_auto_share_one_collector(world, tmp_path):
     r = subprocess.run(cmd, cwd=repo, env=env_broken, capture_output=True, text=True)
     assert r.returncode == 1 and "not importable in this environment: ['vllm', 'torch', 'transformers', 'compressed-tensors']" in r.stdout + r.stderr
     _manifest(man, "int4", str(w["ckpt"]))
+
+
+def test_judge_freeze_binds_extractor_and_backend_identity(world, tmp_path, monkeypatch):
+    """Session-2 review items 2 and 3: a parser change after the freeze is
+    detected; the freeze records which backend answered during validation and
+    the config's backend description; a local judge needs its revision and the
+    live serve manifest must agree."""
+    import qflip.judge as J
+    from qflip.freeze import build_judge_frozen, check_judge_frozen, check_judge_manifest
+    from qflip.judge import JudgeSettingsError
+
+    w = world
+    jcfg = _judge_cfg(w, backend={"provider": "proxy P", "upstream_model": "vendor/model-a", "revision": None, "thinking_control": "reasoning_effort none, verified through the proxy"})
+    jf = build_judge_frozen(jcfg, 60, repo_root=w["root"], records=_val_records(jcfg))
+    assert jf["fingerprints"]["extractor"] == {"version": J.EXTRACTOR_VERSION, "sha256": J.extractor_fingerprint()["sha256"]}
+    assert jf["backend"] == {"provider": "proxy P", "upstream_model": "vendor/model-a", "thinking_control": "reasoning_effort none, verified through the proxy", "response_model": "judge-x-2026-01", "validation_records": 3}
+    assert check_judge_frozen(jf, jcfg) == []
+    # (2) extractor edited after the freeze: version bump, or a silent regex change
+    monkeypatch.setattr(J, "EXTRACTOR_VERSION", "5")
+    d = check_judge_frozen(jf, jcfg)
+    assert len(d) == 1 and d[0].startswith("score extractor differs from the frozen one (live version 5, frozen 4)")
+    monkeypatch.undo()
+    monkeypatch.setattr(J, "_TOTAL_LINE_RE", __import__("re").compile(r"Total\s+Score\s*:?\s*([^\n]*)"))
+    d = check_judge_frozen(jf, jcfg)
+    assert len(d) == 1 and d[0].startswith("score extractor differs")
+    monkeypatch.undo()
+    # follow-up item 5: the same pattern with another flag parses differently and must change the digest
+    monkeypatch.setattr(J, "_TOTAL_LINE_RE", __import__("re").compile(J._TOTAL_LINE_RE.pattern, __import__("re").IGNORECASE))
+    assert J.extract_score_rule("total score: 85") == (85, "markdown")
+    d = check_judge_frozen(jf, jcfg)
+    assert len(d) == 1 and d[0].startswith("score extractor differs")
+    monkeypatch.undo()
+    assert J.extract_score_rule("total score: 85") == (None, None)
+    assert check_judge_frozen(jf, jcfg) == []
+    # follow-up item 1: validation records written under another description are not evidence for this one
+    other = _val_records(_judge_cfg(w, backend={**jcfg["backend"], "upstream_model": "vendor/model-b"}))
+    with pytest.raises(FreezeError, match="no scored validation record was written under the backend description being frozen"):
+        build_judge_frozen(jcfg, 60, repo_root=w["root"], records=other)
+    # third pass, item 1: a record whose stored score survives but whose reply the current extractor rejects is no evidence
+    stale_reply = [{**r, "reply": "Total Score: 13 =", "score": 13} for r in _val_records(jcfg, n=1)]
+    with pytest.raises(FreezeError, match="stored reply yields no score under the current extractor"):
+        build_judge_frozen(jcfg, 60, repo_root=w["root"], records=stale_reply)
+    assert build_judge_frozen(jcfg, 60, repo_root=w["root"], records=stale_reply + _val_records(jcfg, n=2))["backend"]["validation_records"] == 2
+    # records from before the description existed are evidence only for an empty description
+    bare = [{k: v for k, v in r.items() if k != "judge_backend"} for r in _val_records(jcfg)]
+    with pytest.raises(FreezeError, match="backend description differs: record {}"):
+        build_judge_frozen(jcfg, 60, repo_root=w["root"], records=bare)
+    assert build_judge_frozen(_judge_cfg(w), 60, repo_root=w["root"], records=bare)["backend"] == {"response_model": "judge-x-2026-01", "validation_records": 3}
+    # (3) backend description changed in config, or missing from an old freeze
+    d = check_judge_frozen(jf, _judge_cfg(w, backend={**jcfg["backend"], "upstream_model": "vendor/model-b"}))
+    assert d == ["judge backend upstream_model: live='vendor/model-b' frozen='vendor/model-a'"]
+    old = {**jf, "backend": {k: v for k, v in jf["backend"].items() if k != "response_model"}}
+    assert check_judge_frozen(old, jcfg) == ["backend.response_model missing from the judge freeze (written from the validation records)"]
+    with pytest.raises(JudgeSettingsError, match="unknown keys"):
+        build_judge_frozen(_judge_cfg(w, backend={"api_key": "x"}), 60, records=[])
+    # validation answered by two backends, or by none under the frozen settings: nothing to freeze
+    with pytest.raises(FreezeError, match="2 response model"):
+        build_judge_frozen(jcfg, 60, repo_root=w["root"], records=_val_records(jcfg) + _val_records(jcfg, response_model="judge-x-2026-02", n=1))
+    with pytest.raises(FreezeError, match="no validation record was produced with the settings"):
+        build_judge_frozen(jcfg, 60, repo_root=w["root"], records=_val_records(_judge_cfg(w, model="judge-y")))
+    # a local judge: revision required, serve manifest checked; every loopback form is local (follow-up item 2)
+    assert all(J.is_local_endpoint(u) for u in ("http://localhost:8001/v1", "http://127.0.0.1:8001/v1", "http://127.0.0.2:8001/v1", "http://[::1]:8001/v1"))
+    assert not J.is_local_endpoint("https://aiapi.paid.lol/v1") and not J.is_local_endpoint("http://judge.local:8001/v1")
+    with pytest.raises(FreezeError, match="judge.backend.revision"):
+        build_judge_frozen(_judge_cfg(w, base_url="http://[::1]:8001/v1"), 60, records=_val_records(_judge_cfg(w, base_url="http://[::1]:8001/v1"), response_model="judge-local"))
+    local = _judge_cfg(w, base_url="http://localhost:8001/v1", backend={"provider": "local vLLM", "upstream_model": "openai/gpt-oss-20b", "revision": "abc123"})
+    man = tmp_path / "serve_judge.txt"
+    with pytest.raises(FreezeError, match="judge.backend.revision"):
+        build_judge_frozen(_judge_cfg(w, base_url="http://localhost:8001/v1"), 60, records=_val_records(local, response_model="judge-local"), manifest_path=man)
+    with pytest.raises(FreezeError, match="missing"):
+        build_judge_frozen(local, 60, records=_val_records(local, response_model="judge-local"), manifest_path=man)
+    man.write_text("role: judge\nmodel: openai/gpt-oss-20b\nrevision: \npinned: no\n")
+    assert check_judge_manifest(local["backend"], man) == [f"{man}: the judge server runs an unpinned checkpoint (empty revision); a frozen local judge needs JUDGE_REVISION"]
+    man.write_text("role: judge\nmodel: openai/gpt-oss-20b\nrevision: def456\npinned: yes\n")
+    assert check_judge_manifest(local["backend"], man) == ["judge checkpoint revision: served 'def456', frozen 'abc123'"]
+    man.write_text("role: judge\nmodel: openai/gpt-oss-20b\nrevision: abc123\npinned: yes\n")
+    assert check_judge_manifest(local["backend"], man) == []
+    jf2 = build_judge_frozen(local, 60, repo_root=w["root"], records=_val_records(local, response_model="judge-local"), manifest_path=man)
+    assert jf2["backend"]["revision"] == "abc123" and jf2["backend"]["response_model"] == "judge-local"
+    man.write_text("role: judge\nmodel: mistralai/Mistral-7B-Instruct-v0.3\nrevision: abc123\n")
+    assert check_judge_manifest(jf2["backend"], man) == ["judge model: served 'mistralai/Mistral-7B-Instruct-v0.3', frozen 'openai/gpt-oss-20b'"]
+    # the trial manifest of November 8 was unpinned: the serve script now refuses that unless told it is a trial
+    import subprocess
+
+    r = subprocess.run(["bash", str(Path(w["root"]).parent / "scripts/serve_judge.sh")], capture_output=True, text=True, env={"PATH": "/usr/bin:/bin", "JUDGE_REVISION": ""}) if (Path(w["root"]).parent / "scripts/serve_judge.sh").exists() else None
+    if r is not None:
+        assert r.returncode == 2 and "JUDGE_REVISION is empty" in r.stderr
+
+
+def test_final_local_judging_checks_the_running_server_not_only_the_manifest(tmp_path, monkeypatch):
+    """Follow-up review item 2: a manifest naming a dead pid, another port or a
+    server started without the frozen revision is refused; the served alias and
+    loaded model are checked at the endpoint like the study servers."""
+    import qflip.guard as G
+    from qflip.guard import check_judge_server
+    from qflip.provenance import ProvenanceError
+
+    settings = {"base_url": "http://127.0.0.1:8001/v1", "model": "judge-local", "max_tokens": 2048, "max_tokens_param": "max_tokens"}
+    backend = {"provider": "local vLLM", "upstream_model": "openai/gpt-oss-20b", "revision": "abc123", "response_model": "judge-local"}
+    proc = tmp_path / "proc"
+    _fake_proc(proc, [("0.0.0.0", 8001, "77")], [], {4321: ["77"]})
+    (proc / "4321/cmdline").write_bytes(b"\0".join([b"vllm", b"serve", b"openai/gpt-oss-20b", b"--revision", b"abc123", b"--served-model-name", b"judge-local", b"--port", b"8001"]) + b"\0")
+    man = tmp_path / "serve_judge.txt"
+
+    def manifest(pid=4321, port=8001, rev="abc123"):
+        man.write_text(f"role: judge\nmodel: openai/gpt-oss-20b\nrevision: {rev}\npinned: yes\nserved_model_name: judge-local\nport: {port}\npid: {pid}\n")
+
+    calls = []
+    monkeypatch.setattr(G, "check_server", lambda url, served, expect_model=None, timeout_s=10: calls.append((url, served, expect_model)) or [])
+    manifest()
+    assert check_judge_server(settings, backend, man, proc_root=proc) == 4321
+    assert calls == [("http://127.0.0.1:8001/v1", "judge-local", "openai/gpt-oss-20b")]
+    manifest(pid=999999999)
+    with pytest.raises(ProvenanceError, match="not running on this host"):
+        check_judge_server(settings, backend, man, proc_root=proc)
+    manifest(port=9999)
+    with pytest.raises(ProvenanceError, match="port 8001, the manifest server is on port 9999"):
+        check_judge_server(settings, backend, man, proc_root=proc)
+    manifest(rev="def456")
+    with pytest.raises(FreezeError, match="served 'def456', frozen 'abc123'"):
+        check_judge_server(settings, backend, man, proc_root=proc)
+    # the manifest agrees but the process was started without --revision
+    manifest()
+    (proc / "4321/cmdline").write_bytes(b"\0".join([b"vllm", b"serve", b"openai/gpt-oss-20b", b"--served-model-name", b"judge-local", b"--port", b"8001"]) + b"\0")
+    with pytest.raises(ProvenanceError, match="command line revision \\[\\] is not the manifest revision 'abc123'"):
+        check_judge_server(settings, backend, man, proc_root=proc)
+    # the endpoint check itself is the study servers' (alias listed, model card root)
+    monkeypatch.setattr(G, "check_server", lambda *a, **k: (_ for _ in ()).throw(ProvenanceError("server at x serves ['other']")))
+    with pytest.raises(ProvenanceError, match="serves"):
+        check_judge_server(settings, backend, man, proc_root=proc)
+
+
+def test_host_pull_reconciles_colliding_untracked_files(tmp_path):
+    """Third pass, item 3: the host holds untracked copies of files the incoming
+    commit adds (frozen files, results, a new script) and a modified tracked
+    file; a plain pull refuses. scripts/host_pull.sh backs them up, fast-forwards,
+    and reports any host copy that differs from what was pulled."""
+    import os
+    import subprocess
+
+    script = Path(__file__).resolve().parents[1] / "scripts/host_pull.sh"
+    env = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@x", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@x", "HOME": str(tmp_path)}
+
+    def git(cwd, *a):
+        return subprocess.run(["git", *a], cwd=cwd, env=env, capture_output=True, text=True, check=True).stdout
+
+    origin = tmp_path / "origin.git"
+    subprocess.run(["git", "init", "--bare", "-b", "main", str(origin)], env=env, check=True, capture_output=True)
+    dev = tmp_path / "dev"
+    subprocess.run(["git", "clone", "-q", str(origin), str(dev)], env=env, check=True, capture_output=True)
+    (dev / "manifests").mkdir()
+    (dev / "manifests/serve.txt").write_text("date: 1\n")
+    git(dev, "add", "."); git(dev, "commit", "-qm", "base"); git(dev, "push", "-q", "origin", "main")
+    host = tmp_path / "host"
+    subprocess.run(["git", "clone", "-q", str(origin), str(host)], env=env, check=True, capture_output=True)
+    # the session commit adds the frozen file, results and a script, and carries the rsynced manifest
+    (dev / "manifests/serve.txt").write_text("date: 2\n")
+    (dev / "manifests/config_frozen.yaml").write_text("frozen: 1\n")
+    (dev / "results/profile").mkdir(parents=True)
+    (dev / "results/profile/s1.json").write_text("{}\n")
+    (dev / "scripts").mkdir()
+    (dev / "scripts/new.sh").write_text("echo\n")
+    git(dev, "add", "."); git(dev, "commit", "-qm", "session"); git(dev, "push", "-q", "origin", "main")
+    # the host produced identical copies, rewrote a tracked manifest, and holds logs the commit does not touch
+    (host / "manifests/config_frozen.yaml").write_text("frozen: 1\n")
+    (host / "results/profile").mkdir(parents=True)
+    (host / "results/profile/s1.json").write_text("{}\n")
+    (host / "scripts").mkdir()
+    (host / "scripts/new.sh").write_text("echo\n")
+    (host / "manifests/serve.txt").write_text("date: 2\n")
+    (host / "logs").mkdir()
+    (host / "logs/run.txt").write_text("log\n")
+    r = subprocess.run(["git", "pull", "-q"], cwd=host, env=env, capture_output=True, text=True)
+    assert r.returncode != 0 and "untracked working tree files would be overwritten" in r.stderr
+    backup = tmp_path / "backup"
+    r = subprocess.run(["bash", str(script)], cwd=host, env={**env, "HOST_BACKUP": str(backup)}, capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert git(host, "rev-parse", "HEAD") == git(dev, "rev-parse", "HEAD")
+    assert (host / "logs/run.txt").read_text() == "log\n" and (host / "results/profile/s1.json").exists()
+    assert (backup / "manifests/serve.txt").read_text() == "date: 2\n" and "DIFFERS" not in r.stdout and "backed up 4 path(s)" in r.stdout
+    # a host copy that differs from the pulled file is reported, kept, and fails the run
+    (dev / "results/profile/s2.json").write_text("{\"a\": 1}\n")
+    git(dev, "add", "."); git(dev, "commit", "-qm", "more"); git(dev, "push", "-q", "origin", "main")
+    (host / "results/profile/s2.json").write_text("{\"a\": 2}\n")
+    r = subprocess.run(["bash", str(script)], cwd=host, env={**env, "HOST_BACKUP": str(tmp_path / "backup2")}, capture_output=True, text=True)
+    assert r.returncode == 1 and "DIFFERS: results/profile/s2.json" in r.stdout
+    assert (host / "results/profile/s2.json").read_text() == '{"a": 1}\n' and (tmp_path / "backup2/results/profile/s2.json").read_text() == '{"a": 2}\n'
+    # fourth pass: a second invocation with the same backup directory is refused before anything
+    # moves, so the earlier run's host copies survive
+    (dev / "results/profile/s3.json").write_text("3\n")
+    git(dev, "add", "."); git(dev, "commit", "-qm", "again"); git(dev, "push", "-q", "origin", "main")
+    (host / "results/profile/s3.json").write_text("host3\n")
+    r = subprocess.run(["bash", str(script)], cwd=host, env={**env, "HOST_BACKUP": str(tmp_path / "backup2")}, capture_output=True, text=True)
+    assert r.returncode == 2 and "already exists; refusing" in r.stderr
+    assert (tmp_path / "backup2/results/profile/s2.json").read_text() == '{"a": 2}\n' and (host / "results/profile/s3.json").read_text() == "host3\n"
+    assert git(host, "rev-parse", "HEAD") != git(dev, "rev-parse", "HEAD")
+    # the default backup location is new per invocation
+    r = subprocess.run(["bash", str(script)], cwd=host, env=env, capture_output=True, text=True)
+    assert r.returncode == 1 and "DIFFERS: results/profile/s3.json" in r.stdout and git(host, "rev-parse", "HEAD") == git(dev, "rev-parse", "HEAD")

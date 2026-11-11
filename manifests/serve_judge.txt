@@ -1,0 +1,14 @@
+date: 2026-11-08T03:12:43+00:00
+role: judge
+model: openai/gpt-oss-20b
+revision: 
+served_model_name: judge-local
+max_model_len: 8192
+gpu_memory_utilization: 0.85
+port: 8001
+pid: 45967
+gpu: NVIDIA GeForce RTX 4090
+vllm: 0.33.0
+torch: 2.14.0+cu130
+transformers: 5.20.2
+compressed_tensors: 0.17.0

@@ -1,0 +1,410 @@
+{
+  "precisions": {
+    "bf16": {
+      "n_sessions": 3,
+      "sessions": [
+        {
+          "file": "results/profile/bf16_clean_s1.json",
+          "session": 1,
+          "model": "Qwen/Qwen2.5-VL-7B-Instruct",
+          "checkpoint_fingerprint": "hf:Qwen/Qwen2.5-VL-7B-Instruct@cc594898137f460bfe9f0759e9844b3ce807cfb5",
+          "study": true,
+          "precision": "bf16",
+          "condition": "clean",
+          "n": 50,
+          "errors": 0,
+          "gpu_peak_mib": 19400,
+          "ttft_s": {
+            "p50": 0.11733738286420703,
+            "p95": 0.3907707752659917,
+            "p99": 0.40882230177521706
+          },
+          "latency_s": {
+            "p50": 2.1072,
+            "p95": 2.3967,
+            "p99": 2.4163
+          },
+          "decode_tok_s": {
+            "p50": 63.3131370688668,
+            "p95": 70.31287677429634
+          },
+          "host": {
+            "hostname": "658b5a53146a",
+            "gpu_name": "NVIDIA GeForce RTX 4090"
+          }
+        },
+        {
+          "file": "results/profile/bf16_clean_s2.json",
+          "session": 2,
+          "model": "Qwen/Qwen2.5-VL-7B-Instruct",
+          "checkpoint_fingerprint": "hf:Qwen/Qwen2.5-VL-7B-Instruct@cc594898137f460bfe9f0759e9844b3ce807cfb5",
+          "study": true,
+          "precision": "bf16",
+          "condition": "clean",
+          "n": 50,
+          "errors": 0,
+          "gpu_peak_mib": 19400,
+          "ttft_s": {
+            "p50": 0.10966294584795833,
+            "p95": 0.3873422280885279,
+            "p99": 0.39434786420315504
+          },
+          "latency_s": {
+            "p50": 2.1046,
+            "p95": 2.3897,
+            "p99": 2.4
+          },
+          "decode_tok_s": {
+            "p50": 63.30964787184169,
+            "p95": 72.92782284357239
+          },
+          "host": {
+            "hostname": "658b5a53146a",
+            "gpu_name": "NVIDIA GeForce RTX 4090"
+          }
+        },
+        {
+          "file": "results/profile/bf16_clean_s3.json",
+          "session": 3,
+          "model": "Qwen/Qwen2.5-VL-7B-Instruct",
+          "checkpoint_fingerprint": "hf:Qwen/Qwen2.5-VL-7B-Instruct@cc594898137f460bfe9f0759e9844b3ce807cfb5",
+          "study": true,
+          "precision": "bf16",
+          "condition": "clean",
+          "n": 50,
+          "errors": 0,
+          "gpu_peak_mib": 19400,
+          "ttft_s": {
+            "p50": 0.11097443802282214,
+            "p95": 0.4007789180614054,
+            "p99": 0.4097877419553697
+          },
+          "latency_s": {
+            "p50": 2.1027,
+            "p95": 2.3921,
+            "p99": 2.4086
+          },
+          "decode_tok_s": {
+            "p50": 63.316537263107314,
+            "p95": 70.5307353608526
+          },
+          "host": {
+            "hostname": "658b5a53146a",
+            "gpu_name": "NVIDIA GeForce RTX 4090"
+          }
+        }
+      ],
+      "pooled": {
+        "requests": 150,
+        "errors": 0,
+        "ttft_s": {
+          "n": 150,
+          "mean": 0.18828280067381759,
+          "p50": 0.11160910222679377,
+          "p95": 0.392078576143831,
+          "p99": 0.40882230177521706,
+          "max": 0.4097877419553697
+        },
+        "latency_s": {
+          "n": 150,
+          "mean": 1.8175426666666665,
+          "p50": 2.1049,
+          "p95": 2.3933,
+          "p99": 2.4086,
+          "max": 2.4163
+        },
+        "decode_tok_s": {
+          "n": 150,
+          "mean": 64.03876860340287,
+          "p50": 63.31439148250208,
+          "p95": 70.5307353608526,
+          "p99": 75.22164275721103,
+          "max": 75.93063461840296
+        },
+        "prompt_tokens_mean": 1694.26,
+        "completion_tokens_mean": 104.12,
+        "gpu_peak_mib_max": 19400,
+        "gpu_peak_mib_per_session": [
+          19400,
+          19400,
+          19400
+        ]
+      },
+      "provenance": {
+        "split": "development",
+        "split_file_sha256": "4f450077b5d1809652b5a69ef58408378751e6f87cc089258375644b225979fb",
+        "exclusions_sha256": "9a26a05ec3e2b1da947628f84a176f6f70aece7950a579193fbf1a533902512f",
+        "annotations_sha256": "50ee8295313b70810bdd7f04d4953b5f5d5d45b2da1a291e87fc108b4df270de",
+        "core_config_sha256": "b16bd628eae2e112909e489df0f08219c2951858c460a93f4b668cb2d73b8950",
+        "prompt_sha256": "24044483e7f02a628e8f17dfc8a1f54aafbcb43e98d0b5e53e7815c415d6fbd3",
+        "precision": "bf16",
+        "condition": "clean",
+        "served_model_name": "qwen2.5-vl-7b-bf16",
+        "model_path_or_id": "Qwen/Qwen2.5-VL-7B-Instruct",
+        "model_revision": "cc594898137f460bfe9f0759e9844b3ce807cfb5",
+        "checkpoint_fingerprint": "hf:Qwen/Qwen2.5-VL-7B-Instruct@cc594898137f460bfe9f0759e9844b3ce807cfb5",
+        "quantization": "none",
+        "dtype": "bfloat16",
+        "max_pixels": "200704",
+        "max_model_len": "4096",
+        "kv_args": "--kv-cache-memory-bytes 2147483648",
+        "seed": "0",
+        "max_num_seqs": "1",
+        "prefix_caching": "true",
+        "vllm_version": "0.33.0",
+        "torch_version": "2.14.0+cu130",
+        "transformers_version": "5.20.2",
+        "compressed_tensors_version": "0.17.0"
+      },
+      "host": {
+        "hostname": "658b5a53146a",
+        "gpu_name": "NVIDIA GeForce RTX 4090"
+      },
+      "workload": {
+        "split": "development",
+        "condition": "clean",
+        "n": 50,
+        "views": 6,
+        "warmup": 3,
+        "n_question_ids": 50
+      }
+    },
+    "int4": {
+      "n_sessions": 3,
+      "sessions": [
+        {
+          "file": "results/profile/int4_clean_s1.json",
+          "session": 1,
+          "model": "checkpoints/qwen2.5-vl-7b-awq-w4a16-g128",
+          "checkpoint_fingerprint": "sha256:2bb17c5214a52fe263dd879f2fd4956564906a97d1b6d0b51cf60a1a5d54347c",
+          "study": true,
+          "precision": "int4",
+          "condition": "clean",
+          "n": 50,
+          "errors": 0,
+          "gpu_peak_mib": 10292,
+          "ttft_s": {
+            "p50": 0.1410547960549593,
+            "p95": 0.42273309314623475,
+            "p99": 0.46288019185885787
+          },
+          "latency_s": {
+            "p50": 0.8838,
+            "p95": 1.1768,
+            "p99": 1.1913
+          },
+          "decode_tok_s": {
+            "p50": 168.34631465431394,
+            "p95": 279.8295558553168
+          },
+          "host": {
+            "hostname": "658b5a53146a",
+            "gpu_name": "NVIDIA GeForce RTX 4090"
+          }
+        },
+        {
+          "file": "results/profile/int4_clean_s2.json",
+          "session": 2,
+          "model": "checkpoints/qwen2.5-vl-7b-awq-w4a16-g128",
+          "checkpoint_fingerprint": "sha256:2bb17c5214a52fe263dd879f2fd4956564906a97d1b6d0b51cf60a1a5d54347c",
+          "study": true,
+          "precision": "int4",
+          "condition": "clean",
+          "n": 50,
+          "errors": 0,
+          "gpu_peak_mib": 10292,
+          "ttft_s": {
+            "p50": 0.1454789601266384,
+            "p95": 0.4246132471598685,
+            "p99": 0.4281222987920046
+          },
+          "latency_s": {
+            "p50": 0.8869,
+            "p95": 1.1779,
+            "p99": 1.1833
+          },
+          "decode_tok_s": {
+            "p50": 168.36792798672712,
+            "p95": 248.1544159689016
+          },
+          "host": {
+            "hostname": "658b5a53146a",
+            "gpu_name": "NVIDIA GeForce RTX 4090"
+          }
+        },
+        {
+          "file": "results/profile/int4_clean_s3.json",
+          "session": 3,
+          "model": "checkpoints/qwen2.5-vl-7b-awq-w4a16-g128",
+          "checkpoint_fingerprint": "sha256:2bb17c5214a52fe263dd879f2fd4956564906a97d1b6d0b51cf60a1a5d54347c",
+          "study": true,
+          "precision": "int4",
+          "condition": "clean",
+          "n": 50,
+          "errors": 0,
+          "gpu_peak_mib": 10292,
+          "ttft_s": {
+            "p50": 0.135255906265229,
+            "p95": 0.41043510427698493,
+            "p99": 0.4163173050619662
+          },
+          "latency_s": {
+            "p50": 0.8701,
+            "p95": 1.1488,
+            "p99": 1.1677
+          },
+          "decode_tok_s": {
+            "p50": 168.37212001480648,
+            "p95": 259.0333234584294
+          },
+          "host": {
+            "hostname": "658b5a53146a",
+            "gpu_name": "NVIDIA GeForce RTX 4090"
+          }
+        }
+      ],
+      "pooled": {
+        "requests": 150,
+        "errors": 0,
+        "ttft_s": {
+          "n": 150,
+          "mean": 0.21100879001120726,
+          "p50": 0.14212039997801185,
+          "p95": 0.4226958826184273,
+          "p99": 0.4281222987920046,
+          "max": 0.46288019185885787
+        },
+        "latency_s": {
+          "n": 150,
+          "mean": 0.769278,
+          "p50": 0.8797,
+          "p95": 1.1677,
+          "p99": 1.1833,
+          "max": 1.1913
+        },
+        "decode_tok_s": {
+          "n": 150,
+          "mean": 182.8614746050771,
+          "p50": 168.37212001480648,
+          "p95": 259.0333234584294,
+          "p99": 293.4563515370124,
+          "max": 316.135664820332
+        },
+        "prompt_tokens_mean": 1694.26,
+        "completion_tokens_mean": 94.76,
+        "gpu_peak_mib_max": 10292,
+        "gpu_peak_mib_per_session": [
+          10292,
+          10292,
+          10292
+        ]
+      },
+      "provenance": {
+        "split": "development",
+        "split_file_sha256": "4f450077b5d1809652b5a69ef58408378751e6f87cc089258375644b225979fb",
+        "exclusions_sha256": "9a26a05ec3e2b1da947628f84a176f6f70aece7950a579193fbf1a533902512f",
+        "annotations_sha256": "50ee8295313b70810bdd7f04d4953b5f5d5d45b2da1a291e87fc108b4df270de",
+        "core_config_sha256": "b16bd628eae2e112909e489df0f08219c2951858c460a93f4b668cb2d73b8950",
+        "prompt_sha256": "24044483e7f02a628e8f17dfc8a1f54aafbcb43e98d0b5e53e7815c415d6fbd3",
+        "precision": "int4",
+        "condition": "clean",
+        "served_model_name": "qwen2.5-vl-7b-awq",
+        "model_path_or_id": "checkpoints/qwen2.5-vl-7b-awq-w4a16-g128",
+        "model_revision": null,
+        "checkpoint_fingerprint": "sha256:2bb17c5214a52fe263dd879f2fd4956564906a97d1b6d0b51cf60a1a5d54347c",
+        "quantization": "compressed-tensors",
+        "dtype": "float16",
+        "max_pixels": "200704",
+        "max_model_len": "4096",
+        "kv_args": "--kv-cache-memory-bytes 2147483648",
+        "seed": "0",
+        "max_num_seqs": "1",
+        "prefix_caching": "true",
+        "vllm_version": "0.33.0",
+        "torch_version": "2.14.0+cu130",
+        "transformers_version": "5.20.2",
+        "compressed_tensors_version": "0.17.0"
+      },
+      "host": {
+        "hostname": "658b5a53146a",
+        "gpu_name": "NVIDIA GeForce RTX 4090"
+      },
+      "workload": {
+        "split": "development",
+        "condition": "clean",
+        "n": 50,
+        "views": 6,
+        "warmup": 3,
+        "n_question_ids": 50
+      }
+    }
+  },
+  "reference": [
+    {
+      "file": "results/profile/bf16_clean_s1.json",
+      "session": 1,
+      "model": "qwen2.5-vl-7b-bf16",
+      "checkpoint_fingerprint": null,
+      "study": null,
+      "precision": "bf16",
+      "condition": "clean",
+      "n": 50,
+      "errors": 0,
+      "gpu_peak_mib": 19296,
+      "ttft_s": {
+        "p50": 0.1097785560414195,
+        "p95": 0.3399139379616827,
+        "p99": 0.3932369779795408
+      },
+      "latency_s": {
+        "p50": 2.1034,
+        "p95": 2.3291,
+        "p99": 2.3495
+      },
+      "decode_tok_s": {
+        "p50": 63.288653366818494,
+        "p95": 75.4086048738278
+      },
+      "host": null
+    },
+    {
+      "file": "results/profile/int4_clean_s1.json",
+      "session": 1,
+      "model": "qwen2.5-vl-7b-awq",
+      "checkpoint_fingerprint": null,
+      "study": null,
+      "precision": "int4",
+      "condition": "clean",
+      "n": 50,
+      "errors": 0,
+      "gpu_peak_mib": 10168,
+      "ttft_s": {
+        "p50": 0.11891062883660197,
+        "p95": 0.3402917389757931,
+        "p99": 0.377064669970423
+      },
+      "latency_s": {
+        "p50": 0.8638,
+        "p95": 1.0921,
+        "p99": 1.1149
+      },
+      "decode_tok_s": {
+        "p50": 168.43769433318076,
+        "p95": 214.7950397621403
+      },
+      "host": null
+    }
+  ],
+  "memory_reduction": 0.4694845360824742,
+  "budgets": {
+    "ttft_p95_le_2s": {
+      "bf16": true,
+      "int4": true
+    },
+    "decode_p50_ge_15": {
+      "bf16": true,
+      "int4": true
+    },
+    "memory_reduction_ge_25pct": true
+  }
+}

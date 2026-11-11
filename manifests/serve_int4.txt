@@ -1,12 +1,20 @@
-date: 2026-11-03T22:58:04+00:00
+date: 2026-11-08T02:22:24+00:00
 precision: int4
-model: Qwen/Qwen2.5-VL-7B-Instruct-AWQ
+model: checkpoints/qwen2.5-vl-7b-awq-w4a16-g128
+revision: 
 served_model_name: qwen2.5-vl-7b-awq
 max_pixels: 200704
 max_model_len: 4096
 kv_args: --kv-cache-memory-bytes 2147483648
-extra_args: --dtype float16 --quantization awq_marlin
+seed: 0
+max_num_seqs: 1
+prefix_caching: true
+extra_args: --dtype float16 --quantization compressed-tensors
+port: 8000
+pid: 35101
 power_limit_w: 450.00
 gpu: NVIDIA GeForce RTX 4090
 vllm: 0.33.0
+torch: 2.14.0+cu130
 transformers: 5.20.2
+compressed_tensors: 0.17.0

@@ -339,18 +339,88 @@ def load_judge_frozen(path: str | Path = JUDGE_FROZEN_PATH) -> dict | None:
 # ---------------------------------------------------------------- judge freeze
 
 
-def build_judge_frozen(jcfg: dict, correct_threshold: float, repo_root: str | Path = ".", validation: dict | None = None) -> dict:
+JUDGE_MANIFEST_PATH = Path("manifests/serve_judge.txt")
+
+
+def read_judge_manifest(path: str | Path = JUDGE_MANIFEST_PATH) -> dict:
+    """`key: value` lines written by scripts/serve_judge.sh."""
+    out = {}
+    for line in Path(path).read_text().splitlines():
+        if ":" in line:
+            k, v = line.split(":", 1)
+            out[k.strip()] = v.strip()
+    return out
+
+
+def check_judge_manifest(backend: dict, manifest_path: str | Path = JUDGE_MANIFEST_PATH) -> list[str]:
+    """A local judge's live identity against the frozen backend: the serve
+    manifest must name the frozen checkpoint revision (and model id when the
+    backend records one)."""
+    if not Path(manifest_path).exists():
+        return [f"{manifest_path} missing (scripts/serve_judge.sh writes it; a local judge is bound by its revision)"]
+    m = read_judge_manifest(manifest_path)
+    diffs = []
+    if not m.get("revision"):
+        diffs.append(f"{manifest_path}: the judge server runs an unpinned checkpoint (empty revision); a frozen local judge needs JUDGE_REVISION")
+    elif backend.get("revision") and m["revision"] != backend["revision"]:
+        diffs.append(f"judge checkpoint revision: served {m['revision']!r}, frozen {backend['revision']!r}")
+    if backend.get("upstream_model") and m.get("model") != backend["upstream_model"]:
+        diffs.append(f"judge model: served {m.get('model')!r}, frozen {backend['upstream_model']!r}")
+    return diffs
+
+
+def backend_from_records(records: list[dict], settings: dict, backend: dict) -> dict:
+    """What the validation records say answered under the settings and backend
+    description being frozen: the one response model id they all carry, and how
+    many there are. Records written under another description are not evidence
+    for this backend (record_backend_status, the predicate resume and analysis
+    use too); several ids mean the backend changed during validation and
+    nothing can be frozen."""
+    from qflip.judge import usable_score
+
+    same_settings = [r for r in records if r.get("judge_settings") == settings]
+    if not same_settings:
+        raise FreezeError("no validation record was produced with the settings being frozen")
+    # evidence = records that count as scores now: expected backend and a reply the current
+    # extractor parses (the stored score field is not the criterion)
+    checked = [(r, usable_score(r, backend)) for r in same_settings]
+    matching = [r for r, (live, why) in checked if why is None]
+    if not matching:
+        why = sorted({why for _, (_, why) in checked})
+        raise FreezeError(f"no scored validation record was written under the backend description being frozen ({'; '.join(why)})")
+    models = {r.get("response_model") for r in matching}
+    if len(models) != 1 or None in models:
+        raise FreezeError(f"validation records name {len(models)} response model(s) {sorted(map(str, models))}; the backend identity must be one known id")
+    return {"response_model": models.pop(), "validation_records": len(matching)}
+
+
+def build_judge_frozen(jcfg: dict, correct_threshold: float, repo_root: str | Path = ".", validation: dict | None = None, records: list[dict] | None = None, manifest_path: str | Path = JUDGE_MANIFEST_PATH) -> dict:
     """The judge protocol freeze: request settings as sent, the correctness
-    threshold, and fingerprints of the system line and every template. Written
-    after development validation (plan section 7)."""
-    from qflip.judge import judge_fingerprints, judge_settings
+    threshold, fingerprints of the system line, every template, the
+    description digest and the score extractor, and the backend identity: the
+    config description (`judge.backend`) plus the response model id observed in
+    the validation records. A local judge also needs its checkpoint revision,
+    checked against the live serve manifest. Written after development
+    validation (plan section 7)."""
+    from qflip.judge import is_local_endpoint, judge_backend, judge_fingerprints, judge_settings
 
     if correct_threshold is None:
         raise FreezeError("the judge freeze needs correct_threshold (decided on development scenes)")
+    settings = judge_settings(jcfg)
+    backend = judge_backend(jcfg)
+    if is_local_endpoint(settings["base_url"]):
+        if not backend.get("revision"):
+            raise FreezeError("a local judge needs judge.backend.revision (the checkpoint revision served by serve_judge.sh)")
+        diffs = check_judge_manifest(backend, manifest_path)
+        if diffs:
+            raise FreezeError("local judge identity:\n  " + "\n  ".join(diffs))
+    if records is not None:
+        backend.update(backend_from_records(records, settings, backend))
     rev, dirty = git_revision(repo_root)
     return {
         "frozen": {"date": datetime.now(timezone.utc).isoformat(timespec="seconds"), "git_commit": rev, "git_dirty": dirty},
-        "judge": judge_settings(jcfg),
+        "judge": settings,
+        "backend": backend,
         "correct_threshold": correct_threshold,
         "fingerprints": judge_fingerprints(),
         "validation": validation or {},
@@ -359,9 +429,10 @@ def build_judge_frozen(jcfg: dict, correct_threshold: float, repo_root: str | Pa
 
 def check_judge_frozen(jf: dict | None, jcfg: dict | None = None) -> list[str]:
     """Differences between the judge freeze and the live code (system line,
-    templates) and, when `jcfg` is given, the live judge settings. Empty list =
-    the frozen judge is the one this code and config would run."""
-    from qflip.judge import JudgeSettingsError, judge_fingerprints, judge_settings
+    templates, extractor) and, when `jcfg` is given, the live judge settings
+    and backend description. Empty list = the frozen judge is the one this
+    code and config would run."""
+    from qflip.judge import BACKEND_KEYS, JudgeSettingsError, judge_backend, judge_fingerprints, judge_settings
 
     if jf is None:
         return [f"{JUDGE_FROZEN_PATH} missing (judge protocol freeze)"]
@@ -392,6 +463,21 @@ def check_judge_frozen(jf: dict | None, jcfg: dict | None = None) -> list[str]:
             diffs.append(f"template for {cell} differs from the frozen one ({sha} vs frozen {frozen_t[cell]})")
     if fp.get("visual_description_sha256") != live["visual_description_sha256"]:
         diffs.append("object-description file digest differs from the frozen one (a description-source update needs a new judge freeze)")
+    fe, le = fp.get("extractor") or {}, live["extractor"]
+    if fe.get("version") != le["version"] or fe.get("sha256") != le["sha256"]:
+        diffs.append(f"score extractor differs from the frozen one (live version {le['version']}, frozen {fe.get('version')}); scores are re-read under the frozen extractor only")
+    backend = jf.get("backend") or {}
+    if not backend.get("response_model"):
+        diffs.append("backend.response_model missing from the judge freeze (written from the validation records)")
+    if jcfg is not None:
+        try:
+            live_b = judge_backend(jcfg)
+        except JudgeSettingsError as e:
+            diffs.append(f"live judge backend: {e}")
+        else:
+            for k in BACKEND_KEYS:
+                if live_b.get(k) != backend.get(k):
+                    diffs.append(f"judge backend {k}: live={live_b.get(k)!r} frozen={backend.get(k)!r}")
     if jcfg is not None and frozen_settings is not None:
         try:
             live_settings = judge_settings(jcfg)

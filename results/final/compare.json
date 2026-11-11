@@ -1,0 +1,1635 @@
+{
+  "margin_edges": [
+    0.25,
+    0.5
+  ],
+  "n_boot_group": 2000,
+  "n_boot_contrast": 20000,
+  "seed": 0,
+  "min_questions": 30,
+  "min_scenes": 10,
+  "analysis_class": "confirmatory",
+  "provenance": {
+    "split": "final",
+    "analysis_class": "confirmatory",
+    "files": {
+      "results/final/bf16_clean.jsonl": {
+        "precision": "bf16",
+        "condition": "clean",
+        "model_path_or_id": "Qwen/Qwen2.5-VL-7B-Instruct",
+        "checkpoint_fingerprint": "hf:Qwen/Qwen2.5-VL-7B-Instruct@cc594898137f460bfe9f0759e9844b3ce807cfb5",
+        "code_revision": "7dfd13889e92f943ebae6d4792ccc597e6dcaa9d",
+        "created": "2026-11-08T00:25:24+00:00"
+      },
+      "results/final/int4_clean.jsonl": {
+        "precision": "int4",
+        "condition": "clean",
+        "model_path_or_id": "checkpoints/qwen2.5-vl-7b-awq-w4a16-g128",
+        "checkpoint_fingerprint": "sha256:2bb17c5214a52fe263dd879f2fd4956564906a97d1b6d0b51cf60a1a5d54347c",
+        "code_revision": "7dfd13889e92f943ebae6d4792ccc597e6dcaa9d",
+        "created": "2026-11-08T02:23:56+00:00"
+      },
+      "results/final/bf16_NoImage.jsonl": {
+        "precision": "bf16",
+        "condition": "NoImage",
+        "model_path_or_id": "Qwen/Qwen2.5-VL-7B-Instruct",
+        "checkpoint_fingerprint": "hf:Qwen/Qwen2.5-VL-7B-Instruct@cc594898137f460bfe9f0759e9844b3ce807cfb5",
+        "code_revision": "7dfd13889e92f943ebae6d4792ccc597e6dcaa9d",
+        "created": "2026-11-08T00:51:23+00:00"
+      },
+      "results/final/int4_NoImage.jsonl": {
+        "precision": "int4",
+        "condition": "NoImage",
+        "model_path_or_id": "checkpoints/qwen2.5-vl-7b-awq-w4a16-g128",
+        "checkpoint_fingerprint": "sha256:2bb17c5214a52fe263dd879f2fd4956564906a97d1b6d0b51cf60a1a5d54347c",
+        "code_revision": "7dfd13889e92f943ebae6d4792ccc597e6dcaa9d",
+        "created": "2026-11-08T02:34:57+00:00"
+      },
+      "results/final/bf16_LowLight.jsonl": {
+        "precision": "bf16",
+        "condition": "LowLight",
+        "model_path_or_id": "Qwen/Qwen2.5-VL-7B-Instruct",
+        "checkpoint_fingerprint": "hf:Qwen/Qwen2.5-VL-7B-Instruct@cc594898137f460bfe9f0759e9844b3ce807cfb5",
+        "code_revision": "7dfd13889e92f943ebae6d4792ccc597e6dcaa9d",
+        "created": "2026-11-08T01:18:13+00:00"
+      },
+      "results/final/int4_LowLight.jsonl": {
+        "precision": "int4",
+        "condition": "LowLight",
+        "model_path_or_id": "checkpoints/qwen2.5-vl-7b-awq-w4a16-g128",
+        "checkpoint_fingerprint": "sha256:2bb17c5214a52fe263dd879f2fd4956564906a97d1b6d0b51cf60a1a5d54347c",
+        "code_revision": "7dfd13889e92f943ebae6d4792ccc597e6dcaa9d",
+        "created": "2026-11-08T02:46:08+00:00"
+      },
+      "results/final/bf16_Fog.jsonl": {
+        "precision": "bf16",
+        "condition": "Fog",
+        "model_path_or_id": "Qwen/Qwen2.5-VL-7B-Instruct",
+        "checkpoint_fingerprint": "hf:Qwen/Qwen2.5-VL-7B-Instruct@cc594898137f460bfe9f0759e9844b3ce807cfb5",
+        "code_revision": "7dfd13889e92f943ebae6d4792ccc597e6dcaa9d",
+        "created": "2026-11-08T01:44:54+00:00"
+      },
+      "results/final/int4_Fog.jsonl": {
+        "precision": "int4",
+        "condition": "Fog",
+        "model_path_or_id": "checkpoints/qwen2.5-vl-7b-awq-w4a16-g128",
+        "checkpoint_fingerprint": "sha256:2bb17c5214a52fe263dd879f2fd4956564906a97d1b6d0b51cf60a1a5d54347c",
+        "code_revision": "7dfd13889e92f943ebae6d4792ccc597e6dcaa9d",
+        "created": "2026-11-08T02:58:11+00:00"
+      }
+    },
+    "frozen": {
+      "date": "2026-11-08T00:06:06+00:00",
+      "git_commit": "7dfd13889e92f943ebae6d4792ccc597e6dcaa9d",
+      "git_dirty": false,
+      "protocol_snapshot": "manifests/PROTOCOL_frozen.md",
+      "requirements_file": "manifests/requirements_frozen.txt",
+      "requirements_sha256": "7a6db2399fabc8f57c7564fb06dd7774b5e22531a9bb503469af08fe661d5bc6",
+      "split_sha256": "4f450077b5d1809652b5a69ef58408378751e6f87cc089258375644b225979fb",
+      "exclusions_sha256": "9a26a05ec3e2b1da947628f84a176f6f70aece7950a579193fbf1a533902512f",
+      "annotations_sha256": "50ee8295313b70810bdd7f04d4953b5f5d5d45b2da1a291e87fc108b4df270de",
+      "prompt_sha256": "24044483e7f02a628e8f17dfc8a1f54aafbcb43e98d0b5e53e7815c415d6fbd3",
+      "core_config_sha256": "b16bd628eae2e112909e489df0f08219c2951858c460a93f4b668cb2d73b8950",
+      "protocol_snapshot_sha256": "cbeb1c6ffc9c9c1e84a226ee948ab9b76c5f6ac5086d93a5c72547208f931996"
+    }
+  },
+  "mcq": {
+    "groups": {
+      "cell": [
+        {
+          "label": "behavior/MCQ",
+          "n": 532,
+          "scenes": 116,
+          "ref_acc": 0.35714285714285715,
+          "quant_acc": 0.32706766917293234,
+          "acc_delta": -0.03007518796992481,
+          "harmful": 34,
+          "beneficial": 18,
+          "neutral_change": 33,
+          "unchanged": 447,
+          "harmful_rate": 0.17894736842105263,
+          "change_rate": 0.15977443609022557,
+          "ref_score_mean": null,
+          "quant_score_mean": null,
+          "assessed": true,
+          "ci": {
+            "harmful_rate": [
+              0.125,
+              0.24305555555555555
+            ],
+            "acc_delta": [
+              -0.06060606060606061,
+              0.001851851851851852
+            ],
+            "change_rate": [
+              0.125,
+              0.19964028776978418
+            ]
+          }
+        },
+        {
+          "label": "perception/MCQ",
+          "n": 532,
+          "scenes": 116,
+          "ref_acc": 0.4398496240601504,
+          "quant_acc": 0.40601503759398494,
+          "acc_delta": -0.03383458646616541,
+          "harmful": 21,
+          "beneficial": 3,
+          "neutral_change": 22,
+          "unchanged": 486,
+          "harmful_rate": 0.08974358974358974,
+          "change_rate": 0.08646616541353383,
+          "ref_score_mean": null,
+          "quant_score_mean": null,
+          "assessed": true,
+          "ci": {
+            "harmful_rate": [
+              0.048484848484848485,
+              0.14049586776859505
+            ],
+            "acc_delta": [
+              -0.056818181818181816,
+              -0.013059701492537313
+            ],
+            "change_rate": [
+              0.058712121212121215,
+              0.11742424242424243
+            ]
+          }
+        }
+      ],
+      "n_views": [
+        {
+          "label": "1",
+          "n": 532,
+          "scenes": 116,
+          "ref_acc": 0.4398496240601504,
+          "quant_acc": 0.40601503759398494,
+          "acc_delta": -0.03383458646616541,
+          "harmful": 21,
+          "beneficial": 3,
+          "neutral_change": 22,
+          "unchanged": 486,
+          "harmful_rate": 0.08974358974358974,
+          "change_rate": 0.08646616541353383,
+          "ref_score_mean": null,
+          "quant_score_mean": null,
+          "assessed": true,
+          "ci": {
+            "harmful_rate": [
+              0.048484848484848485,
+              0.14049586776859505
+            ],
+            "acc_delta": [
+              -0.056818181818181816,
+              -0.013059701492537313
+            ],
+            "change_rate": [
+              0.058712121212121215,
+              0.11742424242424243
+            ]
+          }
+        },
+        {
+          "label": "6",
+          "n": 532,
+          "scenes": 116,
+          "ref_acc": 0.35714285714285715,
+          "quant_acc": 0.32706766917293234,
+          "acc_delta": -0.03007518796992481,
+          "harmful": 34,
+          "beneficial": 18,
+          "neutral_change": 33,
+          "unchanged": 447,
+          "harmful_rate": 0.17894736842105263,
+          "change_rate": 0.15977443609022557,
+          "ref_score_mean": null,
+          "quant_score_mean": null,
+          "assessed": true,
+          "ci": {
+            "harmful_rate": [
+              0.125,
+              0.24305555555555555
+            ],
+            "acc_delta": [
+              -0.06060606060606061,
+              0.001851851851851852
+            ],
+            "change_rate": [
+              0.125,
+              0.19964028776978418
+            ]
+          }
+        }
+      ],
+      "margin": [
+        {
+          "label": "[0,0.25)",
+          "n": 524,
+          "scenes": 112,
+          "ref_acc": 0.4179389312977099,
+          "quant_acc": 0.3568702290076336,
+          "acc_delta": -0.061068702290076333,
+          "harmful": 53,
+          "beneficial": 21,
+          "neutral_change": 55,
+          "unchanged": 395,
+          "harmful_rate": 0.2420091324200913,
+          "change_rate": 0.24618320610687022,
+          "ref_score_mean": null,
+          "quant_score_mean": null,
+          "assessed": true,
+          "ci": {
+            "harmful_rate": [
+              0.18095238095238095,
+              0.3068181818181818
+            ],
+            "acc_delta": [
+              -0.09829867674858223,
+              -0.024299065420560748
+            ],
+            "change_rate": [
+              0.20528455284552846,
+              0.2894211576846307
+            ]
+          }
+        },
+        {
+          "label": "[0.25,0.5)",
+          "n": 333,
+          "scenes": 101,
+          "ref_acc": 0.4864864864864865,
+          "quant_acc": 0.4804804804804805,
+          "acc_delta": -0.006006006006006006,
+          "harmful": 2,
+          "beneficial": 0,
+          "neutral_change": 0,
+          "unchanged": 331,
+          "harmful_rate": 0.012345679012345678,
+          "change_rate": 0.006006006006006006,
+          "ref_score_mean": null,
+          "quant_score_mean": null,
+          "assessed": true,
+          "ci": {
+            "harmful_rate": [
+              0.0,
+              0.03007518796992481
+            ],
+            "acc_delta": [
+              -0.015197568389057751,
+              0.0
+            ],
+            "change_rate": [
+              0.0,
+              0.015197568389057751
+            ]
+          }
+        },
+        {
+          "label": "[0.5,1]",
+          "n": 207,
+          "scenes": 61,
+          "ref_acc": 0.20772946859903382,
+          "quant_acc": 0.20772946859903382,
+          "acc_delta": 0.0,
+          "harmful": 0,
+          "beneficial": 0,
+          "neutral_change": 0,
+          "unchanged": 207,
+          "harmful_rate": 0.0,
+          "change_rate": 0.0,
+          "ref_score_mean": null,
+          "quant_score_mean": null,
+          "assessed": true,
+          "ci": {
+            "harmful_rate": [
+              0.0,
+              0.0
+            ],
+            "acc_delta": [
+              0.0,
+              0.0
+            ],
+            "change_rate": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      ],
+      "condition": [
+        {
+          "label": "Fog",
+          "n": 266,
+          "scenes": 116,
+          "ref_acc": 0.43609022556390975,
+          "quant_acc": 0.37969924812030076,
+          "acc_delta": -0.05639097744360902,
+          "harmful": 21,
+          "beneficial": 6,
+          "neutral_change": 12,
+          "unchanged": 227,
+          "harmful_rate": 0.1810344827586207,
+          "change_rate": 0.14661654135338345,
+          "ref_score_mean": null,
+          "quant_score_mean": null,
+          "assessed": true,
+          "ci": {
+            "harmful_rate": [
+              0.11764705882352941,
+              0.25833333333333336
+            ],
+            "acc_delta": [
+              -0.09375,
+              -0.01937984496124031
+            ],
+            "change_rate": [
+              0.10740740740740741,
+              0.19230769230769232
+            ]
+          }
+        },
+        {
+          "label": "LowLight",
+          "n": 266,
+          "scenes": 116,
+          "ref_acc": 0.40225563909774437,
+          "quant_acc": 0.37593984962406013,
+          "acc_delta": -0.02631578947368421,
+          "harmful": 12,
+          "beneficial": 5,
+          "neutral_change": 15,
+          "unchanged": 234,
+          "harmful_rate": 0.11214953271028037,
+          "change_rate": 0.12030075187969924,
+          "ref_score_mean": null,
+          "quant_score_mean": null,
+          "assessed": true,
+          "ci": {
+            "harmful_rate": [
+              0.05555555555555555,
+              0.17757009345794392
+            ],
+            "acc_delta": [
+              -0.05426356589147287,
+              0.0034965034965034965
+            ],
+            "change_rate": [
+              0.08333333333333333,
+              0.16058394160583941
+            ]
+          }
+        },
+        {
+          "label": "NoImage",
+          "n": 266,
+          "scenes": 116,
+          "ref_acc": 0.35714285714285715,
+          "quant_acc": 0.3533834586466165,
+          "acc_delta": -0.0037593984962406013,
+          "harmful": 7,
+          "beneficial": 6,
+          "neutral_change": 14,
+          "unchanged": 239,
+          "harmful_rate": 0.07368421052631578,
+          "change_rate": 0.10150375939849623,
+          "ref_score_mean": null,
+          "quant_score_mean": null,
+          "assessed": true,
+          "ci": {
+            "harmful_rate": [
+              0.02586206896551724,
+              0.12790697674418605
+            ],
+            "acc_delta": [
+              -0.031007751937984496,
+              0.022727272727272728
+            ],
+            "change_rate": [
+              0.06818181818181818,
+              0.13533834586466165
+            ]
+          }
+        },
+        {
+          "label": "clean",
+          "n": 266,
+          "scenes": 116,
+          "ref_acc": 0.39849624060150374,
+          "quant_acc": 0.35714285714285715,
+          "acc_delta": -0.041353383458646614,
+          "harmful": 15,
+          "beneficial": 4,
+          "neutral_change": 14,
+          "unchanged": 233,
+          "harmful_rate": 0.14150943396226415,
+          "change_rate": 0.12406015037593984,
+          "ref_score_mean": null,
+          "quant_score_mean": null,
+          "assessed": true,
+          "ci": {
+            "harmful_rate": [
+              0.08108108108108109,
+              0.21052631578947367
+            ],
+            "acc_delta": [
+              -0.07633587786259542,
+              -0.011278195488721804
+            ],
+            "change_rate": [
+              0.08582089552238806,
+              0.16165413533834586
+            ]
+          }
+        }
+      ]
+    },
+    "overall": {
+      "label": "all",
+      "n": 1064,
+      "scenes": 116,
+      "ref_acc": 0.39849624060150374,
+      "quant_acc": 0.36654135338345867,
+      "acc_delta": -0.03195488721804511,
+      "harmful": 55,
+      "beneficial": 21,
+      "neutral_change": 55,
+      "unchanged": 933,
+      "harmful_rate": 0.12971698113207547,
+      "change_rate": 0.1231203007518797,
+      "ref_score_mean": null,
+      "quant_score_mean": null,
+      "assessed": true,
+      "ci": {
+        "harmful_rate": [
+          0.09615384615384616,
+          0.16826923076923078
+        ],
+        "acc_delta": [
+          -0.05,
+          -0.014097744360902255
+        ],
+        "change_rate": [
+          0.10096153846153846,
+          0.14738805970149255
+        ]
+      }
+    }
+  },
+  "contrasts": [
+    {
+      "name": "C1",
+      "a_label": "margin [0,0.25)",
+      "b_label": "other margin bins",
+      "population": "clean, pairs with a margin",
+      "a": {
+        "n": 133,
+        "scenes": 95,
+        "ref_correct": 47,
+        "ref_correct_scenes": 41,
+        "harmful": 15,
+        "harmful_rate": 0.3191489361702128
+      },
+      "b": {
+        "n": 133,
+        "scenes": 92,
+        "ref_correct": 59,
+        "ref_correct_scenes": 47,
+        "harmful": 0,
+        "harmful_rate": 0.0
+      },
+      "delta": 0.3191489361702128,
+      "ci95": [
+        0.18421052631578946,
+        0.4642857142857143
+      ],
+      "ci99_bonferroni": [
+        0.14,
+        0.5116279069767442
+      ],
+      "excludes_zero_raw": true,
+      "excludes_zero_adjusted": true,
+      "n_boot_contrast": 20000,
+      "valid_draws": 20000,
+      "intervals_available": true,
+      "assessed": true,
+      "reason": null,
+      "reason_detail": null
+    },
+    {
+      "name": "C2",
+      "a_label": "behavior/MCQ",
+      "b_label": "perception/MCQ",
+      "population": "clean",
+      "a": {
+        "n": 133,
+        "scenes": 116,
+        "ref_correct": 51,
+        "ref_correct_scenes": 47,
+        "harmful": 9,
+        "harmful_rate": 0.17647058823529413
+      },
+      "b": {
+        "n": 133,
+        "scenes": 116,
+        "ref_correct": 55,
+        "ref_correct_scenes": 51,
+        "harmful": 6,
+        "harmful_rate": 0.10909090909090909
+      },
+      "delta": 0.06737967914438504,
+      "ci95": [
+        -0.06293706293706294,
+        0.19966832504145937
+      ],
+      "ci99_bonferroni": [
+        -0.10327635327635326,
+        0.24716553287981857
+      ],
+      "excludes_zero_raw": false,
+      "excludes_zero_adjusted": false,
+      "n_boot_contrast": 20000,
+      "valid_draws": 20000,
+      "intervals_available": true,
+      "assessed": true,
+      "reason": null,
+      "reason_detail": null
+    },
+    {
+      "name": "C4a",
+      "a_label": "NoImage",
+      "b_label": "clean",
+      "population": "common support (ids paired without error under both)",
+      "a": {
+        "n": 266,
+        "scenes": 116,
+        "ref_correct": 95,
+        "ref_correct_scenes": 72,
+        "harmful": 7,
+        "harmful_rate": 0.07368421052631578
+      },
+      "b": {
+        "n": 266,
+        "scenes": 116,
+        "ref_correct": 106,
+        "ref_correct_scenes": 78,
+        "harmful": 15,
+        "harmful_rate": 0.14150943396226415
+      },
+      "delta": -0.06782522343594836,
+      "ci95": [
+        -0.15913781242834213,
+        0.019394714407502137
+      ],
+      "ci99_bonferroni": [
+        -0.19196428571428573,
+        0.043244949494949496
+      ],
+      "excludes_zero_raw": false,
+      "excludes_zero_adjusted": false,
+      "n_boot_contrast": 20000,
+      "valid_draws": 20000,
+      "intervals_available": true,
+      "assessed": true,
+      "reason": null,
+      "reason_detail": null,
+      "support_dropped": {
+        "clean/bf16": 0,
+        "clean/int4": 0,
+        "NoImage/bf16": 0,
+        "NoImage/int4": 0
+      }
+    },
+    {
+      "name": "C4b",
+      "a_label": "LowLight",
+      "b_label": "clean",
+      "population": "common support (ids paired without error under both)",
+      "a": {
+        "n": 266,
+        "scenes": 116,
+        "ref_correct": 107,
+        "ref_correct_scenes": 79,
+        "harmful": 12,
+        "harmful_rate": 0.11214953271028037
+      },
+      "b": {
+        "n": 266,
+        "scenes": 116,
+        "ref_correct": 106,
+        "ref_correct_scenes": 78,
+        "harmful": 15,
+        "harmful_rate": 0.14150943396226415
+      },
+      "delta": -0.029359901251983775,
+      "ci95": [
+        -0.11008403361344535,
+        0.05020320344250538
+      ],
+      "ci99_bonferroni": [
+        -0.13727405959941377,
+        0.07532956685499059
+      ],
+      "excludes_zero_raw": false,
+      "excludes_zero_adjusted": false,
+      "n_boot_contrast": 20000,
+      "valid_draws": 20000,
+      "intervals_available": true,
+      "assessed": true,
+      "reason": null,
+      "reason_detail": null,
+      "support_dropped": {
+        "clean/bf16": 0,
+        "clean/int4": 0,
+        "LowLight/bf16": 0,
+        "LowLight/int4": 0
+      }
+    },
+    {
+      "name": "C4c",
+      "a_label": "Fog",
+      "b_label": "clean",
+      "population": "common support (ids paired without error under both)",
+      "a": {
+        "n": 266,
+        "scenes": 116,
+        "ref_correct": 116,
+        "ref_correct_scenes": 84,
+        "harmful": 21,
+        "harmful_rate": 0.1810344827586207
+      },
+      "b": {
+        "n": 266,
+        "scenes": 116,
+        "ref_correct": 106,
+        "ref_correct_scenes": 78,
+        "harmful": 15,
+        "harmful_rate": 0.14150943396226415
+      },
+      "delta": 0.03952504879635654,
+      "ci95": [
+        -0.0520042295491685,
+        0.13247311827956987
+      ],
+      "ci99_bonferroni": [
+        -0.08110936682365255,
+        0.16139542275905913
+      ],
+      "excludes_zero_raw": false,
+      "excludes_zero_adjusted": false,
+      "n_boot_contrast": 20000,
+      "valid_draws": 20000,
+      "intervals_available": true,
+      "assessed": true,
+      "reason": null,
+      "reason_detail": null,
+      "support_dropped": {
+        "clean/bf16": 0,
+        "clean/int4": 0,
+        "Fog/bf16": 0,
+        "Fog/int4": 0
+      }
+    }
+  ],
+  "descriptive": [
+    {
+      "name": "views",
+      "a_label": "1 view",
+      "b_label": "6 views",
+      "population": "clean",
+      "a": {
+        "n": 133,
+        "scenes": 116,
+        "ref_correct": 55,
+        "ref_correct_scenes": 51,
+        "harmful": 6,
+        "harmful_rate": 0.10909090909090909
+      },
+      "b": {
+        "n": 133,
+        "scenes": 116,
+        "ref_correct": 51,
+        "ref_correct_scenes": 47,
+        "harmful": 9,
+        "harmful_rate": 0.17647058823529413
+      },
+      "delta": -0.06737967914438504,
+      "ci95": [
+        -0.19925925925925925,
+        0.06300940438871472
+      ],
+      "ci99_bonferroni": null,
+      "excludes_zero_raw": false,
+      "excludes_zero_adjusted": null,
+      "n_boot_contrast": 20000,
+      "valid_draws": 20000,
+      "intervals_available": true,
+      "assessed": true,
+      "reason": null,
+      "reason_detail": null,
+      "confirmatory": false,
+      "note": "descriptive only: in the final split every behavior MCQ has six views and every perception MCQ has one, so \u0394_views = \u2212\u0394_task in every draw"
+    }
+  ],
+  "contrast_settings": {
+    "n_boot_contrast": 20000,
+    "seed": 0,
+    "support_min_ref_correct": 20,
+    "support_min_ref_scenes": 10,
+    "family_size": 5,
+    "alpha_adjusted": 0.01
+  },
+  "coverage": {
+    "clean": {
+      "behavior/MCQ": {
+        "eligible": 133,
+        "present_ref": 133,
+        "present_quant": 133,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 133,
+        "unpaired": 0,
+        "scenes": 116,
+        "assessed": true
+      },
+      "perception/MCQ": {
+        "eligible": 133,
+        "present_ref": 133,
+        "present_quant": 133,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 133,
+        "unpaired": 0,
+        "scenes": 116,
+        "assessed": true
+      },
+      "perception/VQA": {
+        "eligible": 133,
+        "present_ref": 133,
+        "present_quant": 133,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 0,
+        "unpaired": 133,
+        "scenes": 0,
+        "assessed": false
+      },
+      "planning/VQA": {
+        "eligible": 399,
+        "present_ref": 399,
+        "present_quant": 399,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 0,
+        "unpaired": 399,
+        "scenes": 0,
+        "assessed": false
+      },
+      "prediction/VQA": {
+        "eligible": 40,
+        "present_ref": 40,
+        "present_quant": 40,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 0,
+        "unpaired": 40,
+        "scenes": 0,
+        "assessed": false
+      }
+    },
+    "NoImage": {
+      "behavior/MCQ": {
+        "eligible": 133,
+        "present_ref": 133,
+        "present_quant": 133,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 133,
+        "unpaired": 0,
+        "scenes": 116,
+        "assessed": true
+      },
+      "perception/MCQ": {
+        "eligible": 133,
+        "present_ref": 133,
+        "present_quant": 133,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 133,
+        "unpaired": 0,
+        "scenes": 116,
+        "assessed": true
+      },
+      "perception/VQA": {
+        "eligible": 133,
+        "present_ref": 133,
+        "present_quant": 133,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 0,
+        "unpaired": 133,
+        "scenes": 0,
+        "assessed": false
+      },
+      "planning/VQA": {
+        "eligible": 399,
+        "present_ref": 399,
+        "present_quant": 399,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 0,
+        "unpaired": 399,
+        "scenes": 0,
+        "assessed": false
+      },
+      "prediction/VQA": {
+        "eligible": 40,
+        "present_ref": 40,
+        "present_quant": 40,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 0,
+        "unpaired": 40,
+        "scenes": 0,
+        "assessed": false
+      }
+    },
+    "LowLight": {
+      "behavior/MCQ": {
+        "eligible": 133,
+        "present_ref": 133,
+        "present_quant": 133,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 133,
+        "unpaired": 0,
+        "scenes": 116,
+        "assessed": true
+      },
+      "perception/MCQ": {
+        "eligible": 133,
+        "present_ref": 133,
+        "present_quant": 133,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 133,
+        "unpaired": 0,
+        "scenes": 116,
+        "assessed": true
+      },
+      "perception/VQA": {
+        "eligible": 133,
+        "present_ref": 133,
+        "present_quant": 133,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 0,
+        "unpaired": 133,
+        "scenes": 0,
+        "assessed": false
+      },
+      "planning/VQA": {
+        "eligible": 399,
+        "present_ref": 399,
+        "present_quant": 399,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 0,
+        "unpaired": 399,
+        "scenes": 0,
+        "assessed": false
+      },
+      "prediction/VQA": {
+        "eligible": 40,
+        "present_ref": 40,
+        "present_quant": 40,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 0,
+        "unpaired": 40,
+        "scenes": 0,
+        "assessed": false
+      }
+    },
+    "Fog": {
+      "behavior/MCQ": {
+        "eligible": 133,
+        "present_ref": 133,
+        "present_quant": 133,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 133,
+        "unpaired": 0,
+        "scenes": 116,
+        "assessed": true
+      },
+      "perception/MCQ": {
+        "eligible": 133,
+        "present_ref": 133,
+        "present_quant": 133,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 133,
+        "unpaired": 0,
+        "scenes": 116,
+        "assessed": true
+      },
+      "perception/VQA": {
+        "eligible": 133,
+        "present_ref": 133,
+        "present_quant": 133,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 0,
+        "unpaired": 133,
+        "scenes": 0,
+        "assessed": false
+      },
+      "planning/VQA": {
+        "eligible": 399,
+        "present_ref": 399,
+        "present_quant": 399,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 0,
+        "unpaired": 399,
+        "scenes": 0,
+        "assessed": false
+      },
+      "prediction/VQA": {
+        "eligible": 40,
+        "present_ref": 40,
+        "present_quant": 40,
+        "errored_ref": 0,
+        "errored_quant": 0,
+        "paired": 0,
+        "unpaired": 40,
+        "scenes": 0,
+        "assessed": false
+      }
+    }
+  },
+  "harmful_examples": [
+    {
+      "question_id": "1d4db80d-bd063ae8-b7da0bc714",
+      "scene_token": "1d4db80d13f342aba4881b38099bc4b7",
+      "condition": "Fog",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.1338539471355693,
+      "ref_answer": "B",
+      "quant_answer": "A",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "240d1548-e154fa0b-1bc4fccc56",
+      "scene_token": "240d15482599449a9bd0432fbfa688ab",
+      "condition": "Fog",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.0,
+      "ref_answer": "B",
+      "quant_answer": "A",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "3032b651-6e349f86-1871b4106d",
+      "scene_token": "3032b651c72e4b5c86d4dea1b4930689",
+      "condition": "Fog",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.13689821394809476,
+      "ref_answer": "B",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "3032b651-c1446529-141aa38fac",
+      "scene_token": "3032b651c72e4b5c86d4dea1b4930689",
+      "condition": "Fog",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.13923519069263968,
+      "ref_answer": "D",
+      "quant_answer": "A",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "3469d30a-011b8e75-4acece530a",
+      "scene_token": "3469d30a6e2a4d878fb0ff899346b7de",
+      "condition": "Fog",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.05245638285498949,
+      "ref_answer": "C",
+      "quant_answer": "D",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "37284f81-fcafd394-fd175ec751",
+      "scene_token": "37284f813cc74496971ff58f5d37400a",
+      "condition": "Fog",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.03832923951151479,
+      "ref_answer": "C",
+      "quant_answer": "B",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "4ed62829-c16bf051-fb93e76780",
+      "scene_token": "4ed628299b1e45a3a73704e8cf8287a9",
+      "condition": "Fog",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.0,
+      "ref_answer": "A",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "7e2d9f38-042f4c4b-d27bffe655",
+      "scene_token": "7e2d9f38f8eb409ea57b3864bb4ed098",
+      "condition": "Fog",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.08940063256696418,
+      "ref_answer": "D",
+      "quant_answer": "A",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "ab8bf18d-e2143daf-343405b5a3",
+      "scene_token": "ab8bf18dfce14db4b8213b88f5dc1429",
+      "condition": "Fog",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.08323658960745223,
+      "ref_answer": "B",
+      "quant_answer": "A",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "c34206e6-10a4d313-6849916919",
+      "scene_token": "c34206e65a1442828b950b0ca52098b7",
+      "condition": "Fog",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.0400715378069193,
+      "ref_answer": "C",
+      "quant_answer": "A",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "e323a27a-3c730292-62520a731f",
+      "scene_token": "e323a27a0ba94ab5ab11010d778cd41f",
+      "condition": "Fog",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.11303700884198997,
+      "ref_answer": "B",
+      "quant_answer": "D",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "ef5f9458-cddb14d9-509e2d8e72",
+      "scene_token": "ef5f945852e84fcc88cab506746a6636",
+      "condition": "Fog",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.03642905174448585,
+      "ref_answer": "D",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "fb3aaad9-80153dcc-31375f4724",
+      "scene_token": "fb3aaad97849430cbc32891319c9be10",
+      "condition": "Fog",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.11244583262886193,
+      "ref_answer": "D",
+      "quant_answer": "A",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "0e247ba6-2700a5b2-61f2d7e302",
+      "scene_token": "0e247ba64b9d4a34a7256b6c173b1b5d",
+      "condition": "Fog",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.05528974958860439,
+      "ref_answer": "B",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "4284a8d9-81bb5113-0a02cf102e",
+      "scene_token": "4284a8d9b40d42edb9725543db91381e",
+      "condition": "Fog",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.08897784957464033,
+      "ref_answer": "A",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "78c5f7d7-4c4e1e94-7c5b6c0951",
+      "scene_token": "78c5f7d7b547483c906d8524a8c3190f",
+      "condition": "Fog",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.0,
+      "ref_answer": "B",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "9f5f2211-3e1d882d-f26a2baf80",
+      "scene_token": "9f5f2211d6f943a89dd87bbe9703539d",
+      "condition": "Fog",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.19941175287519092,
+      "ref_answer": "B",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "b79d940d-dae47bb9-f793ae6b05",
+      "scene_token": "b79d940da8df43d09ee972c2414ffeca",
+      "condition": "Fog",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.08232891627625277,
+      "ref_answer": "A",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "bc4fd5a0-f317f943-9bffebf0bf",
+      "scene_token": "bc4fd5a05a004333b9411754630f4cba",
+      "condition": "Fog",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.04223668753558335,
+      "ref_answer": "A",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "dcdea563-0f6432a5-67d468e53a",
+      "scene_token": "dcdea563c77544bb887de11d87619d3c",
+      "condition": "Fog",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.047260116678208786,
+      "ref_answer": "A",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "e15260c4-7a639c70-6a24bed67f",
+      "scene_token": "e15260c4ed5b4505900d497ef92ddd2d",
+      "condition": "Fog",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.04686191902051973,
+      "ref_answer": "A",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "37284f81-fcafd394-fd175ec751",
+      "scene_token": "37284f813cc74496971ff58f5d37400a",
+      "condition": "LowLight",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.07379813428289572,
+      "ref_answer": "C",
+      "quant_answer": "B",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "73030fb6-8de7ec06-24e410c705",
+      "scene_token": "73030fb67d3c46cfb5e590168088ae39",
+      "condition": "LowLight",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.0,
+      "ref_answer": "C",
+      "quant_answer": "D",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "c2d5a5e7-7a8188fd-1bc89a72e7",
+      "scene_token": "c2d5a5e7f7dc4e12b967fff22a0e1bf1",
+      "condition": "LowLight",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.04311413542064013,
+      "ref_answer": "C",
+      "quant_answer": "B",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "e5a3df5f-474e5ee2-a6c3f000be",
+      "scene_token": "e5a3df5fe95149b5b974af1d14277ea7",
+      "condition": "LowLight",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.0,
+      "ref_answer": "A",
+      "quant_answer": "D",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "eac3102e-ee4ed593-439f888048",
+      "scene_token": "eac3102e4cc24d4b95532bcc711a902f",
+      "condition": "LowLight",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.09311591269711122,
+      "ref_answer": "B",
+      "quant_answer": "A",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "240d1548-e154fa0b-d49b35d24f",
+      "scene_token": "240d15482599449a9bd0432fbfa688ab",
+      "condition": "LowLight",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.049609482794628346,
+      "ref_answer": "B",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "4284a8d9-81bb5113-0a02cf102e",
+      "scene_token": "4284a8d9b40d42edb9725543db91381e",
+      "condition": "LowLight",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.04368548034008529,
+      "ref_answer": "A",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "57f5503b-27ec52e7-d84762f12f",
+      "scene_token": "57f5503bf63144b8bf450315e860f58e",
+      "condition": "LowLight",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.04207684234839193,
+      "ref_answer": "B",
+      "quant_answer": "A",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "78c5f7d7-4c4e1e94-7c5b6c0951",
+      "scene_token": "78c5f7d7b547483c906d8524a8c3190f",
+      "condition": "LowLight",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.15798669189537162,
+      "ref_answer": "B",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "bc4fd5a0-f317f943-9bffebf0bf",
+      "scene_token": "bc4fd5a05a004333b9411754630f4cba",
+      "condition": "LowLight",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.07987458066810266,
+      "ref_answer": "A",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "c6da5920-378b6469-df35ab0211",
+      "scene_token": "c6da5920d2bc459bb3bc51ee6b9fdd7e",
+      "condition": "LowLight",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.1555840928380539,
+      "ref_answer": "B",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "d0b2d916-f1999ab8-59ac357ab5",
+      "scene_token": "d0b2d916178a402a842c88f394d7d7e8",
+      "condition": "LowLight",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.0,
+      "ref_answer": "A",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "16c90eed-9ffb0eec-d7caaa08c0",
+      "scene_token": "16c90eedfc7943a5a4c64e84d18876a2",
+      "condition": "NoImage",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.37220305543546633,
+      "ref_answer": "C",
+      "quant_answer": "D",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "19640fe4-c217fc76-42fe2a9f2a",
+      "scene_token": "19640fe4b6894f97b16e0faad51432b4",
+      "condition": "NoImage",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.14046466596275686,
+      "ref_answer": "B",
+      "quant_answer": "A",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "3032b651-6e349f86-1871b4106d",
+      "scene_token": "3032b651c72e4b5c86d4dea1b4930689",
+      "condition": "NoImage",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.1476202175501009,
+      "ref_answer": "B",
+      "quant_answer": "A",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "45275e70-a02918af-505a702f17",
+      "scene_token": "45275e709d4a4b0592d57850d8e8bd8d",
+      "condition": "NoImage",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.2004059560026355,
+      "ref_answer": "B",
+      "quant_answer": "A",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "9ac6dff0-7f32be25-618b2e25be",
+      "scene_token": "9ac6dff089a84a6d8f066122443a10db",
+      "condition": "NoImage",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.0,
+      "ref_answer": "A",
+      "quant_answer": "D",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "e323a27a-3c730292-62520a731f",
+      "scene_token": "e323a27a0ba94ab5ab11010d778cd41f",
+      "condition": "NoImage",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.25259040413016964,
+      "ref_answer": "B",
+      "quant_answer": "D",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "f9e460f0-8e8e071e-adeb3c3088",
+      "scene_token": "f9e460f092c94466b1211704b5a8859d",
+      "condition": "NoImage",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.133087195051783,
+      "ref_answer": "B",
+      "quant_answer": "A",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "10dfdae8-2e3ff290-4cbef9750e",
+      "scene_token": "10dfdae842b543938a230f25a1e9f934",
+      "condition": "clean",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.03892833554477915,
+      "ref_answer": "D",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "4ed62829-c16bf051-fb93e76780",
+      "scene_token": "4ed628299b1e45a3a73704e8cf8287a9",
+      "condition": "clean",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.09241375000116442,
+      "ref_answer": "A",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "79770033-fbc07f14-d659520519",
+      "scene_token": "797700339b014fb6aa61c1ea3778d587",
+      "condition": "clean",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.0,
+      "ref_answer": "B",
+      "quant_answer": "D",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "befb9609-82828760-02a753b780",
+      "scene_token": "befb96098dc14988ac468a6bd3cbd4a0",
+      "condition": "clean",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.046638751259505784,
+      "ref_answer": "A",
+      "quant_answer": "D",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "c2d5a5e7-7a8188fd-1bc89a72e7",
+      "scene_token": "c2d5a5e7f7dc4e12b967fff22a0e1bf1",
+      "condition": "clean",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.08736284060940802,
+      "ref_answer": "C",
+      "quant_answer": "B",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "c34206e6-10a4d313-6849916919",
+      "scene_token": "c34206e65a1442828b950b0ca52098b7",
+      "condition": "clean",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.08062084021159899,
+      "ref_answer": "C",
+      "quant_answer": "A",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "eac3102e-ee4ed593-439f888048",
+      "scene_token": "eac3102e4cc24d4b95532bcc711a902f",
+      "condition": "clean",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.13657816105693626,
+      "ref_answer": "B",
+      "quant_answer": "A",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "fb3aaad9-80153dcc-31375f4724",
+      "scene_token": "fb3aaad97849430cbc32891319c9be10",
+      "condition": "clean",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.05620416076549534,
+      "ref_answer": "D",
+      "quant_answer": "A",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "fd2d419d-3c8a9403-5da3755847",
+      "scene_token": "fd2d419d4cf84a2d84922b9b7d2cea4d",
+      "condition": "clean",
+      "cell": "behavior/MCQ",
+      "n_views": 6,
+      "margin": 0.05206135985179172,
+      "ref_answer": "C",
+      "quant_answer": "A",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "1fbcc26e-03d203bc-e4cdeb1b70",
+      "scene_token": "1fbcc26ebf6948bb964d3ae74939e8ea",
+      "condition": "clean",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.0,
+      "ref_answer": "A",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "57f5503b-27ec52e7-d84762f12f",
+      "scene_token": "57f5503bf63144b8bf450315e860f58e",
+      "condition": "clean",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.0,
+      "ref_answer": "B",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "9f5f2211-3e1d882d-f26a2baf80",
+      "scene_token": "9f5f2211d6f943a89dd87bbe9703539d",
+      "condition": "clean",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.047158580078202894,
+      "ref_answer": "B",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "befb9609-82828760-6ea5d1e557",
+      "scene_token": "befb96098dc14988ac468a6bd3cbd4a0",
+      "condition": "clean",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.04516827619581648,
+      "ref_answer": "A",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "d90b94e8-786371ca-0a2bbe9b63",
+      "scene_token": "d90b94e8bfd446cd9407f48665122268",
+      "condition": "clean",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.0,
+      "ref_answer": "B",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    },
+    {
+      "question_id": "dcdea563-0f6432a5-67d468e53a",
+      "scene_token": "dcdea563c77544bb887de11d87619d3c",
+      "condition": "clean",
+      "cell": "perception/MCQ",
+      "n_views": 1,
+      "margin": 0.04739749300826934,
+      "ref_answer": "A",
+      "quant_answer": "C",
+      "ref_score": null,
+      "quant_score": null
+    }
+  ]
+}

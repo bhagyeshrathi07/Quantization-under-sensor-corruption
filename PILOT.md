@@ -202,6 +202,7 @@ Results and manifests land in the repo checkout under `$S`; `git add results`-st
 ## GPU session log
 
 - **October 15 (host m:3752, 300 W cap, vLLM 0.31):** gate pilot, LowLight 20 questions both precisions. `manifests/gate_week5.md`.
+- **November 7–8 (same host):** core freeze, server verification, own-checkpoint stability, profile ×3, the 8-run matrix (zero errors), confirmatory analysis, judge trials. `manifests/session2_2026-11-08.md`.
 - **November 3 (host m:11851, 450 W, vLLM 0.33):** the October instance had been destroyed by its host; rebuilt from `vast_setup.sh`. Clean images, KV flag and streaming verified, clean/Fog/NoImage slices both precisions, stability, profile session 1, own AWQ checkpoint built and smoke-tested. `manifests/session1_2026-11-03.md`. Everything below in the checklist is done except the freeze.
 
 ## Next GPU session checklist (written after the October 15 pilot; completed November 3)

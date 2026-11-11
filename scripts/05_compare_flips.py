@@ -78,7 +78,7 @@ def report(label: str, pairs, n_boot: int, seed: int, min_n: int, min_scenes: in
     return {"label": label, **s, "assessed": True, "ci": ci}
 
 
-def load_vqa_pairs(ref_path: str, quant_path: str, threshold: float, settings: dict, desc_data: dict, question_text):
+def load_vqa_pairs(ref_path: str, quant_path: str, threshold: float, settings: dict, desc_data: dict, question_text, backend: dict | None = None):
     """Production VQA scores: replicate 0 whose input hash matches the current
     answer under the (frozen or configured) judge settings, with the object
     description derived from the hash-checked description file; everything
@@ -88,10 +88,11 @@ def load_vqa_pairs(ref_path: str, quant_path: str, threshold: float, settings: d
         print(f"  no judge sidecar for {ref_path} / {quant_path}; run scripts/08_judge_vqa.py first")
         return []
     ref_recs, quant_recs = read_records(ref_path), read_records(quant_path)
-    ref_sel, ref_stale = production_scores(ref_scores, ref_recs, settings, desc_data, question_text)
-    quant_sel, quant_stale = production_scores(quant_scores, quant_recs, settings, desc_data, question_text)
+    ref_sel, ref_stale = production_scores(ref_scores, ref_recs, settings, desc_data, question_text, backend)
+    quant_sel, quant_stale = production_scores(quant_scores, quant_recs, settings, desc_data, question_text, backend)
     for path, sel, stale in ((ref_path, ref_sel, ref_stale), (quant_path, quant_sel, quant_stale)):
-        print(f"  {path}: {len(sel)} usable judge scores, {len(stale)} stale")
+        reread = sum(1 for r in sel.values() if "score_recorded" in r)
+        print(f"  {path}: {len(sel)} usable judge scores ({reread} re-read to another value under the current extractor), {len(stale)} stale")
         for qid, reason in list(stale.items())[:3]:
             print(f"    stale {qid}: {reason}")
     return pair_vqa_records(ref_recs, quant_recs, ref_sel, quant_sel, threshold, question_text)
@@ -246,8 +247,10 @@ def main():
         except JudgeInputError as e:
             sys.exit(f"--vqa: {e}")
         vqa = []
+        # the backend the records must have been written under: the config description on
+        # development files, the frozen description and response model on final files
         for ref_path, quant_path in zip(args.files[::2], args.files[1::2]):
-            vqa.extend(load_vqa_pairs(ref_path, quant_path, threshold, judge_set, desc_data, question_text))
+            vqa.extend(load_vqa_pairs(ref_path, quant_path, threshold, judge_set, desc_data, question_text, js.get("backend")))
         print(f"\n{len(vqa)} paired VQA at threshold {threshold}")
         # the VQA section exists whenever --vqa was asked for, empty pair list included,
         # so every condition keeps its (possibly n = 0) unassessed headline row

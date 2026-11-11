@@ -61,11 +61,13 @@ scripts/06_stability.py            three-repeat slice: nondeterminism floor
 scripts/07_profile.py              TTFT, latency percentiles, decode tok/s, peak memory per session; --report pools sessions (--out JSON)
 scripts/08_judge_vqa.py            VQA rubric judge (released prompts, settings hashed into each record, --compat-check, replicates), resumable sidecars
 scripts/09_tables.py               markdown tables T1-T7 from the 05, 07 and 06 JSON outputs
+scripts/serve_judge.sh             open-weights judge on a second vLLM port for the VQA judge trial (any OpenAI-compatible endpoint works via --base-url)
+scripts/host_pull.sh               update the GPU host's checkout: backs up colliding untracked and modified files, fast-forwards, compares
 scripts/quantize_awq.py            own AWQ W4A16 checkpoint with llm-compressor, calibration-split prompts, manifest
 scripts/run_matrix.sh              serve -> all conditions -> stop, per precision; resumable; DRY_RUN=1 prints the plan
 scripts/rescore.py                 recompute MCQ fields after a rule change
 scripts/vast_setup.sh, hpc_pilot.sbatch
-tests/                             85 offline unit tests (pytest)
+tests/                             86 offline unit tests (pytest)
 ```
 
 ## Scope
@@ -90,9 +92,11 @@ tests/                             85 offline unit tests (pytest)
 
 - Steps 1 and 2 of the plan are committed: integrity fixes (four review rounds), then the five prespecified contrasts with both intervals and the support rule (`05 --contrasts`), the views comparison as descriptive only, PROTOCOL sections 8 and 9 rewritten (two review rounds). Step 4 (judge, November 5): optional request settings, `input_sha256` and `replicate` as the record key, production scores bound to the current answer and judge settings, `08 --compat-check`, measured usage, and the cost note [manifests/judge_cost.md](manifests/judge_cost.md) with current prices; after review, `08` validates provenance and both freezes before any call and the judge freeze binds the rubric templates by hash. The judge model itself is still the team's decision. Step 3 (November 6): `05` writes coverage per cell and harmful examples, `07 --report --out` pools profile sessions under the plan's rule, and `09_tables.py` formats T1–T7.
 
-**In progress (week 9, two weeks behind the plan).** The protocol is ready for the core freeze (every row outside the judge and mitigation sections is FROZEN; `freeze_config.py` dry-run passes). Next: one GPU session that writes the freeze on the host and runs own-checkpoint stability, profile ×3, the 8-run matrix, and the judge compat check and trial.
+- GPU session 2, November 7–8 ([manifests/session2_2026-11-08.md](manifests/session2_2026-11-08.md)): core freeze written on the host and committed; both servers verified against it; own-checkpoint stability: zero observed MCQ letter or correctness changes across three repeats for both precisions (VQA text varies in 6 of 35 BF16 and 5 of 35 INT4 questions; judge-score noise unmeasured); three profile sessions per precision pooled (INT4 peak memory 10,292 vs 19,400 MiB, latency p50 0.88 vs 2.10 s); the 8-run matrix on the 838 confirmatory questions with zero errors; analysis under the frozen settings: 1,064 MCQ pairs; descriptive summaries: pooled F_h 0.130 [0.096, 0.168], 53 of 55 harmful flips at BF16 margin below 0.25; confirmatory family: contrast C1 (low margin vs other bins) excludes zero after Bonferroni adjustment, the other four do not. Judge trial on 40 development answers: local gpt-oss-20b scored 40 of 40 after settings and extraction changes; DeepSeek V4 flash and pro through the team's proxy scored 40 of 40 each with thinking turned off (`reasoning_effort: none`, verified through the proxy), projected matrix cost $2.97 and $9.99 from measured tokens. The reviewer's two passes on the session fixed the score extractor (a complete expression or nothing, decimals rejected; version 4), bound it to the judge freeze, added backend identity to every record and to the freeze with one validity predicate shared by resume, freeze evidence and analysis, and bound a local judge to its running server; a third pass made one function (`usable_score`: expected backend plus a reply the current extractor parses) the criterion for resume, freeze evidence, the judging summary and analysis alike, and replaced the host pull checklist with `scripts/host_pull.sh` (93 tests).
 
-**Not started.** Profile sessions 2 and 3, VQA judging (budget decision), analysis and explorer (weeks 10–11), mitigation (12), report (13–14).
+**In progress (week 9).** Judge decision and freeze (noise test, human-label threshold), then VQA judging; report tables from `results/final/tables.md`; mitigation if time permits.
+
+**Not started.** VQA judging of the matrix (after the judge freeze), explorer (weeks 10–11), mitigation (12), report (13–14).
 
 **Open team decisions** are listed in [TEAM_REVIEW.md](TEAM_REVIEW.md), section 8 and the October 19 addendum.
 

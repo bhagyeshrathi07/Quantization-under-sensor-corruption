@@ -3,7 +3,9 @@ next to each result file:
 
     results/<run>/bf16_clean.jsonl  ->  results/<run>/bf16_clean.judge.jsonl
 
-    export OPENAI_API_KEY=...                       # per session; never stored
+    export JUDGE_API_KEY=...                        # per session; never stored (OPENAI_API_KEY also accepted)
+    python scripts/08_judge_vqa.py --compat-check --model deepseek-chat --base-url https://api.deepseek.com/v1
+    python scripts/08_judge_vqa.py --compat-check --model judge-local --base-url http://localhost:8001/v1   # scripts/serve_judge.sh
     python scripts/08_judge_vqa.py --compat-check                                   # one probe call: accepted settings, usage
     python scripts/08_judge_vqa.py results/dev/bf16_clean.jsonl --dry-run           # count, prompts, no calls
     python scripts/08_judge_vqa.py results/dev/bf16_clean.jsonl --limit 20          # cost trial: measured usage per call
@@ -38,25 +40,30 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from qflip.config import load_config  # noqa: E402
 from qflip.drivebench import load_questions  # noqa: E402
 from qflip.freeze import FreezeError  # noqa: E402
-from qflip.guard import prepare_judging  # noqa: E402
+from qflip.guard import check_judge_server, prepare_judging  # noqa: E402
 from qflip.judge import (  # noqa: E402
-    VQA_CELLS,
-    JudgeInputError,
-    JudgeSettingsError,
+    backend_description,
     build_prompt,
     compat_check,
     ensure_visual_description,
     expected_description,
+    EXTRACTOR_VERSION,
     input_sha256,
     invocation_usage,
+    is_local_endpoint,
+    JudgeInputError,
+    JudgeSettingsError,
     load_scores,
     load_visual_description,
     prompt_template,
+    record_backend_status,
     request_body,
     request_judge,
-    scored_keys,
+    rescore,
     sidecar_path,
     template_sha,
+    usable_score,
+    VQA_CELLS,
 )
 from qflip.provenance import ProvenanceError  # noqa: E402
 from qflip.records import append_record, read_records  # noqa: E402
@@ -93,7 +100,7 @@ def build_jobs(records: list[dict], desc_data: dict | None, cells: tuple[str, ..
     return jobs, skipped
 
 
-def judge_record(job: dict, settings: dict, replicate: int, res: dict) -> dict:
+def judge_record(job: dict, settings: dict, replicate: int, res: dict, backend: dict | None = None) -> dict:
     r = job["rec"]
     return {
         "question_id": r["question_id"],
@@ -105,6 +112,7 @@ def judge_record(job: dict, settings: dict, replicate: int, res: dict) -> dict:
         "input_sha256": job["input_sha256"],
         "judge_model": settings["model"],
         "judge_settings": settings,
+        "judge_backend": backend or {},
         "judge_template": prompt_template(r["cell"])[0],
         "judge_template_sha": template_sha(r["cell"]),
         "desc": job["desc"],
@@ -112,11 +120,33 @@ def judge_record(job: dict, settings: dict, replicate: int, res: dict) -> dict:
     }
 
 
-def judge_file(path: Path, settings: dict, client, desc_data, cells, workers: int, limit: int | None, dry_run: bool, replicate: int, question_text: dict[str, str]) -> dict:
+def reparse_file(path: Path) -> dict:
+    """Re-read every stored reply of the file's sidecar under the current
+    extractor, in place, without any call: scores, rules, extractor version
+    and error are rewritten, replies and everything else kept."""
+    out_path = sidecar_path(path)
+    if not out_path.exists():
+        print(f"{path}: no sidecar {out_path}")
+        return {"file": str(path), "records": 0}
+    rows = [json.loads(line) for line in out_path.read_text().splitlines() if line.strip()]
+    new = [rescore(r) for r in rows]
+    changed = sum(1 for a, b in zip(rows, new) if a.get("score") != b.get("score") or a.get("score_rule") != b.get("score_rule"))
+    gained = sum(1 for a, b in zip(rows, new) if a.get("score") is None and b.get("score") is not None)
+    lost = sum(1 for a, b in zip(rows, new) if a.get("score") is not None and b.get("score") is None)
+    out_path.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in new))
+    print(f"{out_path}: {len(rows)} records re-read under extractor {EXTRACTOR_VERSION}: {changed} changed (score or rule), {gained} newly scored, {lost} no longer scored")
+    return {"file": str(path), "records": len(rows), "changed": changed, "gained": gained, "lost": lost}
+
+
+def judge_file(path: Path, settings: dict, client, desc_data, cells, workers: int, limit: int | None, dry_run: bool, replicate: int, question_text: dict[str, str], backend: dict | None = None, expected_backend: dict | None = None) -> dict:
     records = read_records(path)
     out_path = sidecar_path(path)
     existing = load_scores(out_path)
-    done = scored_keys(existing)
+    # resume counts a record as done only when it counts as a score now: written under the
+    # expected backend (description, and the frozen response model on final files) with a
+    # reply the current extractor parses; the same test the judge freeze and production
+    # scoring apply (usable_score). The stored score field is not the criterion.
+    done = {k for k, r in existing.items() if usable_score(r, expected_backend)[1] is None}
     jobs, skipped = build_jobs(records, desc_data, cells, settings, replicate, question_text)
     todo = [j for j in jobs if j["key"] not in done]
     scored_now = [j for j in jobs if j["key"] in done]
@@ -138,7 +168,14 @@ def judge_file(path: Path, settings: dict, client, desc_data, cells, workers: in
         return {"file": str(path), "to_judge": len(todo), "skipped": len(skipped)}
 
     def one(j):
-        return judge_record(j, settings, replicate, request_judge(client, j["body"]))
+        res = request_judge(client, j["body"])
+        rec = judge_record(j, settings, replicate, res, backend)
+        why = record_backend_status(rec, expected_backend) if res.get("reply") else None
+        if why:
+            # final files: a reply from another backend than the frozen one is kept but never
+            # scored, now or under any later --reparse
+            rec.update(score=None, score_rule=None, error=why, rejected=why)
+        return rec
 
     written = []
     with ThreadPoolExecutor(max_workers=workers) as ex:
@@ -147,22 +184,34 @@ def judge_file(path: Path, settings: dict, client, desc_data, cells, workers: in
             written.append(rec)
 
     # Score summary over the current keys only (this replicate, these answers,
-    # these settings); usage over this invocation's calls only. Records under
-    # other keys stay in the file but enter neither.
+    # these settings), each record passed through the same validity test as
+    # resume, freeze evidence and production scoring: a record under the current
+    # key that is not usable (other backend, rejected, unparseable or empty
+    # reply) is stale, a key with no record yet (--limit) is pending. Usage is
+    # over this invocation's calls only. Records under other keys stay in the
+    # file but enter neither.
     scores = load_scores(out_path)
-    current = [scores[j["key"]] for j in jobs if j["key"] in scores]
-    by_cell = {}
-    for r in current:
-        if r.get("score") is not None:
-            by_cell.setdefault(r["cell"], []).append(r["score"])
-    errors = sum(1 for r in current if r.get("score") is None)
+    by_cell, stale, pending = {}, {}, 0
+    for j in jobs:
+        rec = scores.get(j["key"])
+        if rec is None:
+            pending += 1
+            continue
+        live, why = usable_score(rec, expected_backend)
+        if why:
+            stale[why] = stale.get(why, 0) + 1
+        else:
+            by_cell.setdefault(rec["cell"], []).append(live["score"])
     usage = invocation_usage(written)
-    print(f"  current key (replicate {replicate}, {settings['model']}): scored {sum(len(v) for v in by_cell.values())}, errors {errors}")
+    seen = sorted({str(r.get("response_model")) for r in written if r.get("reply")})
+    print(f"  current key (replicate {replicate}, {settings['model']}): scored {sum(len(v) for v in by_cell.values())}, stale {sum(stale.values())}, pending {pending}; response model(s) this invocation: {', '.join(seen) or 'none'}")
+    for why, n in sorted(stale.items()):
+        print(f"    stale {n}: {why}")
     for cell, v in sorted(by_cell.items()):
         print(f"  {cell:15s} n={len(v):4d} mean={sum(v)/len(v):6.1f}")
     if usage["with_usage"]:
         print(f"  this invocation: {usage['calls']} calls, {usage['errors']} errors; measured usage per call (mean over {usage['with_usage']}): prompt {usage['prompt_tokens_mean']}, completion {usage['completion_tokens_mean']}, reasoning {usage['reasoning_tokens']} total")
-    return {"file": str(path), "scored": sum(len(v) for v in by_cell.values()), "errors": errors, "usage": usage}
+    return {"file": str(path), "scored": sum(len(v) for v in by_cell.values()), "stale": sum(stale.values()), "pending": pending, "usage": usage}
 
 
 def run_compat_check(client, settings: dict, prompt: str, fallback: bool) -> int:
@@ -181,6 +230,7 @@ def main():
     ap.add_argument("files", nargs="*", help="result .jsonl files from 03/06")
     ap.add_argument("--config", default="config/pilot.yaml")
     ap.add_argument("--model", help="override judge.model from config")
+    ap.add_argument("--base-url", help="override judge.base_url from config (any OpenAI-compatible endpoint; refused on final-split files when it differs from the frozen judge)")
     ap.add_argument("--desc", default="data/visual_description.json")
     ap.add_argument("--cells", nargs="*", default=list(VQA_CELLS), help="cells to judge (default: the three VQA cells)")
     ap.add_argument("--workers", type=int, default=4)
@@ -191,9 +241,20 @@ def main():
     ap.add_argument("--split-file", default="manifests/scene_split.json")
     ap.add_argument("--exclusions-file", default="manifests/scene_exclusions.json")
     ap.add_argument("--no-provenance", action="store_true", help="pilot files written before sidecars existed; never for final-split files")
+    ap.add_argument("--reparse", action="store_true", help="re-read every stored reply in the files' sidecars under the current extractor, in place; no call, no key")
+    ap.add_argument("--judge-manifest", default="manifests/serve_judge.txt", help="serve manifest of a local judge (checked against the frozen revision on final files)")
     args = ap.parse_args()
 
+    if args.reparse:
+        if not args.files:
+            sys.exit("--reparse needs result files")
+        for f in args.files:
+            reparse_file(Path(f))
+        return
+
     cfg = load_config(args.config)
+    if args.base_url:
+        cfg["judge"]["base_url"] = args.base_url
     if args.replicate < 0:
         sys.exit("--replicate must be 0 or a positive integer")
     if not args.files and not args.compat_check:
@@ -207,15 +268,27 @@ def main():
         sys.exit(str(e))
     except JudgeSettingsError as e:
         sys.exit(f"{e} (team item 2: pass --model or set config judge.model)")
-    settings, prov = prep["settings"], prep["provenance"]
+    settings, prov, backend = prep["settings"], prep["provenance"], prep["backend"]
     if args.files:
         print(f"provenance ok: split={prov['split']} ({prov['analysis_class']}), {len(prov['files'])} files" + (f", judge frozen {prep['judge_frozen']['date']}" if prep["judge_frozen"] else ""))
+    # resume, freeze evidence and production scoring share one predicate: a record counts
+    # only under the expected backend description; on final files also the frozen response model
+    expected_backend = dict(backend)
+    if prov["split"] == "final" and is_local_endpoint(settings["base_url"]) and not args.dry_run:
+        # a local judge is bound to its running server (manifest revision, served alias,
+        # loaded model, listener owner, --revision on the command line), not to a text file
+        try:
+            check_judge_server(settings, backend, args.judge_manifest)
+        except (FreezeError, ProvenanceError) as e:
+            sys.exit(f"final-split judging refused; local judge server: {e}")
+    record_backend = backend_description(backend)
 
     client = None
     if not args.dry_run:
-        key = os.environ.get("OPENAI_API_KEY")
+        # one key variable for whatever provider the endpoint is; a local vLLM judge accepts any value
+        key = os.environ.get("JUDGE_API_KEY") or os.environ.get("OPENAI_API_KEY")
         if not key:
-            sys.exit("OPENAI_API_KEY is not set; export it for this session (never write it to a file in the repo)")
+            sys.exit("JUDGE_API_KEY (or OPENAI_API_KEY) is not set; export it for this session (never write it to a file in the repo; use EMPTY for a local vLLM judge)")
         from openai import OpenAI
 
         # endpoint from the (frozen or configured) settings, passed explicitly: OPENAI_BASE_URL in the environment is ignored
@@ -243,7 +316,7 @@ def main():
         sys.exit(run_compat_check(client, settings, prompt, fallback))
 
     for f in args.files:
-        judge_file(Path(f), settings, client, desc_data, tuple(args.cells), args.workers, args.limit, args.dry_run, args.replicate, question_text)
+        judge_file(Path(f), settings, client, desc_data, tuple(args.cells), args.workers, args.limit, args.dry_run, args.replicate, question_text, record_backend, expected_backend)
 
 
 if __name__ == "__main__":

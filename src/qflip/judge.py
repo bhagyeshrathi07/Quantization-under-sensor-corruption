@@ -30,15 +30,19 @@ rows and are never deduplicated. Production scoring (05 --vqa) consumes
 replicate 0 whose hash matches the current answer and the current (or
 frozen) judge settings; anything else is reported as stale and not used.
 
-The API key comes from OPENAI_API_KEY only; it is never read from a file.
+The API key comes from JUDGE_API_KEY (or OPENAI_API_KEY) only; it is never read from a file.
 """
 
 import hashlib
+import inspect
+import ipaddress
 import json
 import re
 import time
 import urllib.request
+from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from qflip import judge_prompts
 
@@ -67,6 +71,20 @@ OPTIONAL_PARAMS = ("temperature", "top_p", "reasoning_effort", "seed")
 DEFAULT_BASE_URL = "https://api.openai.com/v1"
 # Name of the completion-length parameter; GPT-5 models reject `max_tokens`.
 TOKEN_PARAMS = ("max_tokens", "max_completion_tokens")
+# Non-secret description of what stands behind the endpoint (config `judge.backend`):
+# the provider or proxy, the upstream model id the proxy routes the alias to (copied
+# from its routing table by hand; the request itself names only the alias), the
+# checkpoint revision of a local judge, and how thinking is controlled. Recorded in
+# every record and bound by the judge freeze. Not a request field, so not in the hash.
+BACKEND_KEYS = ("provider", "upstream_model", "revision", "thinking_control")
+# Score extraction version. 1: the released regex only. 2: markdown-tolerant
+# fallbacks (November 8). 3: the Total Score line parsed as a whole (November 8
+# review). 4: complete grammar only: an equation or parenthesised sum must be
+# consumed entirely, delimiters balanced, no trailing operator, decimals
+# rejected rather than truncated (November 11 review). Bound by the judge freeze
+# with a digest of the extractor source and regexes; every record names the
+# version it was scored with; production scoring re-reads the stored reply.
+EXTRACTOR_VERSION = "4"
 
 # upstream eval.py extract_visual_description workaround
 _NO_DESC_QUESTION = "In this scenario, what are safe actions to take for the ego vehicle?"
@@ -154,19 +172,112 @@ def expected_description(desc_data: dict | None, rec: dict, question: str) -> st
 
 def judge_fingerprints() -> dict:
     """What the judge freeze binds besides the request settings: the system
-    line, every template the released scorer routes to, and the recorded
-    digest of the object-description file (judge input)."""
+    line, every template the released scorer routes to, the recorded digest of
+    the object-description file (judge input), and the score extractor."""
     return {
         "system_line_sha256": hashlib.sha256(SYSTEM_LINE.encode()).hexdigest(),
         "templates": {cell: template_sha(cell) for cell in PROMPT_BY_CELL},
         "visual_description_sha256": VISUAL_DESCRIPTION_SHA256,
+        "extractor": extractor_fingerprint(),
     }
 
 
+_MARKDOWN_CHARS = re.compile(r"[*_#|`]")
+_TOTAL_LINE_RE = re.compile(r"Total Score\s*:?\s*([^\n]*)")
+_OUT_OF_100 = re.compile(r"(?:/|out of)\s*100\b", re.IGNORECASE)
+_COMMENT_PARENS = re.compile(r"\([^()+=]*\)")  # a balanced parenthesis with no operator inside is commentary
+_DECIMAL = re.compile(r"\d[.,]\d")
+_TERM = r"\d{1,3}"
+_SUM = rf"{_TERM}(?:\s*\+\s*{_TERM})+"
+_NUM_OR_SUM = rf"(?:{_SUM}|{_TERM})"
+# the whole arithmetic forms accepted: `a + b = n`, `n = a + b`, `n (a + b)`; nothing but digit-free prose may follow
+_ARITH_RE = re.compile(rf"^\s*(?P<a>{_NUM_OR_SUM})\s*(?P<mid>[^\d+=()]*?)\s*(?:=\s*(?P<b>{_NUM_OR_SUM})|\(\s*(?P<c>{_SUM})\s*\))\s*(?P<rest>[^\d+=()]*)$", re.S)
+_PLAIN_RE = re.compile(rf"^\s*(?P<n>{_TERM})(?![.,]?\d)\b")
+
+
+def _eval_sum(expr: str) -> int:
+    return sum(int(t) for t in re.findall(_TERM, expr))
+
+
+def _parse_total_segment(seg: str) -> tuple[int | None, bool]:
+    """(value, arithmetic) for the text after `Total Score`. `/100`, `out of
+    100` and balanced operator-free parentheses are commentary. A decimal
+    attached to the number (`99.5`) is no score (the rubric is integer; nothing
+    is truncated). Without `+`, `=` or parentheses the leading number is the
+    score. Otherwise the whole segment must be one complete form, `a + b = n`,
+    `n = a + b` or `n (a + b)`, with nothing but digit-free prose between or
+    after the parts; both sides must evaluate to the same value. A sum without a stated total, an
+    empty side, a trailing operator, or an unbalanced delimiter is no score."""
+    seg = _COMMENT_PARENS.sub(" ", _OUT_OF_100.sub(" ", seg))
+    if _DECIMAL.search(seg):
+        return None, False
+    if not re.search(r"[+=()]", seg):
+        m = _PLAIN_RE.match(seg)
+        return (int(m.group("n")) if m else None), False
+    m = _ARITH_RE.match(seg)
+    if not m:
+        return None, True
+    left = _eval_sum(m.group("a"))
+    right = _eval_sum(m.group("b") or m.group("c"))
+    if left != right:
+        return None, True
+    return left, True
+
+
+def extract_score_rule(reply: str) -> tuple[int | None, str | None]:
+    """(score, rule). The first `Total Score` line is read after markdown
+    characters are stripped (`**Total Score:** 15/100`, a table cell, a sum
+    `0 + 5 + 8 = **13**`). Rule `released` when the upstream regex
+    `Total Score:\\s*(\\d+)` on the raw reply gives the same value, `markdown`
+    when only the stripped line yields it, `arithmetic` when the line is a
+    complete equation or parenthesised sum (_parse_total_segment). A value
+    outside 0..100, a decimal, an incomplete or inconsistent expression is not
+    a score."""
+    reply = reply or ""
+    text = _MARKDOWN_CHARS.sub(" ", reply.replace("\u202f", " ").replace("\u00a0", " "))
+    m = _TOTAL_LINE_RE.search(text)
+    if not m:
+        return None, None
+    val, arithmetic = _parse_total_segment(m.group(1))
+    if val is None or not 0 <= val <= 100:
+        return None, None
+    if arithmetic:
+        return val, "arithmetic"
+    rm = _SCORE_RE.search(reply)
+    return val, ("released" if rm and int(rm.group(1)) == val else "markdown")
+
+
 def extract_score(reply: str) -> int | None:
-    """Upstream extract_answer regex; None instead of raising when absent."""
-    m = _SCORE_RE.search(reply or "")
-    return int(m.group(1)) if m else None
+    """Score under the current extractor (extract_score_rule)."""
+    return extract_score_rule(reply)[0]
+
+
+def extractor_fingerprint() -> dict:
+    """Version and source digest of the score extractor, bound by the judge
+    freeze: a parser change after the freeze is detected like a template edit."""
+    src = "\n".join(inspect.getsource(f) for f in (_eval_sum, _parse_total_segment, extract_score_rule))
+    # pattern and flags of every regex the extractor uses (IGNORECASE alone changes what parses)
+    src += "\n".join(f"{p.pattern}\t{p.flags}" for p in (_SCORE_RE, _MARKDOWN_CHARS, _TOTAL_LINE_RE, _OUT_OF_100, _COMMENT_PARENS, _DECIMAL, _ARITH_RE, _PLAIN_RE))
+    return {"version": EXTRACTOR_VERSION, "sha256": hashlib.sha256(src.encode()).hexdigest()}
+
+
+def rescore(rec: dict) -> dict:
+    """The record re-read under the current extractor: `score`, `score_rule`,
+    `extractor_version` and `error` derived again from the stored `reply`,
+    which is never changed. No reply (transport error, empty answer) means no
+    score, whatever number the record carried. A record rejected when it was
+    written (`rejected`: a reply from another backend than the frozen one)
+    stays rejected: its reply is kept, its score is never restored."""
+    out = dict(rec, extractor_version=EXTRACTOR_VERSION)
+    if rec.get("rejected"):
+        out.update(score=None, score_rule=None, error=rec["rejected"])
+        return out
+    if not rec.get("reply"):
+        out.update(score=None, score_rule=None, error=rec.get("error") or "empty reply")
+        return out
+    score, rule = extract_score_rule(rec["reply"])
+    out.update(score=score, score_rule=rule, error=None if score is not None else "no Total Score in reply")
+    return out
 
 
 def judge_messages(prompt: str) -> list[dict]:
@@ -200,6 +311,53 @@ def judge_settings(jcfg: dict) -> dict:
         if jcfg.get(k) is not None:
             out[k] = jcfg[k]
     return out
+
+
+def judge_backend(jcfg: dict) -> dict:
+    """The non-secret backend description from config `judge.backend` (keys
+    BACKEND_KEYS, null values dropped). Written into every record as
+    `judge_backend` and into the judge freeze as `backend`; a final-split run
+    refuses when the live block differs from the frozen one."""
+    b = jcfg.get("backend") or {}
+    unknown = sorted(set(b) - set(BACKEND_KEYS))
+    if unknown:
+        raise JudgeSettingsError(f"judge.backend has unknown keys {unknown}; allowed: {list(BACKEND_KEYS)}")
+    return {k: b[k] for k in BACKEND_KEYS if b.get(k) is not None}
+
+
+def is_local_endpoint(base_url: str) -> bool:
+    """True for `localhost` and every loopback address, IPv6 included
+    (`http://[::1]:8001/v1`, `http://127.0.0.2:8001`)."""
+    host = urlsplit(base_url).hostname or ""
+    if host == "localhost":
+        return True
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
+
+
+def backend_description(backend: dict | None) -> dict:
+    """The config-controlled part of a backend block (BACKEND_KEYS, null dropped)."""
+    return {k: v for k, v in (backend or {}).items() if k in BACKEND_KEYS and v is not None}
+
+
+def record_backend_status(rec: dict, backend: dict | None) -> str | None:
+    """The one validity predicate for a judge record against an expected
+    backend, shared by resume (08), the judge freeze (validation evidence) and
+    production scoring (05): None when the record was written under the same
+    backend description and, when `backend` names a `response_model`, the
+    provider reported that model; otherwise the reason. A record written before
+    the description existed carries none, which equals an empty description:
+    earlier trials stay valid for development and no identity is invented."""
+    if backend is None:
+        return None
+    want, have = backend_description(backend), backend_description(rec.get("judge_backend"))
+    if want != have:
+        return f"backend description differs: record {have or '{}'}, expected {want or '{}'}"
+    if backend.get("response_model") is not None and rec.get("response_model") != backend["response_model"]:
+        return f"backend identity: response model {rec.get('response_model')!r} differs from the frozen {backend['response_model']!r}"
+    return None
 
 
 def request_body(settings: dict, prompt: str) -> dict:
@@ -255,12 +413,22 @@ def request_judge(client, body: dict, retries: int = 5) -> dict:
         try:
             resp = client.chat.completions.create(**body)
             reply = (resp.choices[0].message.content or "").strip()
-            score = extract_score(reply)
+            score, rule = extract_score_rule(reply)
             return {
                 "reply": reply,
                 "score": score,
+                "score_rule": rule,
+                "extractor_version": EXTRACTOR_VERSION,
                 "usage": _usage_dict(getattr(resp, "usage", None)),
                 "latency_s": round(time.perf_counter() - t0, 3),
+                # what the provider says answered: the model id it returns (an alias
+                # for a proxy, the served name for vLLM), its response id and
+                # fingerprint, and when; the judge freeze binds the response model
+                "response_model": getattr(resp, "model", None),
+                "response_id": getattr(resp, "id", None),
+                "system_fingerprint": getattr(resp, "system_fingerprint", None),
+                "created": getattr(resp, "created", None),
+                "requested_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                 "error": None if score is not None else "no Total Score in reply",
             }
         except Exception as e:  # noqa: BLE001 - record, back off, retry
@@ -268,7 +436,7 @@ def request_judge(client, body: dict, retries: int = 5) -> dict:
             if _is_request_error(e):
                 break  # a rejected parameter or model does not get better with retries
             time.sleep(min(2**attempt, 30))
-    return {"reply": "", "score": None, "usage": None, "latency_s": None, "error": err}
+    return {"reply": "", "score": None, "score_rule": None, "extractor_version": EXTRACTOR_VERSION, "usage": None, "latency_s": None, "response_model": None, "response_id": None, "system_fingerprint": None, "created": None, "requested_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "error": err}
 
 
 def _is_request_error(e: Exception) -> bool:
@@ -337,15 +505,41 @@ def scored_ids(scores: dict[ScoreKey, dict]) -> set[str]:
     return {k[0] for k in scored_keys(scores)}
 
 
-def production_scores(scores: dict[ScoreKey, dict], records: list[dict], settings: dict, desc_data: dict | None, question_text: dict[str, str] | None = None) -> tuple[dict[str, dict], dict[str, str]]:
+def usable_score(rec: dict, backend: dict | None) -> tuple[dict | None, str | None]:
+    """(record re-read under the current extractor, None) when the record counts
+    as a score under `backend`, else (None, reason). The one test of a judge
+    record's validity: written under the expected backend
+    (record_backend_status) and a stored reply that parses now (rescore). The
+    stored number is never the criterion. Used by resume (08), the judge freeze
+    (validation evidence), the 08 summary and production scoring (05)."""
+    why = record_backend_status(rec, backend)
+    if why:
+        return None, why
+    live = rescore(rec)
+    if live.get("score") is None:
+        if rec.get("reply") and not rec.get("rejected"):
+            return None, "stored reply yields no score under the current extractor"
+        return None, f"no usable reply ({live.get('error')})"
+    if live["score"] != rec.get("score"):
+        live["score_recorded"] = rec.get("score")
+    return live, None
+
+
+def production_scores(scores: dict[ScoreKey, dict], records: list[dict], settings: dict, desc_data: dict | None, question_text: dict[str, str] | None = None, backend: dict | None = None) -> tuple[dict[str, dict], dict[str, str]]:
     """Select, per answer record, the replicate-0 judge record whose input hash
     equals the hash of the current answer under `settings`, with the object
     description derived from the hash-checked description file (never from
     stored judge rows, so the selection cannot depend on which rows exist or
-    their order). Returns ({question_id: judge record}, {question_id: reason})
-    where the second map names answers that have judge records but no usable
-    one (stale answer, changed settings or template, replicate 0 missing,
-    pre-step-4 record, description lookup failure)."""
+    their order). The selected record's score is re-read from its stored reply
+    under the current extractor (the stored number is never trusted; when it
+    differs it is kept as `score_recorded`; no reply, no score), and when
+    `backend` is given (the frozen backend: description and response model)
+    the record must satisfy record_backend_status.
+    Returns ({question_id: judge record}, {question_id: reason}) where the
+    second map names answers that have judge records but no usable one (stale
+    answer, changed settings or template, replicate 0 missing, pre-step-4
+    record, description lookup failure, reply without a parseable total,
+    other backend)."""
     by_qid: dict[str, list[dict]] = {}
     for rec in scores.values():
         by_qid.setdefault(rec["question_id"], []).append(rec)
@@ -368,12 +562,17 @@ def production_scores(scores: dict[ScoreKey, dict], records: list[dict], setting
             stale[qid] = f"description lookup: {e}"
             continue
         rec = scores.get((qid, 0, judge_input_hash(r["cell"], question, r["gt"], r["pred"], desc, settings)))
-        if rec is not None and rec.get("score") is not None:
-            selected[qid] = rec
-        elif not any(int(c.get("replicate") or 0) == 0 for c in cands):
-            stale[qid] = "replicate 0 missing"
-        else:
-            stale[qid] = "no replicate-0 record matches the current answer and judge settings"
+        if rec is None:
+            if not any(int(c.get("replicate") or 0) == 0 for c in cands):
+                stale[qid] = "replicate 0 missing"
+            else:
+                stale[qid] = "no replicate-0 record matches the current answer and judge settings"
+            continue
+        live, why = usable_score(rec, backend)
+        if why:
+            stale[qid] = why
+            continue
+        selected[qid] = live
     return selected, stale
 
 

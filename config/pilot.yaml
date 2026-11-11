@@ -74,6 +74,14 @@ judge:
   max_tokens: 512              # what the released request.py intended (its 3000 default is unreachable)
   max_tokens_param: "max_tokens"   # "max_completion_tokens" for GPT-5 models (the compat check tells)
   timeout_s: 120
+  # Non-secret description of what stands behind the endpoint; recorded in every
+  # judge record and bound by the judge freeze (not a request field, not hashed).
+  # The request names only the alias; a proxy's routing table is copied here by hand.
+  backend:
+    provider: null             # e.g. "DeepSeek API through the team's LiteLLM proxy" / "local vLLM (scripts/serve_judge.sh)"
+    upstream_model: null       # e.g. "deepseek/deepseek-v4-flash" (proxy routing table) / "openai/gpt-oss-20b" (local)
+    revision: null             # local judge: the checkpoint revision served (JUDGE_REVISION); required for a frozen local judge
+    thinking_control: null     # e.g. "reasoning_effort none, verified through the proxy (DeepSeek documents thinking.type=disabled)"
   # Rubric score (0-100) at or above which a VQA answer counts as correct for
   # flip classification. TO DECIDE on development scenes; null = VQA unassessed.
   correct_threshold: null

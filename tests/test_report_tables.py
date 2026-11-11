@@ -306,7 +306,7 @@ def test_cli_vqa_section_written_when_every_judge_record_is_stale(tmp_path):
     res = subprocess.run([sys.executable, str(ROOT / "scripts/05_compare_flips.py"), str(d / "bf16_clean.jsonl"), str(d / "int4_clean.jsonl"), "--no-provenance", "--vqa",
                           "--judge-threshold", "60", "--config", str(cfg_path), "--out", str(out)], cwd=ROOT, capture_output=True, text=True)
     assert res.returncode == 0, res.stderr + res.stdout
-    assert "0 usable judge scores, 12 stale" in res.stdout and "0 paired VQA" in res.stdout
+    assert "0 usable judge scores (0 re-read to another value under the current extractor), 12 stale" in res.stdout and "0 paired VQA" in res.stdout
     j = json.loads(out.read_text())
     assert j["vqa"]["threshold"] == 60.0 and j["vqa"]["overall"]["n"] == 0 and not j["vqa"]["overall"]["assessed"]
     assert j["vqa"]["groups"]["condition"] == [{"label": "clean", "n": 0, "scenes": 0, "assessed": False, "reason": "coverage: 0 questions from 0 scenes, below 30 / 10"}]
