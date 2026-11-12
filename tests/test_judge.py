@@ -47,7 +47,7 @@ DESC = {
     }
 }
 
-CFG = {"model": "judge-x", "temperature": 0.0, "top_p": None, "reasoning_effort": None, "seed": None, "max_tokens": 512, "max_tokens_param": "max_tokens"}
+CFG = {"model": "judge-x", "temperature": 0.0, "top_p": None, "reasoning_effort": None, "seed": None, "max_tokens": 512, "max_tokens_param": "max_tokens", "no_cache": False}
 
 
 def test_visual_description_lookup_matches_upstream():
@@ -139,7 +139,7 @@ def test_extract_score_and_messages():
 
 def test_optional_settings_omitted_when_null():
     s = judge_settings(CFG)
-    assert s == {"base_url": "https://api.openai.com/v1", "model": "judge-x", "max_tokens": 512, "max_tokens_param": "max_tokens", "temperature": 0.0}
+    assert s == {"base_url": "https://api.openai.com/v1", "model": "judge-x", "max_tokens": 512, "max_tokens_param": "max_tokens", "temperature": 0.0, "no_cache": False}
     assert judge_settings({**CFG, "base_url": "http://judge.local:8001/v1/"})["base_url"] == "http://judge.local:8001/v1"
     body = request_body(s, "P")
     assert set(body) == {"model", "messages", "max_tokens", "temperature"}  # the endpoint is not a request field
@@ -326,6 +326,14 @@ def test_request_judge_records_measured_usage_and_sends_only_set_params():
     assert res["score"] == 77 and res["error"] is None
     assert res["usage"] == {"prompt_tokens": 900, "completion_tokens": 180, "total_tokens": 1080, "reasoning_tokens": 0}
     assert set(c.calls[0]) == {"model", "messages", "max_tokens", "temperature", "reasoning_effort"}
+    # the proxy cache bypass (default on) is part of the wire request and the hash, and travels in extra_body
+    s_nc = judge_settings({**CFG, "no_cache": True})
+    body = request_body(s_nc, "P")
+    assert body["cache"] == {"no-cache": True, "no-store": True} and input_sha256(body, s_nc["base_url"]) != input_sha256(request_body(s, "P"), s["base_url"])
+    c3 = _FakeClient()
+    request_judge(c3, body)
+    assert "cache" not in c3.calls[0] and c3.calls[0]["extra_body"] == {"cache": {"no-cache": True, "no-store": True}}
+    assert judge_settings({k: v for k, v in CFG.items() if k != "no_cache"})["no_cache"] is True
     # the provider's own identity of the reply is recorded (the judge freeze binds response_model)
     assert res["response_model"] == "judge-x-2026-01" and res["response_id"] == "chatcmpl-1" and res["system_fingerprint"] == "fp_a" and res["created"] == 1794100000
     assert res["requested_at"].endswith("+00:00") and res["extractor_version"] == "4"

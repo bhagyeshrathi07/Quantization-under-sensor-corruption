@@ -1,0 +1,574 @@
+{
+ "created": "2026-11-11",
+ "source": "results/stability/*_clean_rep1.jsonl (all 35 VQA x 2 precisions) plus rep2 answers whose text differs from rep1",
+ "judge": "deepseek-v4-flash-ron, replicate 0, cache bypassed",
+ "items": {
+  "T001": {
+   "question_id": "126aa95f-71374b6b-6e035aed95",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 31
+  },
+  "T002": {
+   "question_id": "faa975ea-99bcb061-98d2efbdbe",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 11
+  },
+  "T003": {
+   "question_id": "f69f7b4c-e2486e66-47002369c7",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 19
+  },
+  "T004": {
+   "question_id": "c7b8d961-c221e488-33035c1b72",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 9
+  },
+  "T005": {
+   "question_id": "97349fd5-c42bcde3-6e035aed95",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 22
+  },
+  "T006": {
+   "question_id": "4047f251-d3ab0416-6e035aed95",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 21
+  },
+  "T007": {
+   "question_id": "e0836277-00b300ae-f817b08b81",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 19
+  },
+  "T008": {
+   "question_id": "892ed06c-36b6aa58-33035c1b72",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 8
+  },
+  "T009": {
+   "question_id": "c6c092a6-74f1506f-f817b08b81",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 26
+  },
+  "T010": {
+   "question_id": "034256c9-c1101ac4-f2825581b4",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 12
+  },
+  "T011": {
+   "question_id": "892ed06c-36b6aa58-33035c1b72",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 13
+  },
+  "T012": {
+   "question_id": "cf652a71-ed0dcc79-33035c1b72",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 17
+  },
+  "T013": {
+   "question_id": "126aa95f-71374b6b-6e035aed95",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 40
+  },
+  "T014": {
+   "question_id": "034256c9-c1101ac4-f2825581b4",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 16
+  },
+  "T015": {
+   "question_id": "8c84164e-3bf6f0df-f817b08b81",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 18
+  },
+  "T016": {
+   "question_id": "892ed06c-36b6aa58-6e035aed95",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 29
+  },
+  "T017": {
+   "question_id": "f69f7b4c-e2486e66-6e035aed95",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 24
+  },
+  "T018": {
+   "question_id": "cf652a71-751b62e2-f817b08b81",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 14
+  },
+  "T019": {
+   "question_id": "4047f251-d3ab0416-6e035aed95",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 25
+  },
+  "T020": {
+   "question_id": "cf652a71-751b62e2-a3104952ef",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 12
+  },
+  "T021": {
+   "question_id": "0b8948ee-ec7523bf-f817b08b81",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 10
+  },
+  "T022": {
+   "question_id": "09f67057-4ce5f221-6e035aed95",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 19
+  },
+  "T023": {
+   "question_id": "c7b8d961-c221e488-6e035aed95",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 21
+  },
+  "T024": {
+   "question_id": "e0836277-00b300ae-f817b08b81",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 12
+  },
+  "T025": {
+   "question_id": "0b8948ee-ec7523bf-6e035aed95",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 40
+  },
+  "T026": {
+   "question_id": "09f67057-152e3f20-6e035aed95",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 22
+  },
+  "T027": {
+   "question_id": "8c84164e-3bf6f0df-f817b08b81",
+   "precision": "int4",
+   "repeat": 2,
+   "cell": "planning/VQA",
+   "judge_score": 12
+  },
+  "T028": {
+   "question_id": "f69f7b4c-e2486e66-47002369c7",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 12
+  },
+  "T029": {
+   "question_id": "928ee3a8-78984662-33035c1b72",
+   "precision": "bf16",
+   "repeat": 2,
+   "cell": "prediction/VQA",
+   "judge_score": 7
+  },
+  "T030": {
+   "question_id": "0b8948ee-ec7523bf-f817b08b81",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 4
+  },
+  "T031": {
+   "question_id": "09f67057-152e3f20-6e035aed95",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 21
+  },
+  "T032": {
+   "question_id": "cf652a71-751b62e2-f817b08b81",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 13
+  },
+  "T033": {
+   "question_id": "cf652a71-ed0dcc79-33035c1b72",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 19
+  },
+  "T034": {
+   "question_id": "c6c092a6-74f1506f-f817b08b81",
+   "precision": "int4",
+   "repeat": 2,
+   "cell": "planning/VQA",
+   "judge_score": 13
+  },
+  "T035": {
+   "question_id": "c6c092a6-74f1506f-f817b08b81",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 30
+  },
+  "T036": {
+   "question_id": "f69f7b4c-e2486e66-33035c1b72",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 15
+  },
+  "T037": {
+   "question_id": "c6c092a6-74f1506f-33035c1b72",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 26
+  },
+  "T038": {
+   "question_id": "c6c092a6-74f1506f-33035c1b72",
+   "precision": "bf16",
+   "repeat": 2,
+   "cell": "prediction/VQA",
+   "judge_score": 42
+  },
+  "T039": {
+   "question_id": "da41ecbc-7e4c3282-33035c1b72",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 14
+  },
+  "T040": {
+   "question_id": "22daa579-ffef59aa-8f656ae683",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 66
+  },
+  "T041": {
+   "question_id": "e0836277-00b300ae-7d324b51ac",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 6
+  },
+  "T042": {
+   "question_id": "cf652a71-751b62e2-a3104952ef",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 24
+  },
+  "T043": {
+   "question_id": "8c84164e-3bf6f0df-6e035aed95",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 21
+  },
+  "T044": {
+   "question_id": "c6c092a6-74f1506f-33035c1b72",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 23
+  },
+  "T045": {
+   "question_id": "0b8948ee-ec7523bf-6e035aed95",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 28
+  },
+  "T046": {
+   "question_id": "22daa579-ffef59aa-8f656ae683",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 12
+  },
+  "T047": {
+   "question_id": "8c84164e-3bf6f0df-f817b08b81",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 7
+  },
+  "T048": {
+   "question_id": "faa975ea-99bcb061-6e035aed95",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 46
+  },
+  "T049": {
+   "question_id": "c7b8d961-c221e488-33035c1b72",
+   "precision": "int4",
+   "repeat": 2,
+   "cell": "prediction/VQA",
+   "judge_score": 7
+  },
+  "T050": {
+   "question_id": "8c84164e-3bf6f0df-6e035aed95",
+   "precision": "int4",
+   "repeat": 2,
+   "cell": "perception/VQA",
+   "judge_score": 24
+  },
+  "T051": {
+   "question_id": "c7b8d961-c221e488-6e035aed95",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 19
+  },
+  "T052": {
+   "question_id": "09f67057-4ce5f221-6e035aed95",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 22
+  },
+  "T053": {
+   "question_id": "a6fae490-475b8b52-6e035aed95",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 21
+  },
+  "T054": {
+   "question_id": "da41ecbc-7e4c3282-33035c1b72",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 16
+  },
+  "T055": {
+   "question_id": "52b30ecd-ee45b7c2-33035c1b72",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 11
+  },
+  "T056": {
+   "question_id": "0b8948ee-ec7523bf-f817b08b81",
+   "precision": "int4",
+   "repeat": 2,
+   "cell": "planning/VQA",
+   "judge_score": 8
+  },
+  "T057": {
+   "question_id": "c7b8d961-c221e488-f817b08b81",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 18
+  },
+  "T058": {
+   "question_id": "faa975ea-99bcb061-98d2efbdbe",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 11
+  },
+  "T059": {
+   "question_id": "faa975ea-99bcb061-6e035aed95",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 40
+  },
+  "T060": {
+   "question_id": "126aa95f-71374b6b-6e035aed95",
+   "precision": "bf16",
+   "repeat": 2,
+   "cell": "perception/VQA",
+   "judge_score": 29
+  },
+  "T061": {
+   "question_id": "8c84164e-3bf6f0df-33035c1b72",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 34
+  },
+  "T062": {
+   "question_id": "c6c092a6-74f1506f-f817b08b81",
+   "precision": "bf16",
+   "repeat": 2,
+   "cell": "planning/VQA",
+   "judge_score": 12
+  },
+  "T063": {
+   "question_id": "c7b8d961-c221e488-33035c1b72",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 4
+  },
+  "T064": {
+   "question_id": "4047f251-d3ab0416-33035c1b72",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 10
+  },
+  "T065": {
+   "question_id": "928ee3a8-78984662-33035c1b72",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 18
+  },
+  "T066": {
+   "question_id": "0b8948ee-ec7523bf-f817b08b81",
+   "precision": "bf16",
+   "repeat": 2,
+   "cell": "planning/VQA",
+   "judge_score": 11
+  },
+  "T067": {
+   "question_id": "f69f7b4c-e2486e66-6e035aed95",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 35
+  },
+  "T068": {
+   "question_id": "4047f251-d3ab0416-33035c1b72",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 17
+  },
+  "T069": {
+   "question_id": "22daa579-ffef59aa-33035c1b72",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 9
+  },
+  "T070": {
+   "question_id": "e0836277-00b300ae-7d324b51ac",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 4
+  },
+  "T071": {
+   "question_id": "928ee3a8-78984662-33035c1b72",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 14
+  },
+  "T072": {
+   "question_id": "892ed06c-36b6aa58-6e035aed95",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 23
+  },
+  "T073": {
+   "question_id": "52b30ecd-ee45b7c2-33035c1b72",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 15
+  },
+  "T074": {
+   "question_id": "f69f7b4c-e2486e66-33035c1b72",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 27
+  },
+  "T075": {
+   "question_id": "97349fd5-c42bcde3-6e035aed95",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 23
+  },
+  "T076": {
+   "question_id": "8c84164e-3bf6f0df-6e035aed95",
+   "precision": "bf16",
+   "repeat": 2,
+   "cell": "perception/VQA",
+   "judge_score": 15
+  },
+  "T077": {
+   "question_id": "8c84164e-3bf6f0df-33035c1b72",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 6
+  },
+  "T078": {
+   "question_id": "22daa579-ffef59aa-33035c1b72",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "prediction/VQA",
+   "judge_score": 16
+  },
+  "T079": {
+   "question_id": "a6fae490-475b8b52-6e035aed95",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 23
+  },
+  "T080": {
+   "question_id": "c7b8d961-c221e488-f817b08b81",
+   "precision": "bf16",
+   "repeat": 1,
+   "cell": "planning/VQA",
+   "judge_score": 10
+  },
+  "T081": {
+   "question_id": "8c84164e-3bf6f0df-6e035aed95",
+   "precision": "int4",
+   "repeat": 1,
+   "cell": "perception/VQA",
+   "judge_score": 20
+  }
+ }
+}

@@ -821,7 +821,7 @@ def test_judge_freeze_binds_settings_templates_and_system_line(world, tmp_path, 
     w = world
     jcfg = _judge_cfg(w)
     jf = build_judge_frozen(jcfg, 60, repo_root=w["root"], records=_val_records(jcfg))
-    assert jf["judge"] == {"base_url": "https://api.openai.com/v1", "model": "judge-x", "max_tokens": 512, "max_tokens_param": "max_tokens", "temperature": 0.0}
+    assert jf["judge"] == {"base_url": "https://api.openai.com/v1", "model": "judge-x", "max_tokens": 512, "max_tokens_param": "max_tokens", "temperature": 0.0, "no_cache": True}
     assert jf["backend"] == {"response_model": "judge-x-2026-01", "validation_records": 3}
     assert set(jf["fingerprints"]["templates"]) == set(J.PROMPT_BY_CELL)
     assert jf["fingerprints"]["visual_description_sha256"] == J.VISUAL_DESCRIPTION_SHA256

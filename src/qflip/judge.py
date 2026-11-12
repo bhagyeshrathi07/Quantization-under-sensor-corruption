@@ -71,6 +71,15 @@ OPTIONAL_PARAMS = ("temperature", "top_p", "reasoning_effort", "seed")
 DEFAULT_BASE_URL = "https://api.openai.com/v1"
 # Name of the completion-length parameter; GPT-5 models reject `max_tokens`.
 TOKEN_PARAMS = ("max_tokens", "max_completion_tokens")
+# Proxy cache control (LiteLLM's per-request `cache` field): a proxy answers an
+# identical request from its cache, which makes replicate judgings copies of the
+# first reply (seen November 11: identical response ids across replicates). With
+# `judge.no_cache` (default true) every request carries this field, so every
+# record is a fresh judging; the field is part of the request and of the hash.
+# It travels in the SDK's `extra_body`, since the OpenAI client rejects unknown
+# keyword arguments.
+NO_CACHE_FIELD = ("cache", {"no-cache": True, "no-store": True})
+EXTRA_BODY_PARAMS = ("cache",)
 # Non-secret description of what stands behind the endpoint (config `judge.backend`):
 # the provider or proxy, the upstream model id the proxy routes the alias to (copied
 # from its routing table by hand; the request itself names only the alias), the
@@ -310,6 +319,7 @@ def judge_settings(jcfg: dict) -> dict:
     for k in OPTIONAL_PARAMS:
         if jcfg.get(k) is not None:
             out[k] = jcfg[k]
+    out["no_cache"] = bool(jcfg.get("no_cache", True))
     return out
 
 
@@ -367,7 +377,19 @@ def request_body(settings: dict, prompt: str) -> dict:
     for k in OPTIONAL_PARAMS:
         if k in settings:
             body[k] = settings[k]
+    if settings.get("no_cache", True):
+        body[NO_CACHE_FIELD[0]] = dict(NO_CACHE_FIELD[1])
     return body
+
+
+def sdk_call_kwargs(body: dict) -> dict:
+    """The request body split for the OpenAI SDK: fields the SDK does not know
+    (the proxy cache control) go into `extra_body`; the wire request is the same."""
+    kw = {k: v for k, v in body.items() if k not in EXTRA_BODY_PARAMS}
+    extra = {k: v for k, v in body.items() if k in EXTRA_BODY_PARAMS}
+    if extra:
+        kw["extra_body"] = extra
+    return kw
 
 
 def input_sha256(body: dict, base_url: str) -> str:
@@ -411,7 +433,7 @@ def request_judge(client, body: dict, retries: int = 5) -> dict:
     for attempt in range(retries):
         t0 = time.perf_counter()
         try:
-            resp = client.chat.completions.create(**body)
+            resp = client.chat.completions.create(**sdk_call_kwargs(body))
             reply = (resp.choices[0].message.content or "").strip()
             score, rule = extract_score_rule(reply)
             return {

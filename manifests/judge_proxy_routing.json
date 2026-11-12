@@ -1,0 +1,42 @@
+{
+ "read_at": "2026-11-11",
+ "endpoint": "https://aiapi.paid.lol/v1",
+ "source": "LiteLLM proxy /model/info (non-secret fields only)",
+ "note": "The proxy forwards the alias to the DeepSeek API model id below. DeepSeek's model page (read November 8, 2026) says the legacy name deepseek-v4-flash routes to DeepSeek-V4.1-Flash-1017 and deepseek-v4-pro is DeepSeek-V4-Pro-0813; that is the provider's official routing, not an independent observation of the backend. The response model id the proxy returns is recorded in every judge record and frozen by the judge freeze.",
+ "models": {
+  "deepseek-v4-flash-ron": {
+   "litellm_params": {
+    "custom_llm_provider": "deepseek",
+    "model": "deepseek/deepseek-v4-flash"
+   },
+   "model_info": {
+    "id": "080d0970-e438-4be9-b38e-78a544a5156b",
+    "created_at": "2026-10-31T21:03:41.804000+00:00",
+    "litellm_provider": "deepseek",
+    "mode": "chat",
+    "supports_reasoning": true,
+    "input_cost_per_token": 3e-07,
+    "output_cost_per_token": 1.2e-06,
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 393216
+   }
+  },
+  "deepseek-v4-pro-ron": {
+   "litellm_params": {
+    "custom_llm_provider": "deepseek",
+    "model": "deepseek/deepseek-v4-pro"
+   },
+   "model_info": {
+    "id": "3f62a80a-3a70-44a6-893a-26de1e255079",
+    "created_at": "2026-10-31T21:03:44.525000+00:00",
+    "litellm_provider": "deepseek",
+    "mode": "chat",
+    "supports_reasoning": true,
+    "input_cost_per_token": 1.32e-06,
+    "output_cost_per_token": 3.96e-06,
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 393216
+   }
+  }
+ }
+}
