@@ -1,0 +1,59 @@
+# Judge decisions before the freeze (team, November 13, 2026)
+
+Four choices were open after the judge validation of November 11 (`manifests/judge_validation_2026-11-11.md`, section 6). The team made them on November 13 from the option list in the project walkthrough. This note records each decision, the rule it fixes, and what it costs, written before any human label exists and before any label is compared with a judge score. Nothing here touches the core freeze (`manifests/config_frozen.yaml`); it is judge protocol only (PROTOCOL section 7).
+
+## Decision 1: production score = mean of three judgings
+
+Each VQA answer in the matrix is judged three times (replicates 0, 1, 2, each a separate request with the cache bypass) and its production score is the mean of the three. Correct = mean ≥ `judge.correct_threshold`.
+
+- Why: a single judging moves by 7 points on average on fixed text (max 20, section 2 of the validation note); averaging three would cut the standard deviation of the judge's own noise by about √3 if the three judgings were independent draws, which is the model, not a measured guarantee, and makes a threshold crossing less often an artefact of one draw.
+- Rule for a missing judging (fixed now): an answer with fewer than three usable judgings under the frozen settings has no production score, is reported as stale by `05 --vqa`, and its pair is dropped and counted in coverage. Missing replicates are re-requested (`08` resumes per replicate) until all three exist; nothing is averaged over fewer than three.
+- Rule for a copied judging (review of November 13): three records that carry the same response id are one judging served three times (a proxy cache does this), not three judgings. Within an answer, a replicate whose response id repeats a lower replicate's is a duplicate (`qflip.judge.duplicate_response_keys`): production scoring treats it as missing, and `08` does not count it as done and requests it again, which supersedes the copy. Equal scores under different response ids are three judgings.
+- Implementation: `judge.production_replicates: 3` in `config/pilot.yaml`, bound by the judge freeze (`production_replicates` in `manifests/judge_frozen.yaml`; a differing live value refuses final files), consumed by `qflip.judge.production_scores` (replicates 0..k-1 must all match the current answer's hash, pass `usable_score` and carry distinct response ids; the result keeps the three scores in `scores` and their mean in `score`). Tests: `test_production_scores_average_the_frozen_number_of_replicates`, `test_judge_freeze_binds_the_production_replicate_count`, `test_duplicate_response_ids_are_copies_not_judgings`.
+- Calibration uses the same aggregate: the human labels are compared with the mean of three judgings of each development answer, never with a single judging.
+- Cost: 4,576 × 3 = 13,728 matrix calls. At the measured trial tokens (897 in, 317 out) and the proxy's flash rates, about $8.9 unweighted, about $8.0 weighted by the matrix cell mix (`manifests/judge_cost.md`), instead of about $3 for one judging. Projection, not a bill.
+
+## Decision 2: a development run on the GPU for the full development VQA population
+
+The label pool grows from the 35 development questions that happened to be in the stability slice to all 131 development VQA questions (90 planning, 30 perception, 11 prediction, 26 scenes), answered once per precision in the clean condition.
+
+- GPU session 3, on the pinned host after `host_pull.sh`, with the same servers and checkpoints as session 2 (`manifests/session2_2026-11-08.md`):
+
+      REQUIRE_FREEZE=1 CONDITIONS=clean SPLIT=development OUT_DIR=results/dev N=0 INT4_MODEL=checkpoints/qwen2.5-vl-7b-awq-w4a16-g128 bash scripts/run_matrix.sh
+
+  `N=0` runs every eligible development question: 191 per precision, the 131 VQA plus 60 MCQ (the development split holds 221 questions; its 30 prediction MCQs have no cell under the released scorer and are not run). The MCQs come along at no meaningful cost and give a second development MCQ accuracy reading. Expected GPU time about 15 minutes plus server starts; the files are `results/dev/{bf16,int4}_clean.jsonl` with sidecars from `prepare_run`. `REQUIRE_FREEZE=1` (review of November 13) makes the driver run `freeze_config.py --check` before any server starts and against each server manifest, and passes `--require-freeze` to `03`, so the development run refuses a config or server that differs from the core freeze exactly as a final run would; each sidecar then carries `freeze_checked` (the freeze's date and commit), the evidence that the calibration answers were produced under the frozen generation settings. Rsync `results/dev/` off the host before the instance is stopped.
+- Judging: three replicates of every development VQA answer, 131 × 2 × 3 = 786 calls, about $0.5:
+
+      for k in 0 1 2; do python scripts/08_judge_vqa.py results/dev/bf16_clean.jsonl results/dev/int4_clean.jsonl --replicate $k; done
+
+- The label sheet of November 11 (`manifests/judge_threshold_sample_2026-11-11.csv`, 81 items, no label entered) is superseded and stays in the repository as the record of the earlier plan. The new sheet is built from `results/dev/*_clean.jsonl` only: one item per answer, 262 items, shuffled with a fixed seed, blind (question, ground truth, answer; no score, no precision, no judge text), with one label column per labeller. The 11 variant answers from the stability repeats are not on the new sheet; the stability judgings keep their role as the noise study (sections 2 and 3 of the validation note).
+- Labelling load: 262 items × 3 labellers. Items are labelled in sheet order. If time runs out, the threshold is calibrated on the items that all three labellers finished and that have a complete judge aggregate (three usable, distinct judgings); the count is recorded, and fewer than 100 such items means the calibration does not happen and VQA stays unassessed (plan section 7 asked for 100).
+
+## Decision 3: three labellers, blind, then a discussion of disagreements
+
+- Each team member (Ronak, Bhagyesh, Akshay) labels every item independently on the rubric's correctness criterion, 1 or 0, without seeing scores, precision, or the others' labels. The key (item to question id, precision, judge scores) is kept out of the sheet and is not opened until all three label columns and the consensus column are complete: scores and precision stay hidden through the discussion as well.
+- Reported before any discussion: pairwise agreement for the three pairs and Fleiss' kappa over the three labellers.
+- Then the three discuss every item on which they disagree and record one consensus label per item, with a one-line reason where the discussion changed somebody's mind. The pre-discussion labels are kept unchanged in their columns.
+- Label used for calibration: the consensus label. Sensitivity: the same calibration on the pre-discussion majority label (three labellers, so a majority always exists).
+
+## Decision 4: the threshold rule, written before any score meets a label
+
+- Candidates: every integer t from 0 to 100. For each t, judge-correct = (mean of three judgings ≥ t). Agreement(t) = share of calibration items on which judge-correct equals the consensus label, every item weighted equally (one item per answer; both precisions are items).
+- Chosen threshold: the t with the highest agreement; on a tie, the lowest such t. Reported with it: the full agreement curve, Cohen's kappa at the chosen t, and the two error counts (judge says correct, humans say not; and the reverse).
+- Acceptance, evaluated apart from the fit (review of November 13: agreement alone is met by a judge that calls every answer incorrect when most answers are incorrect, which the low development scores make likely). Leave-one-scene-out cross-validation over the development scenes: for each scene, the threshold is fitted by the rule above on the other scenes' items and applied to the held-out scene's items; the held-out predictions are pooled. The judge is accepted only if, on the pooled held-out predictions, all of the following hold: agreement ≥ 0.80; Cohen's kappa ≥ 0.40; recall on human-correct items ≥ 0.60; recall on human-incorrect items ≥ 0.60. The class-aware checks need material: at least 15 human-correct and 15 human-incorrect items among the calibration items, otherwise the judge is not accepted. When acceptance passes, the threshold frozen is the one fitted on all calibration items.
+- Fallback, fixed now: if acceptance fails, no threshold is frozen, every VQA cell stays unassessed, and the human labels themselves (consensus, per cell and precision, with the harmful and beneficial counts they imply on the development answers) are the VQA evidence of the report. The bars (0.80, 0.40, 0.60, 15) are the team's choice, not derived from anything; they are here so they cannot be chosen after seeing the curves.
+- Sensitivity (reported, never used to choose or accept): the same rule on the pre-discussion majority labels; the same rule using replicate 0 alone instead of the mean.
+
+## Order from here
+
+1. Push the commit of November 12 (`e26589a`) and this change.
+2. GPU session 3: the development run above; rsync; stop the instance.
+3. Judge the development answers three times each (786 calls).
+4. Build and issue the blind sheet (262 items); three people label; discussion; consensus column.
+5. Calibrate with the rule of decision 4; write the numbers into the validation note.
+6. Judge freeze: `python scripts/freeze_judge.py --threshold <t> --records results/dev/*.judge.jsonl results/stability/*.judge.jsonl --note "..."` (the freeze records `production_replicates: 3`, the response model id seen in the validation records, and the threshold).
+7. Matrix judging, three replicates, the eight raw answer files named explicitly (a `*_*.jsonl` glob also matches the `.judge.jsonl` sidecars once replicate 0 exists; `08` now refuses a sidecar given as input): `for k in 0 1 2; do python scripts/08_judge_vqa.py results/final/{bf16,int4}_{clean,NoImage,LowLight,Fog}.jsonl --workers 8 --replicate $k; done` (13,728 calls, about $8–9), rerun the same line on resume; then `05 --contrasts --vqa`, `09_tables.py`, the report.
+
+Open until the labels exist: the threshold value, and whether acceptance passes.
+
+Review of November 13 (after this note was first written): four findings, all confirmed and fixed with tests (98 tests): the 0.80 agreement floor alone accepts an uninformative judge (class-aware acceptance under scene-grouped cross-validation added above); three copies of one response counted as three judgings (duplicate response ids rejected in production scoring and re-requested on resume); the matrix judging loop's glob swallowed the sidecars after replicate 0 (explicit file list; `08` refuses sidecar inputs); the development run did not enforce the frozen generation settings (`REQUIRE_FREEZE=1` / `03 --require-freeze`, recorded in the sidecar). Two wording corrections: 191 eligible development answers per precision, not 221; √3 is the independent-replicate model, not a measurement. Second pass the same day, two gaps closed (99 tests): `prepare_run(..., require_freeze=False)` could switch the check off on the final split (the final split is now checked whatever the caller passes, in `prepare_run` and in `validate_server_and_freeze`; regression test with an explicit False); the `08` summary after writing counted a retry that came back with another replicate's response id as scored (duplicates are recomputed after writing and reported stale, and the next run requests them again; tested with a client that always returns the same id). Still to implement before the labels arrive: the calibration script itself (agreement curve, leave-one-scene-out acceptance, kappa, per-class recall, sensitivity rows), with tests on synthetic labels.

@@ -15,6 +15,8 @@ Plan `WEEK9_ANALYSIS_PLAN.md` section 7. The team decides budget and model (team
 
 Matrix plus development validation: about 5,040 calls. With mitigation: about 7,330.
 
+Amended November 13 (`manifests/judge_decisions_2026-11-13.md`): the production score is the mean of three judgings, so the matrix is 4,576 × 3 = 13,728 calls (about $8.9 unweighted, $8.0 cell-weighted at the flash rates and the trial's measured tokens; mitigation would add 6,864), and the threshold sample becomes the 262 development VQA answers of the development run judged three times each, 786 calls (about $0.5). The two rows above record the November 5 plan.
+
 ## Token budget per call
 
 | Quantity | Provisional assumption | Measured (`--limit 20`) |

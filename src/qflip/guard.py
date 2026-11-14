@@ -4,7 +4,7 @@ freeze guard, and analysis-side population checks."""
 
 from pathlib import Path
 
-from qflip.freeze import FROZEN_PATH, JUDGE_FROZEN_PATH, JUDGE_MANIFEST_PATH, FreezeError, check_config, check_judge_frozen, check_judge_manifest, check_meta_against_frozen, check_serve_manifest, load_frozen, load_judge_frozen, read_judge_manifest
+from qflip.freeze import FROZEN_PATH, JUDGE_FROZEN_PATH, JUDGE_MANIFEST_PATH, FreezeError, check_config, check_judge_frozen, check_judge_manifest, check_meta_against_frozen, check_serve_manifest, load_frozen, load_judge_frozen, production_replicates, read_judge_manifest
 from qflip.judge import judge_backend, judge_settings
 from qflip.provenance import (
     build_run_meta,
@@ -54,8 +54,14 @@ def prepare_run(
     base_url: str | None = None,
     check_live_server: bool = True,
     frozen_path: str | Path = FROZEN_PATH,
+    require_freeze: bool | None = None,
 ) -> dict:
     """Validate the server and write/check the sidecar before the first record.
+    `require_freeze` makes any run, a development run included, refuse unless
+    config and server manifest equal the core freeze; the final split is
+    checked whatever the caller passes (False cannot switch it off); the sidecar then carries `freeze_checked` (the freeze's date and
+    commit), so a calibration run on development scenes can be shown to have
+    used the frozen generation settings.
 
     The live check uses the client's effective endpoint (QFLIP_BASE_URL or the
     config), requires the served alias, binds the manifest to the running
@@ -63,7 +69,7 @@ def prepare_run(
     it loaded, requires it to be the manifest's model."""
     meta = validate_server_and_freeze(cfg, config_path=config_path, precision=precision, condition=condition, split=split, split_file=split_file,
                                       exclusions_file=exclusions_file, manifests_dir=manifests_dir, base_url=base_url, check_live_server=check_live_server,
-                                      frozen_path=frozen_path, require_freeze=(split == "final"))
+                                      frozen_path=frozen_path, require_freeze=(split == "final") or bool(require_freeze))
     allowed = None if split == "all" else scenes_for(split, split_file, exclusions_file)
     ensure_meta(result_file, meta, allowed_scenes=allowed)
     return meta
@@ -86,8 +92,8 @@ def validate_server_and_freeze(
 ) -> dict:
     """The server binding every measurement needs (manifest present, served
     alias at the client's effective endpoint, listener owned by the manifest's
-    process, loaded model when reported) and, when required, the core freeze
-    (config and serve manifest equal to the frozen study). Returns the
+    process, loaded model when reported) and, when required or on the final
+    split, the core freeze (config and serve manifest equal to the frozen study). Returns the
     provenance block (the sidecar's compatibility fields)."""
     served = cfg["models"][precision]
     manifest = Path(manifests_dir) / f"serve_{precision}.txt"
@@ -98,9 +104,9 @@ def validate_server_and_freeze(
         url = base_url or effective_base_url(cfg)
         check_server(url, served, expect_model=man.get("model"))
         check_server_process(man, url)
-    if require_freeze:
-        final_guard(cfg, precision, manifest, split_file, exclusions_file, frozen_path)
-    return build_run_meta(
+    # the final split is checked whatever the caller passed; `require_freeze` can only add the check
+    frozen = final_guard(cfg, precision, manifest, split_file, exclusions_file, frozen_path) if (require_freeze or split == "final") else None
+    meta = build_run_meta(
         split=split,
         precision=precision,
         condition=condition,
@@ -112,6 +118,9 @@ def validate_server_and_freeze(
         serve_manifest_path=manifest,
         served_model_name=served,
     )
+    if frozen is not None:
+        meta["freeze_checked"] = {"date": frozen["frozen"]["date"], "git_commit": frozen["frozen"]["git_commit"]}
+    return meta
 
 
 def prepare_measurement(cfg: dict, *, study: bool = True, **kw) -> dict:
@@ -240,13 +249,13 @@ def judge_settings_for(split: str | None, cfg: dict, cli_model: str | None = Non
     if cli_model:
         jcfg["model"] = cli_model
     if split != "final":
-        return {"settings": judge_settings(jcfg), "backend": judge_backend(jcfg), "correct_threshold": jcfg.get("correct_threshold"), "judge_frozen": None}
+        return {"settings": judge_settings(jcfg), "backend": judge_backend(jcfg), "correct_threshold": jcfg.get("correct_threshold"), "production_replicates": production_replicates(jcfg), "judge_frozen": None}
     jf = load_judge_frozen(judge_frozen_path)
     diffs = check_judge_frozen(jf, jcfg)
     if diffs:
         raise FreezeError("final-split judging refused; judge freeze:\n  " + "\n  ".join(diffs))
     # the frozen backend carries the config description plus the response model observed during validation
-    return {"settings": judge_settings(jf["judge"]), "backend": dict(jf.get("backend") or {}), "correct_threshold": jf["correct_threshold"], "judge_frozen": jf["frozen"]}
+    return {"settings": judge_settings(jf["judge"]), "backend": dict(jf.get("backend") or {}), "correct_threshold": jf["correct_threshold"], "production_replicates": int(jf.get("production_replicates", 1)), "judge_frozen": jf["frozen"]}
 
 
 def prepare_judging(

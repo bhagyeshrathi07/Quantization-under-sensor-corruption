@@ -47,6 +47,7 @@ def main():
     ap.add_argument("--split-file", default="manifests/scene_split.json")
     ap.add_argument("--exclusions-file", default="manifests/scene_exclusions.json")
     ap.add_argument("--out-dir", help="results directory; default pilot.results_dir from config (results/pilot)")
+    ap.add_argument("--require-freeze", action="store_true", help="refuse unless config and server manifest equal the core freeze, whatever the split (always on for final); the sidecar records the check. Used for the development calibration run")
     args = ap.parse_args()
 
     cfg = load_config(args.config)
@@ -63,7 +64,8 @@ def main():
     # Provenance sidecar, live-server check, and (final split) the freeze guard.
     # Raises before any record is written.
     prepare_run(cfg, config_path=args.config, precision=args.precision, condition=args.condition, split=args.split,
-                result_file=jsonl, split_file=args.split_file, exclusions_file=args.exclusions_file)
+                result_file=jsonl, split_file=args.split_file, exclusions_file=args.exclusions_file,
+                require_freeze=True if args.require_freeze else None)
     done = load_done_ids(jsonl)
     todo = [q for q in questions if q.question_id not in done]
     print(f"{len(questions)} selected, {len(done)} done, {len(todo)} to run -> {jsonl}")

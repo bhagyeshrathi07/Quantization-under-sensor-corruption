@@ -1323,3 +1323,77 @@ def test_host_pull_reconciles_colliding_untracked_files(tmp_path):
     # the default backup location is new per invocation
     r = subprocess.run(["bash", str(script)], cwd=host, env=env, capture_output=True, text=True)
     assert r.returncode == 1 and "DIFFERS: results/profile/s3.json" in r.stdout and git(host, "rev-parse", "HEAD") == git(dev, "rev-parse", "HEAD")
+
+
+def test_judge_freeze_binds_the_production_replicate_count(world, tmp_path, monkeypatch):
+    """November 13 decision: the number of judgings averaged into the production
+    score is part of the judge freeze; a config that averages a different number
+    cannot judge or analyse final files."""
+    from qflip.freeze import FreezeError, build_judge_frozen, check_judge_frozen, production_replicates
+    from qflip.guard import judge_settings_for
+
+    w = world
+    monkeypatch.chdir(w["root"])
+    jcfg = {**_judge_cfg(w), "production_replicates": 3}
+    jf = build_judge_frozen(jcfg, 60, repo_root=w["root"], records=_val_records(jcfg))
+    assert jf["production_replicates"] == 3 and check_judge_frozen(jf, jcfg) == []
+    d = check_judge_frozen(jf, {**jcfg, "production_replicates": 1})
+    assert d == ["judge.production_replicates 1 differs from the frozen 3 (judgings averaged into the production score)"]
+    assert "production_replicates" not in jcfg or production_replicates({**jcfg, "production_replicates": 1}) == 1
+    # absent from config means the single replicate-0 score, and an old freeze without the field reads as 1
+    legacy = {k: v for k, v in jf.items() if k != "production_replicates"}
+    assert production_replicates({}) == 1 and check_judge_frozen(legacy, _judge_cfg(w)) == []
+    assert "differs from the frozen 1" in check_judge_frozen(legacy, jcfg)[0]
+    for bad in (0, -2, 2.5, True, "3"):
+        with pytest.raises(FreezeError):
+            production_replicates({"production_replicates": bad})
+        assert any("positive integer" in x for x in check_judge_frozen({**jf, "production_replicates": bad}, jcfg))
+    # the analysis takes the count from the live config on development files and from the freeze on final files
+    jfp = tmp_path / "judge_frozen.yaml"
+    jfp.write_text(yaml.safe_dump(jf, sort_keys=False))
+    assert judge_settings_for("development", {"judge": jcfg}, judge_frozen_path=jfp)["production_replicates"] == 3
+    assert judge_settings_for("final", {"judge": jcfg}, judge_frozen_path=jfp)["production_replicates"] == 3
+    with pytest.raises(FreezeError):
+        judge_settings_for("final", {"judge": {**jcfg, "production_replicates": 2}}, judge_frozen_path=jfp)
+
+
+def test_development_run_can_require_the_core_freeze(world, tmp_path, monkeypatch):
+    """Review of November 13, item 4: the judge-calibration run on development
+    scenes must use the frozen generation settings. `prepare_run(...,
+    require_freeze=True)` refuses a config or server manifest that differs from
+    the freeze on any split, and the sidecar records the check; without the
+    flag a development run is not checked (as before)."""
+    from qflip.guard import prepare_run
+
+    w = world
+    frozen_path = tmp_path / "config_frozen.yaml"
+    frozen_path.write_text(yaml.safe_dump(build_frozen(w["cfg"], w["split"], w["excl"], str(w["ckpt"]), repo_root=w["root"], requirements_file=w["man"] / "requirements_frozen.txt", protocol_snapshot=w["man"] / "PROTOCOL_frozen.md")))
+    _manifest(w["man"] / "serve_int4.txt", "int4", str(w["ckpt"]))
+    kw = dict(config_path=w["cfg_path"], precision="int4", condition="clean", split="development", split_file=w["split"], exclusions_file=w["excl"], manifests_dir=w["man"], check_live_server=False, frozen_path=frozen_path)
+    meta = prepare_run(w["cfg"], result_file=tmp_path / "ok/int4_clean.jsonl", require_freeze=True, **kw)
+    assert meta["freeze_checked"] == {"date": yaml.safe_load(frozen_path.read_text())["frozen"]["date"], "git_commit": yaml.safe_load(frozen_path.read_text())["frozen"]["git_commit"]}
+    assert json.loads((tmp_path / "ok/int4_clean.jsonl.meta.json").read_text())["freeze_checked"] == meta["freeze_checked"]
+    # a changed core setting: refused with the flag, accepted (and not recorded as checked) without it
+    bad = yaml.safe_load(yaml.safe_dump(w["cfg"]))
+    bad["serving"]["max_pixels"] = 401408
+    with pytest.raises(FreezeError, match="max_pixels"):
+        prepare_run(bad, result_file=tmp_path / "bad/int4_clean.jsonl", require_freeze=True, **kw)
+    assert "freeze_checked" not in prepare_run(bad, result_file=tmp_path / "unchecked/int4_clean.jsonl", **kw)
+    # a server that is not the frozen checkpoint
+    _manifest(w["man"] / "serve_int4.txt", "int4", "Qwen/Qwen2.5-VL-7B-Instruct-AWQ", extra="--dtype float16 --quantization awq_marlin")
+    with pytest.raises(FreezeError, match="model:"):
+        prepare_run(w["cfg"], result_file=tmp_path / "bad2/int4_clean.jsonl", require_freeze=True, **kw)
+    # no freeze file at all
+    with pytest.raises(FreezeError, match="missing"):
+        prepare_run(w["cfg"], result_file=tmp_path / "bad3/int4_clean.jsonl", require_freeze=True, **{**kw, "frozen_path": tmp_path / "none.yaml"})
+    # final split is checked whether or not the flag is given, and an explicit False cannot switch it off
+    # (second review of November 13, item 1)
+    _manifest(w["man"] / "serve_int4.txt", "int4", str(w["ckpt"]))
+    assert "freeze_checked" in prepare_run(w["cfg"], result_file=tmp_path / "fin/int4_clean.jsonl", **{**kw, "split": "final"})
+    assert "freeze_checked" in prepare_run(w["cfg"], result_file=tmp_path / "fin2/int4_clean.jsonl", require_freeze=False, **{**kw, "split": "final"})
+    with pytest.raises(FreezeError, match="max_pixels"):
+        prepare_run(bad, result_file=tmp_path / "fin3/int4_clean.jsonl", require_freeze=False, **{**kw, "split": "final"})
+    from qflip.guard import validate_server_and_freeze
+
+    with pytest.raises(FreezeError, match="max_pixels"):
+        validate_server_and_freeze(bad, config_path=w["cfg_path"], precision="int4", condition="clean", split="final", split_file=w["split"], exclusions_file=w["excl"], manifests_dir=w["man"], check_live_server=False, frozen_path=frozen_path, require_freeze=False)

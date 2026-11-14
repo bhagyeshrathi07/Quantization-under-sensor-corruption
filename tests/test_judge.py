@@ -548,3 +548,148 @@ def test_summary_after_a_limited_run_counts_only_usable_records(tmp_path, capsys
     client = _FakeClient(reply="Total Score: 10")
     out = mod.judge_file(res, s, client, None, ("prediction/VQA",), 1, 1, False, 0, {}, backend_description(new_b), new_b)
     assert len(client.calls) == 1 and out == {**out, "scored": 1, "stale": 0, "pending": 1}  # a re-judged, b pending
+
+
+def test_production_scores_average_the_frozen_number_of_replicates():
+    """Team decision of November 13 (manifests/judge_decisions_2026-11-13.md):
+    the production score is the mean of `production_replicates` judgings of the
+    same answer under the same settings; an answer missing any usable replicate
+    has no production score. k = 1 is the former replicate-0 behaviour."""
+    s = judge_settings(CFG)
+    recs = [_rec("a", "s1"), _rec("b", "s1"), _rec("c", "s2"), _rec("d", "s2"), _rec("e", "s3")]
+    rows = [
+        _judged(recs[0], s, 0, 80), _judged(recs[0], s, 1, 60), _judged(recs[0], s, 2, 70),       # a: three usable judgings
+        _judged(recs[1], s, 0, 90), _judged(recs[1], s, 1, 50),                                   # b: replicate 2 never requested
+        _judged(recs[2], s, 0, 40), _judged(recs[2], s, 1, 40, pred="old answer"), _judged(recs[2], s, 2, 40),  # c: replicate 1 judged another answer
+        _judged(recs[3], s, 0, 30), _judged(recs[3], s, 1, 30, reply=""), _judged(recs[3], s, 2, 30),           # d: replicate 1 has no reply
+        _judged(recs[4], s, 0, 0, reply="Total Score: 0 + 5 + 8 = 13"), _judged(recs[4], s, 1, 13), _judged(recs[4], s, 2, 20),  # e: a stored number re-read
+    ]
+    scores = {score_key(r): r for r in rows}
+    selected, stale = production_scores(scores, recs, s, DESC_DATA, replicates=3)
+    assert set(selected) == {"a", "e"} and set(stale) == {"b", "c", "d"}
+    assert selected["a"]["score"] == 70 and selected["a"]["scores"] == [80, 60, 70] and selected["a"]["production_replicates"] == 3
+    assert selected["e"]["scores"] == [13, 13, 20] and abs(selected["e"]["score"] - 46 / 3) < 1e-9 and "score_recorded" not in selected["e"]
+    assert stale["b"] == "replicate 2 missing"
+    assert stale["c"] == "no replicate-1 record matches the current answer and judge settings"
+    assert stale["d"] == "replicate 1: no usable reply (empty reply)"
+    # the single-score rule is k = 1 and reads exactly as before
+    one, stale1 = production_scores(scores, recs, s, DESC_DATA, replicates=1)
+    assert set(one) == {"a", "b", "c", "d", "e"} and one["a"]["score"] == 80 and "scores" not in one["a"] and one["e"]["score_recorded"] == 0
+    with pytest.raises(JudgeSettingsError):
+        production_scores(scores, recs, s, DESC_DATA, replicates=0)
+    # a mean of 3 against the threshold: 70 >= 60 counts as correct, (80, 60, 30) -> 56.7 does not
+    ref = [_rec("a", "s1"), _rec("f", "s1")]
+    qnt = [_rec("a", "s1", pred="q a", precision="int4"), _rec("f", "s1", pred="q f", precision="int4")]
+    rs = {"a": {"score": 70.0}, "f": {"score": 170 / 3}}
+    qs = {"a": {"score": 170 / 3}, "f": {"score": 61.0}}
+    pairs = pair_vqa_records(ref, qnt, rs, qs, threshold=60)
+    assert {p.question_id: p.flip for p in pairs} == {"a": "harmful", "f": "beneficial"}
+
+
+def test_duplicate_response_ids_are_copies_not_judgings(tmp_path, capsys):
+    """Review of November 13, item 2: three records of one answer that carry the
+    same response id are one judging served three times (proxy cache). They
+    yield no production mean, and resume requests the copies again. Equal scores
+    under different response ids stay three judgings."""
+    import importlib.util
+    from pathlib import Path
+
+    from qflip.judge import backend_description, duplicate_response_keys
+
+    s = judge_settings(CFG)
+    recs = [_rec("a", "s1"), _rec("b", "s1"), _rec("c", "s2")]
+    rows = [
+        _judged(recs[0], s, 0, 40, response_id="r1"), _judged(recs[0], s, 1, 40, response_id="r1"), _judged(recs[0], s, 2, 40, response_id="r1"),  # a: one reply, three rows
+        _judged(recs[1], s, 0, 40, response_id="r2"), _judged(recs[1], s, 1, 40, response_id="r3"), _judged(recs[1], s, 2, 40, response_id="r4"),  # b: equal scores, three replies
+        _judged(recs[2], s, 0, 50, response_id="r5"), _judged(recs[2], s, 1, 60, response_id="r6"), _judged(recs[2], s, 2, 70, response_id="r5"),  # c: replicate 2 copies replicate 0
+    ]
+    scores = {score_key(r): r for r in rows}
+    dups = duplicate_response_keys(scores)
+    a1, a2, c2 = score_key(rows[1]), score_key(rows[2]), score_key(rows[8])
+    assert set(dups) == {a1, a2, c2} and dups[a1].startswith("response id r1 duplicates replicate 0's reply")
+    selected, stale = production_scores(scores, recs, s, DESC_DATA, replicates=3)
+    assert set(selected) == {"b"} and selected["b"]["score"] == 40
+    assert stale["a"] == "replicate 1: response id r1 duplicates replicate 0's reply (one judging served twice, not two judgings)"
+    assert stale["c"].startswith("replicate 2: response id r5 duplicates replicate 0's reply")
+    # the single-score rule never averages, so replicate 0 stands on its own
+    assert set(production_scores(scores, recs, s, DESC_DATA, replicates=1)[0]) == {"a", "b", "c"}
+    # records without a response id (local judge, old rows) are never called duplicates of each other
+    assert duplicate_response_keys({score_key(r): r for r in (_judged(recs[0], s, 0, 1), _judged(recs[0], s, 1, 1))}) == {}
+
+    # resume: the copies are not "done"; replicate 1 and 2 of a and replicate 2 of c are requested again
+    spec = importlib.util.spec_from_file_location("judge08dup", Path(__file__).resolve().parents[1] / "scripts/08_judge_vqa.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    prec = [_rec(q, sc, cell="prediction/VQA") for q, sc in (("a", "s1"), ("b", "s1"), ("c", "s2"))]
+    res = tmp_path / "bf16_clean.jsonl"
+    res.write_text("".join(json.dumps(r) + "\n" for r in prec))
+    side = tmp_path / "bf16_clean.judge.jsonl"
+    prow = [
+        _judged(prec[0], s, 0, 40, desc=None, response_id="r1"), _judged(prec[0], s, 1, 40, desc=None, response_id="r1"), _judged(prec[0], s, 2, 40, desc=None, response_id="r1"),
+        _judged(prec[1], s, 0, 40, desc=None, response_id="r2"), _judged(prec[1], s, 1, 40, desc=None, response_id="r3"), _judged(prec[1], s, 2, 40, desc=None, response_id="r4"),
+        _judged(prec[2], s, 0, 50, desc=None, response_id="r5"), _judged(prec[2], s, 1, 60, desc=None, response_id="r6"), _judged(prec[2], s, 2, 70, desc=None, response_id="r5"),
+    ]
+    side.write_text("".join(json.dumps({**r, "judge_settings": s}) + "\n" for r in prow))
+
+    def todo(rep):
+        mod.judge_file(res, s, None, None, ("prediction/VQA",), 1, None, True, rep, {}, backend_description(None), None)
+        return capsys.readouterr().out
+
+    assert "3 scored under the current key, 0 to judge" in todo(0)
+    out1 = todo(1)
+    assert "2 scored under the current key, 1 to judge" in out1 and "1 record(s) of replicate 1 repeat another replicate's response id" in out1
+    assert "1 scored under the current key, 2 to judge" in todo(2)
+
+
+def test_08_refuses_sidecar_files_as_input(tmp_path):
+    """Review of November 13, item 3: results/final/*_*.jsonl also matches the
+    .judge.jsonl sidecars once replicate 0 exists; the script names the mistake
+    instead of failing on their provenance."""
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    side = tmp_path / "bf16_clean.judge.jsonl"
+    side.write_text("")
+    raw = tmp_path / "bf16_clean.jsonl"
+    raw.write_text("")
+    env = {k: v for k, v in os.environ.items() if k not in ("JUDGE_API_KEY", "OPENAI_API_KEY")}
+    r = subprocess.run([sys.executable, str(root / "scripts/08_judge_vqa.py"), str(raw), str(side), "--dry-run"], cwd=root, env=env, capture_output=True, text=True)
+    assert r.returncode == 1 and "is a sidecar, not a result file" in r.stdout + r.stderr
+    r = subprocess.run([sys.executable, str(root / "scripts/08_judge_vqa.py"), "--reparse", str(raw / "x.meta.json")], cwd=root, env=env, capture_output=True, text=True)
+    assert r.returncode == 1 and "is a sidecar, not a result file" in r.stdout + r.stderr
+
+
+def test_summary_counts_a_copied_retry_as_stale(tmp_path, capsys):
+    """Second review of November 13, item 2: when a retry comes back with the
+    response id of another replicate (the fake client always answers
+    chatcmpl-1), the summary after writing reports it stale, not scored, and
+    the next run requests it again."""
+    import importlib.util
+    from pathlib import Path
+
+    from qflip.judge import backend_description
+
+    spec = importlib.util.spec_from_file_location("judge08c", Path(__file__).resolve().parents[1] / "scripts/08_judge_vqa.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    s = judge_settings(CFG)
+    rec = _rec("a", "s1", cell="prediction/VQA")
+    res = tmp_path / "bf16_clean.jsonl"
+    res.write_text(json.dumps(rec) + "\n")
+    side = tmp_path / "bf16_clean.judge.jsonl"
+    side.write_text(json.dumps({**_judged(rec, s, 0, 77, desc=None, response_id="chatcmpl-1"), "judge_settings": s, "cell": rec["cell"]}) + "\n")
+    client = _FakeClient()
+    out = mod.judge_file(res, s, client, None, ("prediction/VQA",), 1, None, False, 1, {}, backend_description(None), None)
+    text = capsys.readouterr().out
+    assert len(client.calls) == 1 and out["scored"] == 0 and out["stale"] == 1 and out["pending"] == 0
+    assert "scored 0, stale 1, pending 0" in text and "stale 1: copy of another replicate's reply (same response id)" in text
+    assert "prediction/VQA" not in text.split("stale 1:")[1]  # no mean line over the copy
+    # the copy is on disk but not done: the next run of replicate 1 asks again
+    out = mod.judge_file(res, s, client, None, ("prediction/VQA",), 1, None, False, 1, {}, backend_description(None), None)
+    assert len(client.calls) == 2 and out["scored"] == 0 and out["stale"] == 1
+    # replicate 0 itself (the original) stays scored
+    out = mod.judge_file(res, s, client, None, ("prediction/VQA",), 1, None, False, 0, {}, backend_description(None), None)
+    assert len(client.calls) == 2 and out["scored"] == 1 and out["stale"] == 0

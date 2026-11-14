@@ -406,6 +406,7 @@ def build_judge_frozen(jcfg: dict, correct_threshold: float, repo_root: str | Pa
 
     if correct_threshold is None:
         raise FreezeError("the judge freeze needs correct_threshold (decided on development scenes)")
+    replicates = production_replicates(jcfg)
     settings = judge_settings(jcfg)
     backend = judge_backend(jcfg)
     if is_local_endpoint(settings["base_url"]):
@@ -422,9 +423,20 @@ def build_judge_frozen(jcfg: dict, correct_threshold: float, repo_root: str | Pa
         "judge": settings,
         "backend": backend,
         "correct_threshold": correct_threshold,
+        "production_replicates": replicates,
         "fingerprints": judge_fingerprints(),
         "validation": validation or {},
     }
+
+
+def production_replicates(jcfg: dict | None) -> int:
+    """`judge.production_replicates`: judgings per answer averaged into the
+    production score (default 1 = the replicate-0 score alone). The team
+    decided 3 on November 13 (manifests/judge_decisions_2026-11-13.md)."""
+    v = (jcfg or {}).get("production_replicates", 1)
+    if isinstance(v, bool) or not isinstance(v, int) or v < 1:
+        raise FreezeError(f"judge.production_replicates must be a positive integer, got {v!r}")
+    return v
 
 
 def check_judge_frozen(jf: dict | None, jcfg: dict | None = None) -> list[str]:
@@ -439,6 +451,17 @@ def check_judge_frozen(jf: dict | None, jcfg: dict | None = None) -> list[str]:
     diffs = []
     if jf.get("correct_threshold") is None:
         diffs.append("correct_threshold missing from the judge freeze")
+    frozen_reps = jf.get("production_replicates", 1)
+    if isinstance(frozen_reps, bool) or not isinstance(frozen_reps, int) or frozen_reps < 1:
+        diffs.append(f"production_replicates in the judge freeze must be a positive integer, got {frozen_reps!r}")
+    elif jcfg is not None:
+        try:
+            live_reps = production_replicates(jcfg)
+        except FreezeError as e:
+            diffs.append(str(e))
+        else:
+            if live_reps != frozen_reps:
+                diffs.append(f"judge.production_replicates {live_reps} differs from the frozen {frozen_reps} (judgings averaged into the production score)")
     if not jf.get("judge"):
         diffs.append("`judge` block (model and request settings) missing from the judge freeze")
         frozen_settings = None

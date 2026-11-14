@@ -83,8 +83,15 @@ judge:
     upstream_model: "deepseek/deepseek-v4-flash"   # proxy routing table for the alias, read November 11, 2026 (manifests/judge_proxy_routing.json); DeepSeek documents the legacy name as routing to DeepSeek-V4.1-Flash-1017
     revision: null             # local judge: the checkpoint revision served (JUDGE_REVISION); required for a frozen local judge
     thinking_control: "reasoning_effort none, verified through the proxy on November 8, 2026 (DeepSeek's own API documents thinking.type=disabled)"
+  # Production score per answer = mean of this many judgings (replicates 0..k-1,
+  # each requested with `08 --replicate k`); an answer missing any usable
+  # replicate has no production score. Team decision November 13, 2026
+  # (manifests/judge_decisions_2026-11-13.md): 3. Bound by the judge freeze.
+  production_replicates: 3
   # Rubric score (0-100) at or above which a VQA answer counts as correct for
-  # flip classification. TO DECIDE on development scenes; null = VQA unassessed.
+  # flip classification: the mean of the production judgings compared with the
+  # threshold calibrated on human labels of development answers (same rule).
+  # TO DECIDE from the labels; null = VQA unassessed.
   correct_threshold: null
 
 # Own INT4 checkpoint (scripts/quantize_awq.py). Group size and scheme are the

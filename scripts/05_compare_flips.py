@@ -78,21 +78,23 @@ def report(label: str, pairs, n_boot: int, seed: int, min_n: int, min_scenes: in
     return {"label": label, **s, "assessed": True, "ci": ci}
 
 
-def load_vqa_pairs(ref_path: str, quant_path: str, threshold: float, settings: dict, desc_data: dict, question_text, backend: dict | None = None):
-    """Production VQA scores: replicate 0 whose input hash matches the current
-    answer under the (frozen or configured) judge settings, with the object
-    description derived from the hash-checked description file; everything
-    else in the sidecar is reported as stale and not used."""
+def load_vqa_pairs(ref_path: str, quant_path: str, threshold: float, settings: dict, desc_data: dict, question_text, backend: dict | None = None, replicates: int = 1):
+    """Production VQA scores: the mean of replicates 0..k-1 (k = judge.production_replicates,
+    frozen on final files) whose input hashes match the current answer under the
+    (frozen or configured) judge settings, with the object description derived from
+    the hash-checked description file; an answer missing any usable replicate and
+    everything else in the sidecar is reported as stale and not used."""
     ref_scores, quant_scores = load_scores(sidecar_path(ref_path)), load_scores(sidecar_path(quant_path))
     if not ref_scores or not quant_scores:
         print(f"  no judge sidecar for {ref_path} / {quant_path}; run scripts/08_judge_vqa.py first")
         return []
     ref_recs, quant_recs = read_records(ref_path), read_records(quant_path)
-    ref_sel, ref_stale = production_scores(ref_scores, ref_recs, settings, desc_data, question_text, backend)
-    quant_sel, quant_stale = production_scores(quant_scores, quant_recs, settings, desc_data, question_text, backend)
+    ref_sel, ref_stale = production_scores(ref_scores, ref_recs, settings, desc_data, question_text, backend, replicates)
+    quant_sel, quant_stale = production_scores(quant_scores, quant_recs, settings, desc_data, question_text, backend, replicates)
     for path, sel, stale in ((ref_path, ref_sel, ref_stale), (quant_path, quant_sel, quant_stale)):
         reread = sum(1 for r in sel.values() if "score_recorded" in r)
-        print(f"  {path}: {len(sel)} usable judge scores ({reread} re-read to another value under the current extractor), {len(stale)} stale")
+        how = f"mean of {replicates} judgings" if replicates > 1 else "replicate 0"
+        print(f"  {path}: {len(sel)} usable judge scores ({how}; {reread} re-read to another value under the current extractor), {len(stale)} stale")
         for qid, reason in list(stale.items())[:3]:
             print(f"    stale {qid}: {reason}")
     return pair_vqa_records(ref_recs, quant_recs, ref_sel, quant_sel, threshold, question_text)
@@ -234,6 +236,7 @@ def main():
         except JudgeSettingsError as e:
             sys.exit(f"--vqa: {e}; the judge settings decide which sidecar records are usable")
         judge_set = js["settings"]
+        replicates = js["production_replicates"]
         if provenance["split"] == "final":
             threshold = js["correct_threshold"]
             if args.judge_threshold is not None and args.judge_threshold != threshold:
@@ -250,11 +253,11 @@ def main():
         # the backend the records must have been written under: the config description on
         # development files, the frozen description and response model on final files
         for ref_path, quant_path in zip(args.files[::2], args.files[1::2]):
-            vqa.extend(load_vqa_pairs(ref_path, quant_path, threshold, judge_set, desc_data, question_text, js.get("backend")))
-        print(f"\n{len(vqa)} paired VQA at threshold {threshold}")
+            vqa.extend(load_vqa_pairs(ref_path, quant_path, threshold, judge_set, desc_data, question_text, js.get("backend"), replicates))
+        print(f"\n{len(vqa)} paired VQA at threshold {threshold} (production score: {'mean of %d judgings' % replicates if replicates > 1 else 'replicate 0'})")
         # the VQA section exists whenever --vqa was asked for, empty pair list included,
         # so every condition keeps its (possibly n = 0) unassessed headline row
-        out["vqa"] = {"threshold": threshold, "judge_settings": judge_set, **section("VQA (judged)", vqa, [f for f in by_factors if f != "margin"], edges, args, min_n, min_scenes)}
+        out["vqa"] = {"threshold": threshold, "production_replicates": replicates, "judge_settings": judge_set, **section("VQA (judged)", vqa, [f for f in by_factors if f != "margin"], edges, args, min_n, min_scenes)}
         out["vqa"]["groups"]["condition"] = condition_rows(out["vqa"]["groups"]["condition"], list(records_by_file), min_n, min_scenes)
         pairs = pairs + vqa
 

@@ -96,6 +96,8 @@ tests/                             86 offline unit tests (pytest)
 
 **In progress (week 10).** Judge chosen (DeepSeek V4 flash via the team's proxy) and validated on development answers ([manifests/judge_validation_2026-11-11.md](manifests/judge_validation_2026-11-11.md)); human labels for the threshold, then the judge freeze and VQA judging of the matrix; report tables from `results/final/tables.md`; mitigation if time permits.
 
+**Decided November 13** ([manifests/judge_decisions_2026-11-13.md](manifests/judge_decisions_2026-11-13.md)): production VQA score = mean of three judgings (`judge.production_replicates`, frozen with the judge), label pool = every development VQA answer from a development run on the frozen servers (262 items), three blind labellers with a consensus label, threshold rule fixed before any label exists.
+
 **Not started.** VQA judging of the matrix (after the judge freeze), explorer (weeks 10–11), mitigation (12), report (13–14).
 
 **Open team decisions** are listed in [TEAM_REVIEW.md](TEAM_REVIEW.md), section 8 and the October 19 addendum.

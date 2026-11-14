@@ -11,7 +11,9 @@ next to each result file:
     python scripts/08_judge_vqa.py results/dev/bf16_clean.jsonl --limit 20          # cost trial: measured usage per call
     python scripts/08_judge_vqa.py results/dev/bf16_clean.jsonl results/dev/int4_clean.jsonl
     python scripts/08_judge_vqa.py results/dev/*_clean.jsonl --replicate 1          # noise study: separate rows
-    python scripts/08_judge_vqa.py results/final/*_*.jsonl --workers 8
+    for k in 0 1 2; do python scripts/08_judge_vqa.py results/final/{bf16,int4}_{clean,NoImage,LowLight,Fog}.jsonl --workers 8 --replicate $k; done
+                                                                                    # production: judge.production_replicates (3) judgings per answer, averaged by 05;
+                                                                                    # the eight raw files named explicitly (a *_*.jsonl glob also matches the sidecars after replicate 0)
 
 Judge model and request settings come from config `judge:` (temperature,
 top_p, reasoning_effort, seed are sent only when non-null; the length
@@ -45,6 +47,7 @@ from qflip.judge import (  # noqa: E402
     backend_description,
     build_prompt,
     compat_check,
+    duplicate_response_keys,
     ensure_visual_description,
     expected_description,
     EXTRACTOR_VERSION,
@@ -147,6 +150,10 @@ def judge_file(path: Path, settings: dict, client, desc_data, cells, workers: in
     # reply the current extractor parses; the same test the judge freeze and production
     # scoring apply (usable_score). The stored score field is not the criterion.
     done = {k for k, r in existing.items() if usable_score(r, expected_backend)[1] is None}
+    # a replicate whose response id repeats another replicate's is one judging served twice
+    # (proxy cache); it is not done and is requested again, which supersedes the copy
+    duplicates = duplicate_response_keys(existing)
+    done -= set(duplicates)
     jobs, skipped = build_jobs(records, desc_data, cells, settings, replicate, question_text)
     todo = [j for j in jobs if j["key"] not in done]
     scored_now = [j for j in jobs if j["key"] in done]
@@ -156,6 +163,9 @@ def judge_file(path: Path, settings: dict, client, desc_data, cells, workers: in
     print(f"{path}: {len(jobs)} judgeable, {len(scored_now)} scored under the current key, {len(todo)} to judge, {len(skipped)} skipped -> {out_path}")
     if other_keys:
         print(f"  {len(other_keys)} question(s) have scores only under other keys (other replicate, answer, model or settings); kept, not reused")
+    dup_now = [k for k in duplicates if k[1] == replicate and k in {j["key"] for j in jobs}]
+    if dup_now:
+        print(f"  {len(dup_now)} record(s) of replicate {replicate} repeat another replicate's response id (copies of one judging); judged again")
     for s in skipped[:5]:
         print(f"  skip {s['question_id']}: {s['reason']}")
     if dry_run:
@@ -191,6 +201,9 @@ def judge_file(path: Path, settings: dict, client, desc_data, cells, workers: in
     # over this invocation's calls only. Records under other keys stay in the
     # file but enter neither.
     scores = load_scores(out_path)
+    # recomputed after writing: a retry that came back with another replicate's response id
+    # is a copy (proxy cache despite the bypass), stale here and requested again on the next run
+    copies = duplicate_response_keys(scores)
     by_cell, stale, pending = {}, {}, 0
     for j in jobs:
         rec = scores.get(j["key"])
@@ -198,6 +211,8 @@ def judge_file(path: Path, settings: dict, client, desc_data, cells, workers: in
             pending += 1
             continue
         live, why = usable_score(rec, expected_backend)
+        if not why and j["key"] in copies:
+            why = "copy of another replicate's reply (same response id); requested again on the next run"
         if why:
             stale[why] = stale.get(why, 0) + 1
         else:
@@ -244,6 +259,12 @@ def main():
     ap.add_argument("--reparse", action="store_true", help="re-read every stored reply in the files' sidecars under the current extractor, in place; no call, no key")
     ap.add_argument("--judge-manifest", default="manifests/serve_judge.txt", help="serve manifest of a local judge (checked against the frozen revision on final files)")
     args = ap.parse_args()
+
+    # the files are the raw answer files; a glob such as results/final/*_*.jsonl also
+    # matches the sidecars this script writes once replicate 0 exists
+    for f in args.files:
+        if f.endswith(".judge.jsonl") or f.endswith(".meta.json"):
+            sys.exit(f"{f} is a sidecar, not a result file; name the raw answer files explicitly, e.g. results/final/{{bf16,int4}}_{{clean,NoImage,LowLight,Fog}}.jsonl")
 
     if args.reparse:
         if not args.files:

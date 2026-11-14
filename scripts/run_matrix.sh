@@ -7,6 +7,7 @@
 #   bash scripts/run_matrix.sh int4            # one precision
 #   DRY_RUN=1 bash scripts/run_matrix.sh       # print the commands only
 #   CONDITIONS="clean Fog" SPLIT=development OUT_DIR=results/dev N=20 bash scripts/run_matrix.sh
+#   REQUIRE_FREEZE=1 CONDITIONS=clean SPLIT=development OUT_DIR=results/dev bash scripts/run_matrix.sh   # development run on the frozen settings (judge calibration)
 #   INT4_MODEL=checkpoints/qwen2.5-vl-7b-awq-w4a16-g128 bash scripts/run_matrix.sh int4   # own checkpoint
 #   RSYNC_TO=user@host:/path/qflip bash scripts/run_matrix.sh   # copy results/ and manifests/ after each run
 #
@@ -24,6 +25,10 @@ N="${N:-0}"
 PORT="${PORT:-8000}"
 HEALTH_TIMEOUT_S="${HEALTH_TIMEOUT_S:-1200}"
 DRY_RUN="${DRY_RUN:-0}"
+REQUIRE_FREEZE="${REQUIRE_FREEZE:-0}"
+[[ "$SPLIT" == "final" ]] && REQUIRE_FREEZE=1
+FREEZE_FLAG=""
+[[ "$REQUIRE_FREEZE" == "1" ]] && FREEZE_FLAG="--require-freeze"
 RSYNC_TO="${RSYNC_TO:-}"
 STAMP="$(date +%Y%m%d_%H%M%S)"
 LOG="logs/matrix_${STAMP}.txt"
@@ -61,15 +66,15 @@ sync_out() {
     || run rsync -a results "$RSYNC_TO/" && run rsync -a manifests logs "$RSYNC_TO/"
 }
 
-log "matrix start: precisions=${PRECISIONS[*]} conditions=${CONDITIONS} split=${SPLIT} out=${OUT_DIR} n=${N} port=${PORT}"
+log "matrix start: precisions=${PRECISIONS[*]} conditions=${CONDITIONS} split=${SPLIT} out=${OUT_DIR} n=${N} port=${PORT} require_freeze=${REQUIRE_FREEZE}"
 [[ "$DRY_RUN" == "1" ]] && echo "+ (dry run; nothing executed)"
 
-# Final split: the core freeze must exist and match the live config before any server starts.
-if [[ "$SPLIT" == "final" ]]; then
+# Final split, or REQUIRE_FREEZE=1: the core freeze must exist and match the live config before any server starts.
+if [[ "$REQUIRE_FREEZE" == "1" ]]; then
   if [[ "$DRY_RUN" == "1" ]]; then
-    echo "+ python scripts/freeze_config.py --check   (required for SPLIT=final)"
+    echo "+ python scripts/freeze_config.py --check   (required for SPLIT=final or REQUIRE_FREEZE=1)"
   else
-    python scripts/freeze_config.py --check || { log "final split refused: freeze check failed"; exit 1; }
+    python scripts/freeze_config.py --check || { log "run refused: freeze check failed"; exit 1; }
   fi
 fi
 
@@ -82,7 +87,7 @@ for p in "${PRECISIONS[@]}"; do
     echo "+ port ${PORT} must be free"
     echo "+ bash scripts/01_serve.sh $p  > logs/serve_${p}_${STAMP}.txt 2>&1 &"
     echo "+ wait for http://localhost:${PORT}/health, then /v1/models must list $(served_name "$p"); manifest pid and port listener must be that server"
-    [[ "$SPLIT" == "final" ]] && echo "+ python scripts/freeze_config.py --check --serve-manifest manifests/serve_${p}.txt --precision $p"
+    [[ "$REQUIRE_FREEZE" == "1" ]] && echo "+ python scripts/freeze_config.py --check --serve-manifest manifests/serve_${p}.txt --precision $p"
   else
     port_free || { log "port ${PORT} already in use: another server is running; refusing to reuse it"; exit 1; }
     log "starting server: $p"
@@ -100,18 +105,18 @@ for p in "${PRECISIONS[@]}"; do
     if [[ "$listener_pid" != "$SERVER_PID" && "$listener_ppid" != "$SERVER_PID" ]]; then
       log "port ${PORT} is held by pid ${listener_pid} (parent ${listener_ppid:-?}), not the started server ${SERVER_PID}"; exit 1
     fi
-    if [[ "$SPLIT" == "final" ]]; then
+    if [[ "$REQUIRE_FREEZE" == "1" ]]; then
       python scripts/freeze_config.py --check --serve-manifest "manifests/serve_${p}.txt" --precision "$p" \
-        || { log "final split refused: server manifest differs from the freeze"; exit 1; }
+        || { log "run refused: server manifest differs from the freeze"; exit 1; }
     fi
   fi
 
   for c in $CONDITIONS; do
     if [[ "$DRY_RUN" == "1" ]]; then
-      echo "+ python scripts/03_smoke_drivebench.py --precision $p --condition $c --n $N --split $SPLIT --out-dir $OUT_DIR  |& tee -a logs/matrix_${p}_${c}.txt"
+      echo "+ python scripts/03_smoke_drivebench.py --precision $p --condition $c --n $N --split $SPLIT --out-dir $OUT_DIR $FREEZE_FLAG  |& tee -a logs/matrix_${p}_${c}.txt"
     else
       log "run: $p $c"
-      python scripts/03_smoke_drivebench.py --precision "$p" --condition "$c" --n "$N" --split "$SPLIT" --out-dir "$OUT_DIR" 2>&1 | tee -a "logs/matrix_${p}_${c}.txt"
+      python scripts/03_smoke_drivebench.py --precision "$p" --condition "$c" --n "$N" --split "$SPLIT" --out-dir "$OUT_DIR" $FREEZE_FLAG 2>&1 | tee -a "logs/matrix_${p}_${c}.txt"
       cp "manifests/serve_${p}.txt" "$OUT_DIR/serve_${p}.txt"
       sync_out
     fi

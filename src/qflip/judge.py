@@ -27,8 +27,10 @@ prediction), plus a `replicate` id (default 0). The resume key is
 (question_id, replicate, input_sha256): a changed answer, model, template,
 or setting is a new key and is judged again; replicates 1..k are separate
 rows and are never deduplicated. Production scoring (05 --vqa) consumes
-replicate 0 whose hash matches the current answer and the current (or
-frozen) judge settings; anything else is reported as stale and not used.
+replicates 0..k-1 (k = `judge.production_replicates`, 3 by the team's decision
+of November 13; 1 = the single replicate-0 score) whose hashes match the
+current answer and the current (or frozen) judge settings, and uses their mean;
+an answer missing any of the k usable replicates is stale and not used.
 
 The API key comes from JUDGE_API_KEY (or OPENAI_API_KEY) only; it is never read from a file.
 """
@@ -547,21 +549,58 @@ def usable_score(rec: dict, backend: dict | None) -> tuple[dict | None, str | No
     return live, None
 
 
-def production_scores(scores: dict[ScoreKey, dict], records: list[dict], settings: dict, desc_data: dict | None, question_text: dict[str, str] | None = None, backend: dict | None = None) -> tuple[dict[str, dict], dict[str, str]]:
-    """Select, per answer record, the replicate-0 judge record whose input hash
+def duplicate_response_keys(scores: dict[ScoreKey, dict]) -> dict[ScoreKey, str]:
+    """Keys whose record is a copy of another replicate's reply: within one
+    (question_id, input_sha256) the same non-null response id under two
+    replicates is one judging served twice (a proxy cache, seen November 11),
+    not two judgings. The lowest replicate keeps the id; every later one is a
+    duplicate, with the reason. Equal scores under different ids are not
+    duplicates. Used by resume (08 re-requests duplicates) and by production
+    scoring (an answer whose required replicates include a duplicate has no
+    production score)."""
+    groups: dict[tuple[str, str | None], list[ScoreKey]] = {}
+    for k in scores:
+        groups.setdefault((k[0], k[2]), []).append(k)
+    out: dict[ScoreKey, str] = {}
+    for keys in groups.values():
+        seen: dict[str, int] = {}
+        for k in sorted(keys, key=lambda k: k[1]):
+            rid = scores[k].get("response_id")
+            if not rid:
+                continue
+            if rid in seen:
+                out[k] = f"response id {rid} duplicates replicate {seen[rid]}'s reply (one judging served twice, not two judgings)"
+            else:
+                seen[rid] = k[1]
+    return out
+
+
+def production_scores(scores: dict[ScoreKey, dict], records: list[dict], settings: dict, desc_data: dict | None, question_text: dict[str, str] | None = None, backend: dict | None = None, replicates: int = 1) -> tuple[dict[str, dict], dict[str, str]]:
+    """Select, per answer record, the judge records of replicates 0..k-1
+    (k = `replicates`, config `judge.production_replicates`) whose input hash
     equals the hash of the current answer under `settings`, with the object
     description derived from the hash-checked description file (never from
     stored judge rows, so the selection cannot depend on which rows exist or
-    their order). The selected record's score is re-read from its stored reply
+    their order). Each selected record's score is re-read from its stored reply
     under the current extractor (the stored number is never trusted; when it
     differs it is kept as `score_recorded`; no reply, no score), and when
     `backend` is given (the frozen backend: description and response model)
-    the record must satisfy record_backend_status.
+    the record must satisfy record_backend_status. With k = 1 the result is
+    the replicate-0 record itself; with k > 1 it is the replicate-0 record
+    with `score` replaced by the mean of the k scores, which are kept in
+    `scores` (the missing-judging rule, decided November 13: an answer with
+    fewer than k usable replicates has no production score and is stale; a
+    replicate whose response id repeats another replicate's is a copy of one
+    judging, duplicate_response_keys, and counts as missing).
     Returns ({question_id: judge record}, {question_id: reason}) where the
     second map names answers that have judge records but no usable one (stale
-    answer, changed settings or template, replicate 0 missing, pre-step-4
+    answer, changed settings or template, a replicate missing, pre-step-4
     record, description lookup failure, reply without a parseable total,
     other backend)."""
+    if int(replicates) < 1:
+        raise JudgeSettingsError(f"production_replicates must be a positive integer, got {replicates!r}")
+    replicates = int(replicates)
+    duplicates = duplicate_response_keys(scores) if replicates > 1 else {}
     by_qid: dict[str, list[dict]] = {}
     for rec in scores.values():
         by_qid.setdefault(rec["question_id"], []).append(rec)
@@ -583,18 +622,36 @@ def production_scores(scores: dict[ScoreKey, dict], records: list[dict], setting
         except (KeyError, ValueError, JudgeInputError) as e:
             stale[qid] = f"description lookup: {e}"
             continue
-        rec = scores.get((qid, 0, judge_input_hash(r["cell"], question, r["gt"], r["pred"], desc, settings)))
-        if rec is None:
-            if not any(int(c.get("replicate") or 0) == 0 for c in cands):
-                stale[qid] = "replicate 0 missing"
-            else:
-                stale[qid] = "no replicate-0 record matches the current answer and judge settings"
-            continue
-        live, why = usable_score(rec, backend)
+        h = judge_input_hash(r["cell"], question, r["gt"], r["pred"], desc, settings)
+        lives, why = [], None
+        for k in range(replicates):
+            rec = scores.get((qid, k, h))
+            if rec is None:
+                if not any(int(c.get("replicate") or 0) == k for c in cands):
+                    why = f"replicate {k} missing"
+                else:
+                    why = f"no replicate-{k} record matches the current answer and judge settings"
+                break
+            live, why = usable_score(rec, backend)
+            if not why and (qid, k, h) in duplicates:
+                why = duplicates[(qid, k, h)]
+            if why:
+                if replicates > 1:
+                    why = f"replicate {k}: {why}"
+                break
+            lives.append(live)
         if why:
             stale[qid] = why
             continue
-        selected[qid] = live
+        if replicates == 1:
+            selected[qid] = lives[0]
+        else:
+            chosen = dict(lives[0])
+            chosen.pop("score_recorded", None)
+            chosen["scores"] = [lv["score"] for lv in lives]
+            chosen["score"] = sum(chosen["scores"]) / replicates
+            chosen["production_replicates"] = replicates
+            selected[qid] = chosen
     return selected, stale
 
 
