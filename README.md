@@ -61,13 +61,16 @@ scripts/06_stability.py            three-repeat slice: nondeterminism floor
 scripts/07_profile.py              TTFT, latency percentiles, decode tok/s, peak memory per session; --report pools sessions (--out JSON)
 scripts/08_judge_vqa.py            VQA rubric judge (released prompts, settings hashed into each record, --compat-check, replicates), resumable sidecars
 scripts/09_tables.py               markdown tables T1-T7 from the 05, 07 and 06 JSON outputs
+scripts/10_build_label_sheet.py    blind label sheet for the judge calibration (development answers under the core freeze only; one item per VQA answer, shuffled; one copy per labeller; key kept apart; never overwritten)
+scripts/11_calibrate_judge.py      --labels-only: pre-discussion agreement and Fleiss' kappa from the label columns alone (consensus columns not read); full: decision 4 against the consensus labels on the rows every labeller reached (issued items, sheet order, displayed text and answers bound by digest; agreement curve, leave-one-scene-out acceptance on judge.acceptance as exact fractions, sensitivity rows)
+scripts/12_merge_label_copies.py   merge the labellers' copies into the master sheet (same items, order and text; conflicts refused)
 scripts/serve_judge.sh             open-weights judge on a second vLLM port for the VQA judge trial (any OpenAI-compatible endpoint works via --base-url)
 scripts/host_pull.sh               update the GPU host's checkout: backs up colliding untracked and modified files, fast-forwards, compares
 scripts/quantize_awq.py            own AWQ W4A16 checkpoint with llm-compressor, calibration-split prompts, manifest
 scripts/run_matrix.sh              serve -> all conditions -> stop, per precision; resumable; DRY_RUN=1 prints the plan
 scripts/rescore.py                 recompute MCQ fields after a rule change
 scripts/vast_setup.sh, hpc_pilot.sbatch
-tests/                             86 offline unit tests (pytest)
+tests/                             115 offline unit tests (pytest)
 ```
 
 ## Scope
@@ -96,7 +99,7 @@ tests/                             86 offline unit tests (pytest)
 
 **In progress (week 10).** Judge chosen (DeepSeek V4 flash via the team's proxy) and validated on development answers ([manifests/judge_validation_2026-11-11.md](manifests/judge_validation_2026-11-11.md)); human labels for the threshold, then the judge freeze and VQA judging of the matrix; report tables from `results/final/tables.md`; mitigation if time permits.
 
-**Decided November 13** ([manifests/judge_decisions_2026-11-13.md](manifests/judge_decisions_2026-11-13.md)): production VQA score = mean of three judgings (`judge.production_replicates`, frozen with the judge), label pool = every development VQA answer from a development run on the frozen servers (262 items), three blind labellers with a consensus label, threshold rule fixed before any label exists.
+**Decided November 13** ([manifests/judge_decisions_2026-11-13.md](manifests/judge_decisions_2026-11-13.md)): production VQA score = mean of three judgings (`judge.production_replicates`, frozen with the judge), label pool = every development VQA answer from a development run on the frozen servers (262 items), three blind labellers with a consensus label, threshold rule fixed before any label exists. **November 14** ([manifests/session3_2026-11-14.md](manifests/session3_2026-11-14.md)): development run done under the core freeze (191 answers per precision, zero errors), every development VQA answer judged three times (786 calls, all distinct, nothing stale), the blind sheet issued (`manifests/judge_label_sheet_2026-11-14.csv`, 262 items, one copy per labeller beside it, key in `results/dev/label_sheet_key.json`), and the calibration implemented (`qflip.calibrate`, scripts 10, 11 and 12, bars in `judge.acceptance`) with tests on synthetic labels; the reviewer's pass on the tooling (five findings: displayed text not bound to the labels, no frozen-development input guard, sheet order and item set not enforced, a kappa of exactly 0.40 failing in floating point, no pre-discussion mode) is fixed. Open: the three labellings, the discussion, the calibration run, the judge freeze.
 
 **Not started.** VQA judging of the matrix (after the judge freeze), explorer (weeks 10–11), mitigation (12), report (13–14).
 

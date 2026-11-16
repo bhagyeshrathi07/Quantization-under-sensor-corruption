@@ -93,6 +93,19 @@ judge:
   # threshold calibrated on human labels of development answers (same rule).
   # TO DECIDE from the labels; null = VQA unassessed.
   correct_threshold: null
+  # Acceptance bars for the calibrated threshold (decision 4, November 13, 2026),
+  # evaluated by scripts/11_calibrate_judge.py on the pooled held-out predictions
+  # of leave-one-scene-out cross-validation over the development scenes; the
+  # class counts are those of the calibration items. The team's choice, written
+  # before any score met a label; all five keys must be present. Failing any bar
+  # means no threshold is frozen and VQA stays unassessed (human labels are the
+  # VQA evidence).
+  acceptance:
+    agreement: 0.80       # held-out agreement with the consensus label
+    kappa: 0.40           # held-out Cohen's kappa
+    recall: 0.60          # held-out recall on human-correct and on human-incorrect items, each
+    min_per_class: 15     # calibration items of each human class
+    min_items: 100        # calibration items (plan section 7); fewer = no calibration
 
 # Own INT4 checkpoint (scripts/quantize_awq.py). Group size and scheme are the
 # official checkpoint's; calibration uses calibration-split questions only.

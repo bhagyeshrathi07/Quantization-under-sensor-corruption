@@ -283,3 +283,49 @@ def prepare_judging(
     if files and prov["split"] != "final":
         holdout_check(files, split_file, exclusions_file)  # whatever the sidecar says, the rows decide
     return {"provenance": prov, **judge_settings_for(prov["split"], cfg, cli_model, judge_frozen_path)}
+
+
+def prepare_calibration_files(
+    files: list[str | Path],
+    cfg: dict,
+    *,
+    no_provenance: bool = False,
+    split_file: str | Path = DEFAULT_SPLIT_FILE,
+    exclusions_file: str | Path = DEFAULT_EXCLUSIONS_FILE,
+    frozen_path: str | Path = FROZEN_PATH,
+) -> dict:
+    """What the label sheet (10) and the calibration (11) must establish about
+    the answer files: the same provenance as 05 and 08, membership of the
+    development split, and production under the core freeze: every sidecar
+    carries `freeze_checked` equal to the freeze's date and commit (written
+    only by a run that passed `03 --require-freeze`) and records the frozen
+    inputs, core config, serving settings and model identity
+    (check_meta_against_frozen). The result is labelled `calibration`.
+    `no_provenance` is for sidecar-less synthetic files only (tests), labelled
+    `exploratory`; a file with a sidecar or a final-split row is refused there
+    as everywhere."""
+    if not files:
+        raise ProvenanceError("no answer files given")
+    if no_provenance:
+        prov = legacy_files_check(files, split_file, exclusions_file)
+        prov["note"] = "EXPLORATORY: --no-provenance skips the sidecar, population and freeze checks; nothing from this run may be frozen"
+        return prov
+    prov = validate_analysis_files(files, cfg, split_file=split_file, exclusions_file=exclusions_file, frozen_path=frozen_path)
+    if prov["split"] != "development":
+        raise ProvenanceError(f"calibration files must be development-split answers; these declare split={prov['split']!r}")
+    frozen = load_frozen(frozen_path)
+    if frozen is None:
+        raise FreezeError(f"calibration refused: {frozen_path} missing; the calibration answers must be produced under the core freeze")
+    want = {"date": frozen["frozen"]["date"], "git_commit": frozen["frozen"]["git_commit"]}
+    diffs = []
+    for f in files:
+        m = load_meta(f)
+        fc = m.get("freeze_checked")
+        if fc != want:
+            diffs.append(f"{f}: freeze_checked={fc!r}, expected {want!r} (the run must pass `03 --require-freeze` / REQUIRE_FREEZE=1)")
+        diffs += [f"{f}: {d}" for d in check_meta_against_frozen(m, frozen)]
+    if diffs:
+        raise FreezeError("calibration refused; the answer files were not produced under the core freeze:\n  " + "\n  ".join(diffs))
+    prov["analysis_class"] = "calibration"
+    prov["frozen"] = frozen["frozen"]
+    return prov
