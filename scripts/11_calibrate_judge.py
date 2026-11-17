@@ -56,6 +56,7 @@ from qflip.calibrate import (  # noqa: E402
 )
 from qflip.config import load_config  # noqa: E402
 from qflip.freeze import FreezeError  # noqa: E402
+from qflip.freeze import AMENDMENTS, amendment  # noqa: E402
 from qflip.guard import judge_settings_for, prepare_calibration_files  # noqa: E402
 from qflip.judge import ensure_visual_description, load_scores, load_visual_description, needs_description, production_scores, sidecar_path  # noqa: E402
 from qflip.provenance import ProvenanceError  # noqa: E402
@@ -122,13 +123,20 @@ def main():
     ap.add_argument("--key", help="the key written by 10 (required unless --labels-only; opened only after the sheet passes its checks)")
     ap.add_argument("--labels-only", action="store_true", help="pre-discussion report from the label columns alone: no key, no scores, no answer files; the consensus columns are not read")
     ap.add_argument("--labellers", nargs="*", help="label columns to use (default: every label_<name> column; with --key the key's list)")
-    ap.add_argument("--config", default="config/pilot.yaml")
+    ap.add_argument("--config", help="default config/pilot.yaml, or the amendment's config with --amendment")
     ap.add_argument("--desc", default="data/visual_description.json", help="object visual descriptions (judge input, hash-checked; loaded only when a planning item is present)")
     ap.add_argument("--out", help="write the full report as JSON")
     ap.add_argument("--split-file", default="manifests/scene_split.json")
     ap.add_argument("--exclusions-file", default="manifests/scene_exclusions.json")
     ap.add_argument("--no-provenance", action="store_true", help="sidecar-less synthetic files only (tests); the result is exploratory and nothing is frozen from it")
+    ap.add_argument("--amendment", choices=sorted(AMENDMENTS), help="answer files produced under this amendment: its config (unless --config is given) and its freeze")
     args = ap.parse_args()
+    frozen_kw = {}
+    if args.amendment:
+        am = amendment(args.amendment)
+        args.config = args.config or am["config"]
+        frozen_kw = {"frozen_path": am["frozen"], "amendment": am["name"]}
+    args.config = args.config or "config/pilot.yaml"
 
     # 1. the sheet alone
     rows, cols = read_rows(Path(args.sheet))
@@ -167,7 +175,7 @@ def main():
     except CalibrationError as e:
         sys.exit(str(e))
     try:
-        prov = prepare_calibration_files(args.files, cfg, no_provenance=args.no_provenance, split_file=args.split_file, exclusions_file=args.exclusions_file)
+        prov = prepare_calibration_files(args.files, cfg, no_provenance=args.no_provenance, split_file=args.split_file, exclusions_file=args.exclusions_file, **frozen_kw)
         judge = judge_settings_for(prov["split"], cfg)
     except (ProvenanceError, FreezeError) as e:
         sys.exit(f"inputs refused: {e}")

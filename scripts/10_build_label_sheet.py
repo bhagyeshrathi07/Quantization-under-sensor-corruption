@@ -38,7 +38,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from qflip.calibrate import BLIND_COLUMNS, FORBIDDEN_SHEET_COLUMNS, display_sha256, label_column, sheet_columns  # noqa: E402
 from qflip.config import load_config  # noqa: E402
-from qflip.freeze import FreezeError  # noqa: E402
+from qflip.freeze import AMENDMENTS, FreezeError, amendment  # noqa: E402
 from qflip.guard import prepare_calibration_files  # noqa: E402
 from qflip.judge import VQA_CELLS  # noqa: E402
 from qflip.provenance import ProvenanceError  # noqa: E402
@@ -133,18 +133,25 @@ def main():
     ap.add_argument("--key", required=True, help="output key JSON (never overwritten)")
     ap.add_argument("--copies", action="store_true", help="also write one blind copy per labeller next to the sheet (<sheet>.<name>.csv)")
     ap.add_argument("--seed", type=int, default=20261113, help="shuffle seed (default: the decision date)")
-    ap.add_argument("--config", default="config/pilot.yaml")
+    ap.add_argument("--config", help="default config/pilot.yaml, or the amendment's config with --amendment")
     ap.add_argument("--split-file", default="manifests/scene_split.json")
     ap.add_argument("--exclusions-file", default="manifests/scene_exclusions.json")
     ap.add_argument("--no-provenance", action="store_true", help="sidecar-less synthetic files only (tests); the output is exploratory and never labelled for the study")
+    ap.add_argument("--amendment", choices=sorted(AMENDMENTS), help="answer files produced under this amendment: its config (unless --config is given) and its freeze")
     args = ap.parse_args()
+    frozen_kw = {}
+    if args.amendment:
+        am = amendment(args.amendment)
+        args.config = args.config or am["config"]
+        frozen_kw = {"frozen_path": am["frozen"], "amendment": am["name"]}
+    args.config = args.config or "config/pilot.yaml"
     check_inputs(args.files)
     if len(args.labellers) % 2 == 0:
         sys.exit("an odd number of labellers is required (a majority label must always exist)")
     if len(set(args.labellers)) != len(args.labellers):
         sys.exit("labeller names must be distinct")
     try:
-        prov = prepare_calibration_files(args.files, load_config(args.config), no_provenance=args.no_provenance, split_file=args.split_file, exclusions_file=args.exclusions_file)
+        prov = prepare_calibration_files(args.files, load_config(args.config), no_provenance=args.no_provenance, split_file=args.split_file, exclusions_file=args.exclusions_file, **frozen_kw)
     except (ProvenanceError, FreezeError) as e:
         sys.exit(f"inputs refused: {e}")
     if prov.get("note"):
@@ -156,7 +163,7 @@ def main():
             sys.exit(f"{p} exists; sheets, copies and keys are never overwritten (labels live in them). Remove or rename it yourself if a rebuild is wanted.")
     rows, key = build(args.files, args.labellers, args.seed)
     key["sheet"] = str(sheet)
-    key["provenance"] = {"analysis_class": prov["analysis_class"], "split": prov["split"], "frozen": prov.get("frozen"), "note": prov.get("note")}
+    key["provenance"] = {"analysis_class": prov["analysis_class"], "split": prov["split"], "frozen": prov.get("frozen"), "amendment": prov.get("amendment"), "note": prov.get("note")}
     sheet.parent.mkdir(parents=True, exist_ok=True)
     key_path.parent.mkdir(parents=True, exist_ok=True)
     write_csv(rows, sheet_columns(args.labellers), sheet)

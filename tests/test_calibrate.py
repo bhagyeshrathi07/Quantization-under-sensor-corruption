@@ -519,6 +519,7 @@ def test_calibration_files_must_be_development_answers_under_the_core_freeze(mon
     monkeypatch.setattr(guard, "load_frozen", lambda path: frozen)
     monkeypatch.setattr(guard, "load_meta", lambda f: dict(state["meta"]))
     monkeypatch.setattr(guard, "check_meta_against_frozen", lambda m, fz: list(state["diffs"]))
+    monkeypatch.setattr(guard, "check_config", lambda *a, **k: [])  # the live-config comparison is covered by tests/test_amendment.py on a real freeze
     f = tmp_path / "bf16_clean.jsonl"
     f.write_text("")
     prov = prepare_calibration_files([f], {})

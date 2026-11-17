@@ -1,0 +1,147 @@
+# The VQA amendment (qflip.freeze.AMENDMENTS["vqa512"]): config/pilot.yaml with
+# generation.max_tokens 512 instead of the frozen 128, and nothing else changed;
+# the amendment freeze (scripts/freeze_config.py --amendment vqa512 ->
+# manifests/config_frozen_vqa512.yaml) refuses any other difference. Used only
+# for the three VQA cells, written to results/dev_vqa512 and results/final_vqa512
+# (03 --amendment vqa512 / AMENDMENT=vqa512 run_matrix.sh). Background and the
+# measurement behind it: manifests/explore_512tok_2026-11-16.md. This file must
+# track config/pilot.yaml in everything but max_tokens; the judge section is
+# frozen separately as before.
+# Pilot configuration. Everything here is a development-time choice; freeze
+# before the final run and record the frozen copy in manifests/.
+
+server:
+  base_url: "http://localhost:8000/v1"
+  api_key: "EMPTY"          # vLLM ignores it; the openai client requires one
+  timeout_s: 300
+
+# Served model names. Must match --served-model-name in scripts/01_serve.sh.
+models:
+  bf16: "qwen2.5-vl-7b-bf16"
+  int4: "qwen2.5-vl-7b-awq"
+
+# Serving flags; scripts/01_serve.sh reads these as its defaults (env vars
+# override for pilots; the frozen copy is enforced for final runs).
+serving:
+  max_pixels: 200704         # ~165 image tokens per 1600x900 view
+  max_model_len: 4096
+  kv_bytes: 2147483648       # 2 GiB KV cache, identical for both precisions
+  max_num_seqs: 1
+  seed: 0
+  prefix_caching: true
+
+data:
+  root: "data"                                   # DriveBench layout, see docs/DATA_PREPAER.md upstream
+  annotations: "data/drivebench-test.json"       # raw file from HF drive-bench/arena
+  # Corruption name -> directory under data/corruption/. Keys are the names we
+  # use in results; values are the upstream directory names from
+  # script/llava1.5-7b.sh. "clean" and "NoImage" are handled specially.
+  conditions:
+    clean: null
+    NoImage: null
+    LowLight: "LowLight"       # DriveBench paper calls this "Dark"
+    Fog: "Fog"
+
+prompt:
+  system_file: "prompt.txt"    # DriveBench system prompt, camera sentence rewritten per question
+  # Appended to MCQ questions only, so the first generated token is the option
+  # letter and the margin can be read from its logprobs. Set to "" to disable.
+  mcq_suffix: " Begin your answer with the option letter."
+
+images:
+  # null = send originals and let vLLM's max_pixels cap decide the token count.
+  # [224, 224] reproduces the released DriveBench adapter, which resizes every
+  # view to 224x224 before inference.
+  resize_to: null
+  noimage_size: [224, 224]     # released NoImage control: black 224x224 per view
+
+generation:
+  temperature: 0.0
+  max_tokens: 512             # the VQA amendment of November 16, 2026: the released DriveBench decoding length; the core freeze keeps 128 for the MCQ study
+  top_logprobs: 5
+  seed: 0
+
+pilot:
+  n_questions: 20
+  results_dir: "results/pilot"
+
+# VQA rubric judge (scripts/08_judge_vqa.py). The released evaluator hard-codes
+# gpt-3.5-turbo (shut down October 23, 2026); the model here is TO DECIDE with
+# the judge budget (team item 2, manifests/judge_cost.md) and every request
+# setting is recorded in every judge record and hashed into its resume key.
+# Key: OPENAI_API_KEY in the environment. Frozen later in manifests/judge_frozen.yaml.
+judge:
+  model: "deepseek-v4-flash-ron"   # team decision November 11, 2026 (trial numbers: manifests/judge_cost.md); the proxy alias, routed per manifests/judge_proxy_routing.json
+  base_url: "https://aiapi.paid.lol/v1"   # the team's LiteLLM proxy; always passed explicitly (OPENAI_BASE_URL ignored); part of the frozen settings and the record hash
+  # Optional request settings: null = omitted from the request (and from the hash).
+  # The released judge used temperature 0; GPT-5 models reject it unless
+  # reasoning_effort is "none" (plan section 7). Verify with 08 --compat-check.
+  temperature: null
+  top_p: null
+  reasoning_effort: "none"     # DeepSeek V4 is a reasoning model: "none" turns thinking off through the proxy; default and "low" return no score within 2048 tokens (session 2 trial)
+  seed: null
+  max_tokens: 2048             # released request.py intended 512; flash replies run to ~530 tokens with thinking off, so 512 would truncate
+  max_tokens_param: "max_tokens"   # "max_completion_tokens" for GPT-5 models (the compat check tells)
+  timeout_s: 120
+  no_cache: true               # send LiteLLM's per-request cache bypass; a proxy cache turns replicates into copies of one reply (seen November 11)
+  # Non-secret description of what stands behind the endpoint; recorded in every
+  # judge record and bound by the judge freeze (not a request field, not hashed).
+  # The request names only the alias; a proxy's routing table is copied here by hand.
+  backend:
+    provider: "DeepSeek API through the team's LiteLLM proxy at aiapi.paid.lol"
+    upstream_model: "deepseek/deepseek-v4-flash"   # proxy routing table for the alias, read November 11, 2026 (manifests/judge_proxy_routing.json); DeepSeek documents the legacy name as routing to DeepSeek-V4.1-Flash-1017
+    revision: null             # local judge: the checkpoint revision served (JUDGE_REVISION); required for a frozen local judge
+    thinking_control: "reasoning_effort none, verified through the proxy on November 8, 2026 (DeepSeek's own API documents thinking.type=disabled)"
+  # Production score per answer = mean of this many judgings (replicates 0..k-1,
+  # each requested with `08 --replicate k`); an answer missing any usable
+  # replicate has no production score. Team decision November 13, 2026
+  # (manifests/judge_decisions_2026-11-13.md): 3. Bound by the judge freeze.
+  production_replicates: 3
+  # Rubric score (0-100) at or above which a VQA answer counts as correct for
+  # flip classification: the mean of the production judgings compared with the
+  # threshold calibrated on human labels of development answers (same rule).
+  # TO DECIDE from the labels; null = VQA unassessed.
+  correct_threshold: null
+  # Acceptance bars for the calibrated threshold (decision 4, November 13, 2026),
+  # evaluated by scripts/11_calibrate_judge.py on the pooled held-out predictions
+  # of leave-one-scene-out cross-validation over the development scenes; the
+  # class counts are those of the calibration items. The team's choice, written
+  # before any score met a label; all five keys must be present. Failing any bar
+  # means no threshold is frozen and VQA stays unassessed (human labels are the
+  # VQA evidence).
+  acceptance:
+    agreement: 0.80       # held-out agreement with the consensus label
+    kappa: 0.40           # held-out Cohen's kappa
+    recall: 0.60          # held-out recall on human-correct and on human-incorrect items, each
+    min_per_class: 15     # calibration items of each human class
+    min_items: 100        # calibration items (plan section 7); fewer = no calibration
+
+# Own INT4 checkpoint (scripts/quantize_awq.py). Group size and scheme are the
+# official checkpoint's; calibration uses calibration-split questions only.
+quantize:
+  base_model: "Qwen/Qwen2.5-VL-7B-Instruct"
+  revision: "cc594898137f460bfe9f0759e9844b3ce807cfb5"
+  scheme: "W4A16_ASYM"         # 4-bit weights, zero point, 16-bit activations (AutoAWQ convention)
+  group_size: 128
+  max_seq_len: 4096            # equals --max-model-len in 01_serve.sh
+  max_pixels: 200704           # equals MAX_PIXELS in 01_serve.sh so calibration sees the served token budget
+  n_samples: 0                 # 0 = every eligible calibration-split question (107)
+  condition: "clean"
+  ignore:                      # never quantized; `re:` = regex over module names
+    - "lm_head"
+    - "re:.*embed_tokens"
+    - "re:visual.*"
+    - "re:model.visual.*"
+  out_dir: "checkpoints/qwen2.5-vl-7b-awq-w4a16-g128"
+
+# Analysis settings (PROTOCOL sections 5, 8, 9). Enforced against the frozen
+# copy for final-split analyses; CLI overrides are errors there.
+analysis:
+  min_questions: 30            # coverage: a group below this is unassessed
+  min_scenes: 10
+  margin_edges: [0.25, 0.5]    # BF16 option-margin bins
+  n_boot_group: 2000           # group intervals
+  n_boot_contrast: 20000       # prespecified contrasts
+  seed: 0                      # bootstrap seed (group and contrast draws)
+  support_min_ref_correct: 20  # contrast support: reference-correct pairs per side
+  support_min_ref_scenes: 10   # ... from at least this many scenes

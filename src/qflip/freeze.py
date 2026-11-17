@@ -43,6 +43,23 @@ EXPECTED_DTYPE = {"bf16": "bfloat16", "int4": "float16"}
 # PROTOCOL sections whose TO DECIDE rows do not block the core freeze.
 OPEN_ALLOWED_SECTIONS = {7, 12}
 
+# Amendments: a second, separately frozen protocol that differs from the core
+# freeze in named settings only and covers named cells only. The first is the
+# VQA generation length (November 16, 2026, manifests/explore_512tok_2026-11-16.md):
+# the core freeze's 128-token cap cut 99% of the VQA answers, so VQA answers
+# are regenerated at the released 512 under this amendment, into their own
+# directories, while the MCQ study and its results stay under the core freeze.
+VQA_CELLS_FOR_AMENDMENT = ("perception/VQA", "prediction/VQA", "planning/VQA")
+AMENDMENTS = {
+    "vqa512": {
+        "config": "config/vqa512.yaml",
+        "frozen": "manifests/config_frozen_vqa512.yaml",
+        "allowed_diffs": {("generation", "max_tokens"): 512},  # the only core setting that may differ, and its value
+        "cells": VQA_CELLS_FOR_AMENDMENT,
+        "reason": "VQA answers regenerated at the released DriveBench decoding length; the frozen 128 truncated 99% of them",
+    },
+}
+
 
 class FreezeError(RuntimeError):
     pass
@@ -183,6 +200,128 @@ def build_frozen(
 def load_frozen(path: str | Path = FROZEN_PATH) -> dict | None:
     p = Path(path)
     return yaml.safe_load(p.read_text()) if p.exists() else None
+
+
+def amendment(name: str) -> dict:
+    """The registered amendment `name` (config path, frozen path, allowed
+    differences, cells)."""
+    if name not in AMENDMENTS:
+        raise FreezeError(f"unknown amendment {name!r}; known: {sorted(AMENDMENTS)}")
+    return {"name": name, **AMENDMENTS[name]}
+
+
+def freeze_identity(frozen: dict) -> dict:
+    """What a sidecar records as `freeze_checked`: the freeze's date and commit,
+    plus the amendment name when the freeze is an amendment. Written by the run
+    guard and compared by the calibration guard, so the two cannot drift."""
+    ident = {"date": frozen["frozen"]["date"], "git_commit": frozen["frozen"]["git_commit"]}
+    if frozen.get("amendment"):
+        ident["amendment"] = frozen["amendment"]["name"]
+    return ident
+
+
+def core_diffs(a: dict, b: dict) -> dict[tuple[str, str], tuple]:
+    """{(section, key): (a value, b value)} for every core setting that differs."""
+    out = {}
+    for section in sorted(set(a) | set(b)):
+        for key in sorted(set(a.get(section, {})) | set(b.get(section, {}))):
+            va, vb = a.get(section, {}).get(key), b.get(section, {}).get(key)
+            if va != vb:
+                out[(section, key)] = (va, vb)
+    return out
+
+
+def check_amendment_config(cfg: dict, base_frozen: dict, am: dict) -> list[str]:
+    """The amendment's core config must equal the base freeze's core except in
+    the amendment's allowed settings, each at its registered value."""
+    diffs = []
+    found = core_diffs(core_config(cfg), base_frozen["core"])
+    for (section, key), (live, base) in found.items():
+        want = am["allowed_diffs"].get((section, key))
+        if want is None:
+            diffs.append(f"config {section}.{key}: live={live!r} base freeze={base!r}; amendment {am['name']} may change only {['.'.join(k) for k in am['allowed_diffs']]}")
+        elif live != want:
+            diffs.append(f"config {section}.{key}: live={live!r}; amendment {am['name']} fixes it at {want!r}")
+    for (section, key), want in am["allowed_diffs"].items():
+        if (section, key) not in found:
+            diffs.append(f"config {section}.{key}: equals the base freeze ({cfg.get(section, {}).get(key)!r}); amendment {am['name']} requires {want!r}")
+    return diffs
+
+
+def build_amendment_frozen(cfg: dict, name: str, base_frozen: dict, split_file: str | Path, exclusions_file: str | Path, git_state: tuple[str, bool] | None = None, repo_root: str | Path = ".", base_path: str | Path = FROZEN_PATH) -> dict:
+    """The amendment freeze: the base freeze's pins, builds, model identities,
+    snapshot and requirements verbatim (the amendment inherits the frozen
+    environment and models), the amendment config's own core and fingerprints,
+    and an `amendment` block naming the base freeze and the one allowed
+    difference. Refuses a config that differs from the base in anything else."""
+    am = amendment(name)
+    bad = check_amendment_config(cfg, base_frozen, am)
+    if bad:
+        raise FreezeError(f"amendment {name} refused:\n  " + "\n  ".join(bad))
+    rev, dirty = git_state if git_state is not None else git_revision(repo_root)
+    bf = base_frozen["frozen"]
+    snapshot = bf["protocol_snapshot"]
+    fp = input_fingerprints(cfg, split_file, exclusions_file, snapshot)
+    for k in ("split_sha256", "exclusions_sha256", "annotations_sha256", "prompt_sha256", "protocol_snapshot_sha256"):
+        if fp[k] != bf.get(k):
+            raise FreezeError(f"amendment {name} refused: {k} differs from the base freeze (live {str(fp[k])[:12]}, base {str(bf.get(k))[:12]}); an amendment changes settings, never inputs")
+    return {
+        "frozen": {
+            "date": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "git_commit": rev,
+            "git_dirty": dirty,
+            "protocol_snapshot": snapshot,
+            "requirements_file": bf["requirements_file"],
+            "requirements_sha256": bf["requirements_sha256"],
+            **fp,
+        },
+        "amendment": {
+            "name": name,
+            "reason": am["reason"],
+            "cells": list(am["cells"]),
+            "differs": {".".join(k): {"base": base_frozen["core"][k[0]][k[1]], "amendment": v} for k, v in am["allowed_diffs"].items()},
+            # the base file's digest binds the amendment to that exact file; recorded only when the file at base_path is this base
+            "base": {"path": str(base_path), "sha256": sha256_file(base_path) if Path(base_path).exists() and load_frozen(base_path) == base_frozen else None,
+                     "date": bf["date"], "git_commit": bf["git_commit"], "core_config_sha256": bf["core_config_sha256"]},
+        },
+        "versions": base_frozen["versions"],
+        "builds": base_frozen.get("builds") or base_frozen["versions"],
+        "models_frozen": base_frozen["models_frozen"],
+        "core": core_config(cfg),
+    }
+
+
+INHERITED_FINGERPRINTS = ("split_sha256", "exclusions_sha256", "annotations_sha256", "prompt_sha256", "protocol_snapshot", "protocol_snapshot_sha256", "requirements_file", "requirements_sha256")
+
+
+def check_amendment(frozen: dict, base_frozen: dict | None, base_sha256: str | None = None) -> list[str]:
+    """An amendment freeze is valid only against the core freeze it was built
+    on: the base file's digest when the caller has it, the base's date, commit
+    and core hash, every inherited input fingerprint, environment and models
+    equal, and a core that differs from the base in the allowed settings alone."""
+    am = frozen.get("amendment")
+    if not am:
+        return []
+    if base_frozen is None:
+        return [f"amendment {am['name']}: the core freeze it amends ({am['base']['path']}) is missing"]
+    diffs = []
+    bf = base_frozen["frozen"]
+    if base_sha256 is not None and am["base"].get("sha256") != base_sha256:
+        diffs.append(f"amendment {am['name']}: the core freeze file {am['base']['path']} changed since the amendment was built (digest {str(am['base'].get('sha256'))[:12]} then, {base_sha256[:12]} now)")
+    for k in ("date", "git_commit", "core_config_sha256"):
+        if am["base"].get(k) != bf.get(k):
+            diffs.append(f"amendment {am['name']}: built on core freeze {k}={str(am['base'].get(k))[:19]!r}, the core freeze now has {str(bf.get(k))[:19]!r}")
+    for k in INHERITED_FINGERPRINTS:
+        if frozen["frozen"].get(k) != bf.get(k):
+            diffs.append(f"amendment {am['name']}: {k} differs from the core freeze (amendment {str(frozen['frozen'].get(k))[:12]!r}, core {str(bf.get(k))[:12]!r})")
+    reg = amendment(am["name"])
+    diffs += check_amendment_config(frozen["core"], base_frozen, reg)
+    for k in ("versions", "builds", "models_frozen"):
+        if frozen.get(k) != base_frozen.get(k):
+            diffs.append(f"amendment {am['name']}: {k} differ from the core freeze")
+    if list(am.get("cells") or []) != list(reg["cells"]):
+        diffs.append(f"amendment {am['name']}: cells {am.get('cells')} differ from the registered {list(reg['cells'])}")
+    return diffs
 
 
 def check_config(cfg: dict, frozen: dict, split_file: str | Path, exclusions_file: str | Path) -> list[str]:

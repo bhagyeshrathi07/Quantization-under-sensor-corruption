@@ -3,6 +3,12 @@
     python scripts/freeze_config.py                 # write manifests/config_frozen.yaml + PROTOCOL_frozen.md
     python scripts/freeze_config.py --check         # live config and inputs match the frozen copy (exit 1 otherwise)
     python scripts/freeze_config.py --check --serve-manifest manifests/serve_int4.txt --precision int4
+    python scripts/freeze_config.py --amendment vqa512           # write manifests/config_frozen_vqa512.yaml from config/vqa512.yaml, on the core freeze
+    python scripts/freeze_config.py --amendment vqa512 --check   # the amendment config, inputs and its fit to the core freeze
+
+An amendment (qflip.freeze.AMENDMENTS) inherits the core freeze's environment,
+models, snapshot and requirements and may differ from it in its registered
+settings only; it is written from a clean commit like the core freeze.
 
 Writing refuses when the git tree is dirty or when PROTOCOL.md still has a
 TO DECIDE status outside sections 7 (VQA judge, frozen separately) and 12
@@ -20,8 +26,12 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from qflip.config import load_config  # noqa: E402
+from qflip.guard import load_frozen_checked  # noqa: E402
 from qflip.freeze import (  # noqa: E402
+    AMENDMENTS,
     FROZEN_PATH,
+    amendment,
+    build_amendment_frozen,
     PROTOCOL_SNAPSHOT,
     REQUIREMENTS_FROZEN,
     FreezeError,
@@ -38,11 +48,11 @@ from qflip.provenance import git_revision, parse_serve_manifest  # noqa: E402
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--config", default="config/pilot.yaml")
+    ap.add_argument("--config", help="default config/pilot.yaml, or the amendment's config with --amendment")
     ap.add_argument("--split-file", default="manifests/scene_split.json")
     ap.add_argument("--exclusions-file", default="manifests/scene_exclusions.json")
     ap.add_argument("--protocol", default="PROTOCOL.md")
-    ap.add_argument("--frozen", default=str(FROZEN_PATH))
+    ap.add_argument("--frozen", help=f"default {FROZEN_PATH}, or the amendment's frozen path with --amendment")
     ap.add_argument("--snapshot", default=str(PROTOCOL_SNAPSHOT))
     ap.add_argument("--int4-model", help="own checkpoint directory (default quantize.out_dir)")
     ap.add_argument("--requirements", default=str(REQUIREMENTS_FROZEN), help="pinned serving environment recorded in the freeze")
@@ -52,13 +62,26 @@ def main():
     ap.add_argument("--serve-manifest", help="with --check: also compare a serve manifest")
     ap.add_argument("--precision", choices=["bf16", "int4"])
     ap.add_argument("--allow-dirty", action="store_true", help="tests only")
+    ap.add_argument("--amendment", choices=sorted(AMENDMENTS), help="write or check this amendment's freeze instead of the core freeze (its config and frozen path unless given explicitly)")
+    ap.add_argument("--base-frozen", default=str(FROZEN_PATH), help="with --amendment (write): the core freeze the amendment is built on; --check uses the base the amendment file names")
     args = ap.parse_args()
 
+    am = None
+    if args.amendment:
+        am = amendment(args.amendment)
+        args.config = args.config or am["config"]
+        args.frozen = args.frozen or am["frozen"]
+    args.config = args.config or "config/pilot.yaml"
+    args.frozen = args.frozen or str(FROZEN_PATH)
     cfg = load_config(args.config)
     if args.check:
-        frozen = load_frozen(args.frozen)
-        if frozen is None:
-            sys.exit(f"no freeze: {args.frozen} missing")
+        try:
+            # the runtime guards' loader: an amendment must carry its block and fit the core freeze file it names (digest included)
+            frozen = load_frozen_checked(args.frozen, "freeze check", am["name"] if am else None)
+        except FreezeError as e:
+            print("FREEZE CHECK FAILED")
+            print("  " + str(e))
+            sys.exit(1)
         diffs = check_config(cfg, frozen, args.split_file, args.exclusions_file)
         if args.serve_manifest:
             if not args.precision:
@@ -69,7 +92,25 @@ def main():
             for d in diffs:
                 print("  " + d)
             sys.exit(1)
-        print(f"freeze check passed ({frozen['frozen']['date']}, commit {frozen['frozen']['git_commit'][:8]})")
+        print(f"freeze check passed ({frozen['frozen']['date']}, commit {frozen['frozen']['git_commit'][:8]})" + (f", amendment {frozen['amendment']['name']} on core freeze {frozen['amendment']['base']['date']}" if frozen.get("amendment") else ""))
+        return
+
+    if am:
+        rev, dirty = git_revision(".")
+        if dirty and not args.allow_dirty:
+            sys.exit("working tree is dirty; commit first so the amendment freeze records a clean commit")
+        if Path(args.frozen).exists():
+            sys.exit(f"{args.frozen} exists; a changed amendment is a new dated freeze (remove the old file deliberately and record it in the PROTOCOL change log)")
+        base = load_frozen(args.base_frozen)
+        if base is None:
+            sys.exit(f"{args.base_frozen} missing; an amendment is built on the core freeze")
+        try:
+            frozen = build_amendment_frozen(cfg, am["name"], base, args.split_file, args.exclusions_file, git_state=(rev, dirty), base_path=args.base_frozen)
+        except FreezeError as e:
+            sys.exit(str(e))
+        Path(args.frozen).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.frozen).write_text(yaml.safe_dump(frozen, sort_keys=False))
+        print(f"wrote {args.frozen}: amendment {am['name']} on core freeze {base['frozen']['date']} (commit {base['frozen']['git_commit'][:8]}); differs {frozen['amendment']['differs']}; cells {frozen['amendment']['cells']}\n  commit {rev[:8]} dirty={dirty}")
         return
 
     open_items = blocking_open_items(Path(args.protocol).read_text())

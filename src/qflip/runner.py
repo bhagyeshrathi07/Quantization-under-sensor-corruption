@@ -10,6 +10,18 @@ from qflip.client import chat, option_margin
 from qflip.drivebench import Question, build_messages, normalize_mcq, normalize_mcq_strict
 
 
+CELL_GROUPS = {"all": None, "vqa": ("perception/VQA", "prediction/VQA", "planning/VQA"), "mcq": ("perception/MCQ", "behavior/MCQ")}
+
+
+def filter_cells(questions: list[Question], cells) -> list[Question]:
+    """Questions whose cell is in `cells` (a group name from CELL_GROUPS or an
+    iterable of cell names); "all"/None keeps every question."""
+    if cells is None or cells == "all":
+        return list(questions)
+    allowed = set(CELL_GROUPS[cells]) if isinstance(cells, str) else set(cells)
+    return [q for q in questions if q.cell in allowed]
+
+
 def select_stratified(questions: list[Question], n: int, seed: int = 0) -> list[Question]:
     """Deterministic round-robin over cells so every eligible cell appears.
     n <= 0 returns every eligible question."""
@@ -65,6 +77,7 @@ def run_question(client, model: str, q: Question, cfg: dict, condition: str, pre
         "error": c.error,
         "prompt_tokens": c.prompt_tokens,
         "completion_tokens": c.completion_tokens,
+        "finish_reason": c.finish_reason,
         "latency_s": round(c.latency_s, 4),
         "first_token_top_logprobs": c.first_token_top_logprobs,
     }

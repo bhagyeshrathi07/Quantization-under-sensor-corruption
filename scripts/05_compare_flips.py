@@ -45,7 +45,7 @@ from qflip.config import load_config  # noqa: E402
 from qflip.contrasts import format_contrast, prespecified_contrasts  # noqa: E402
 from qflip.drivebench import load_questions  # noqa: E402
 from qflip.flips import PairingError, bootstrap_scenes, coverage, group_by, merge_pairs, pair_records, pair_vqa_records, summarize  # noqa: E402
-from qflip.freeze import FreezeError  # noqa: E402
+from qflip.freeze import AMENDMENTS, FreezeError, amendment  # noqa: E402
 from qflip.guard import judge_settings_for, legacy_files_check, validate_analysis_files  # noqa: E402
 from qflip.judge import JudgeInputError, JudgeSettingsError, ensure_visual_description, load_scores, load_visual_description, production_scores, sidecar_path  # noqa: E402
 from qflip.records import read_records  # noqa: E402
@@ -121,7 +121,7 @@ def main():
     ap.add_argument("--n-boot-contrast", type=int, help="contrast bootstrap draws (default analysis.n_boot_contrast)")
     ap.add_argument("--contrasts", action="store_true", help="evaluate the five prespecified F_h contrasts (plan section 4) over the MCQ pairs, grouped by condition")
     ap.add_argument("--seed", type=int, help="bootstrap seed (default analysis.seed; frozen on final-split files)")
-    ap.add_argument("--config", default="config/pilot.yaml")
+    ap.add_argument("--config", help="default config/pilot.yaml, or the amendment's config with --amendment")
     ap.add_argument("--split-file", default="manifests/scene_split.json")
     ap.add_argument("--exclusions-file", default="manifests/scene_exclusions.json")
     ap.add_argument("--no-provenance", action="store_true", help="skip sidecar/population validation (pilot files from before sidecars existed; never for final)")
@@ -132,7 +132,14 @@ def main():
     ap.add_argument("--desc", default="data/visual_description.json", help="object visual descriptions (judge input, hash-checked)")
     ap.add_argument("--out", help="write the full report as JSON")
     ap.add_argument("--show-harmful", type=int, default=20, help="print up to N harmful examples")
+    ap.add_argument("--amendment", choices=sorted(AMENDMENTS), help="files produced under this amendment: its config (unless --config is given) and its freeze; the files may hold its cells only")
     args = ap.parse_args()
+    frozen_kw = {}
+    if args.amendment:
+        am = amendment(args.amendment)
+        args.config = args.config or am["config"]
+        frozen_kw = {"frozen_path": am["frozen"], "amendment": am["name"]}
+    args.config = args.config or "config/pilot.yaml"
     if len(args.files) % 2:
         sys.exit("files must come in ref/quant pairs")
     resolved = [str(Path(f).resolve()) for f in args.files]
@@ -155,8 +162,8 @@ def main():
         provenance = legacy_files_check(args.files, args.split_file, args.exclusions_file)
         print("EXPLORATORY: --no-provenance skips sidecar/population validation; this output is not a confirmatory result")
     else:
-        provenance = validate_analysis_files(args.files, cfg, split_file=args.split_file, exclusions_file=args.exclusions_file, settings=effective)
-        print(f"provenance ok: split={provenance['split']} ({provenance['analysis_class']}), {len(provenance['files'])} files" + (", frozen " + provenance["frozen"]["date"] if "frozen" in provenance else ""))
+        provenance = validate_analysis_files(args.files, cfg, split_file=args.split_file, exclusions_file=args.exclusions_file, settings=effective, **frozen_kw)
+        print(f"provenance ok: split={provenance['split']} ({provenance['analysis_class']}), {len(provenance['files'])} files" + (", frozen " + provenance["frozen"]["date"] if "frozen" in provenance else "") + (f", amendment {provenance['amendment']}" if provenance.get("amendment") else ""))
     questions = load_questions(cfg["data"]["annotations"])
     question_text = {q.question_id: q.question for q in questions}
     # eligible questions per cell in the declared population (None when the files carry no population)

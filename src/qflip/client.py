@@ -36,6 +36,7 @@ class Completion:
     latency_s: float
     first_token_top_logprobs: list[dict] | None  # [{"token": str, "logprob": float}, ...]
     error: str | None = None
+    finish_reason: str | None = None  # the server's reason ("stop", "length" = cut at max_tokens); None when unknown
 
 
 def make_client(cfg: dict) -> OpenAI:
@@ -72,6 +73,7 @@ def chat(client: OpenAI, model: str, messages: list[dict], gen: dict) -> Complet
         completion_tokens=usage.completion_tokens if usage else None,
         latency_s=latency,
         first_token_top_logprobs=top,
+        finish_reason=getattr(choice, "finish_reason", None),
     )
 
 

@@ -10,6 +10,9 @@
 #   REQUIRE_FREEZE=1 CONDITIONS=clean SPLIT=development OUT_DIR=results/dev bash scripts/run_matrix.sh   # development run on the frozen settings (judge calibration)
 #   INT4_MODEL=checkpoints/qwen2.5-vl-7b-awq-w4a16-g128 bash scripts/run_matrix.sh int4   # own checkpoint
 #   RSYNC_TO=user@host:/path/qflip bash scripts/run_matrix.sh   # copy results/ and manifests/ after each run
+#   INT4_MODEL=checkpoints/qwen2.5-vl-7b-awq-w4a16-g128 AMENDMENT=vqa512 bash scripts/run_matrix.sh   # VQA cells under the 512-token amendment: its config, its freeze (required), results/final_vqa512
+#   INT4_MODEL=checkpoints/qwen2.5-vl-7b-awq-w4a16-g128 AMENDMENT=vqa512 SPLIT=development OUT_DIR=results/dev_vqa512 CONDITIONS=clean bash scripts/run_matrix.sh   # the amendment's development run
+#   (INT4_MODEL names the own checkpoint; without it 01_serve.sh serves the official AWQ checkpoint and the freeze check refuses the server)
 #
 # Logs: logs/matrix_<timestamp>.txt (this driver), logs/serve_<precision>_<timestamp>.txt (vLLM),
 # and 03's own output appended to logs/matrix_<precision>_<condition>.txt.
@@ -20,7 +23,15 @@ PRECISIONS=("$@")
 [[ ${#PRECISIONS[@]} -eq 0 ]] && PRECISIONS=(bf16 int4)
 CONDITIONS="${CONDITIONS:-clean NoImage LowLight Fog}"
 SPLIT="${SPLIT:-final}"
-OUT_DIR="${OUT_DIR:-results/final}"
+AMENDMENT="${AMENDMENT:-}"
+AMEND_FLAG=""
+if [[ -n "$AMENDMENT" ]]; then
+  AMEND_FLAG="--amendment ${AMENDMENT}"
+  REQUIRE_FREEZE=1
+  OUT_DIR="${OUT_DIR:-results/final_${AMENDMENT}}"
+else
+  OUT_DIR="${OUT_DIR:-results/final}"
+fi
 N="${N:-0}"
 PORT="${PORT:-8000}"
 HEALTH_TIMEOUT_S="${HEALTH_TIMEOUT_S:-1200}"
@@ -66,15 +77,15 @@ sync_out() {
     || run rsync -a results "$RSYNC_TO/" && run rsync -a manifests logs "$RSYNC_TO/"
 }
 
-log "matrix start: precisions=${PRECISIONS[*]} conditions=${CONDITIONS} split=${SPLIT} out=${OUT_DIR} n=${N} port=${PORT} require_freeze=${REQUIRE_FREEZE}"
+log "matrix start: precisions=${PRECISIONS[*]} conditions=${CONDITIONS} split=${SPLIT} out=${OUT_DIR} n=${N} port=${PORT} require_freeze=${REQUIRE_FREEZE} amendment=${AMENDMENT:-none}"
 [[ "$DRY_RUN" == "1" ]] && echo "+ (dry run; nothing executed)"
 
 # Final split, or REQUIRE_FREEZE=1: the core freeze must exist and match the live config before any server starts.
 if [[ "$REQUIRE_FREEZE" == "1" ]]; then
   if [[ "$DRY_RUN" == "1" ]]; then
-    echo "+ python scripts/freeze_config.py --check   (required for SPLIT=final or REQUIRE_FREEZE=1)"
+    echo "+ python scripts/freeze_config.py --check ${AMEND_FLAG}  (required for SPLIT=final or REQUIRE_FREEZE=1)"
   else
-    python scripts/freeze_config.py --check || { log "run refused: freeze check failed"; exit 1; }
+    python scripts/freeze_config.py --check ${AMEND_FLAG} || { log "run refused: freeze check failed"; exit 1; }
   fi
 fi
 
@@ -87,7 +98,7 @@ for p in "${PRECISIONS[@]}"; do
     echo "+ port ${PORT} must be free"
     echo "+ bash scripts/01_serve.sh $p  > logs/serve_${p}_${STAMP}.txt 2>&1 &"
     echo "+ wait for http://localhost:${PORT}/health, then /v1/models must list $(served_name "$p"); manifest pid and port listener must be that server"
-    [[ "$REQUIRE_FREEZE" == "1" ]] && echo "+ python scripts/freeze_config.py --check --serve-manifest manifests/serve_${p}.txt --precision $p"
+    [[ "$REQUIRE_FREEZE" == "1" ]] && echo "+ python scripts/freeze_config.py --check ${AMEND_FLAG} --serve-manifest manifests/serve_${p}.txt --precision $p"
   else
     port_free || { log "port ${PORT} already in use: another server is running; refusing to reuse it"; exit 1; }
     log "starting server: $p"
@@ -106,17 +117,17 @@ for p in "${PRECISIONS[@]}"; do
       log "port ${PORT} is held by pid ${listener_pid} (parent ${listener_ppid:-?}), not the started server ${SERVER_PID}"; exit 1
     fi
     if [[ "$REQUIRE_FREEZE" == "1" ]]; then
-      python scripts/freeze_config.py --check --serve-manifest "manifests/serve_${p}.txt" --precision "$p" \
+      python scripts/freeze_config.py --check ${AMEND_FLAG} --serve-manifest "manifests/serve_${p}.txt" --precision "$p" \
         || { log "run refused: server manifest differs from the freeze"; exit 1; }
     fi
   fi
 
   for c in $CONDITIONS; do
     if [[ "$DRY_RUN" == "1" ]]; then
-      echo "+ python scripts/03_smoke_drivebench.py --precision $p --condition $c --n $N --split $SPLIT --out-dir $OUT_DIR $FREEZE_FLAG  |& tee -a logs/matrix_${p}_${c}.txt"
+      echo "+ python scripts/03_smoke_drivebench.py --precision $p --condition $c --n $N --split $SPLIT --out-dir $OUT_DIR $FREEZE_FLAG $AMEND_FLAG  |& tee -a logs/matrix_${p}_${c}.txt"
     else
       log "run: $p $c"
-      python scripts/03_smoke_drivebench.py --precision "$p" --condition "$c" --n "$N" --split "$SPLIT" --out-dir "$OUT_DIR" $FREEZE_FLAG 2>&1 | tee -a "logs/matrix_${p}_${c}.txt"
+      python scripts/03_smoke_drivebench.py --precision "$p" --condition "$c" --n "$N" --split "$SPLIT" --out-dir "$OUT_DIR" $FREEZE_FLAG $AMEND_FLAG 2>&1 | tee -a "logs/matrix_${p}_${c}.txt"
       cp "manifests/serve_${p}.txt" "$OUT_DIR/serve_${p}.txt"
       sync_out
     fi
@@ -131,4 +142,4 @@ for p in "${PRECISIONS[@]}"; do
 done
 
 log "matrix done"
-[[ "$DRY_RUN" == "1" ]] || echo "next: python scripts/05_compare_flips.py $(for c in $CONDITIONS; do printf '%s/bf16_%s.jsonl %s/int4_%s.jsonl ' "$OUT_DIR" "$c" "$OUT_DIR" "$c"; done)--by cell n_views margin condition"
+[[ "$DRY_RUN" == "1" ]] || echo "next: python scripts/05_compare_flips.py $(for c in $CONDITIONS; do printf '%s/bf16_%s.jsonl %s/int4_%s.jsonl ' "$OUT_DIR" "$c" "$OUT_DIR" "$c"; done)--by cell n_views margin condition ${AMEND_FLAG}"

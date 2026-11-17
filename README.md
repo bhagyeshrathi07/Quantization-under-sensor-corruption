@@ -64,13 +64,16 @@ scripts/09_tables.py               markdown tables T1-T7 from the 05, 07 and 06 
 scripts/10_build_label_sheet.py    blind label sheet for the judge calibration (development answers under the core freeze only; one item per VQA answer, shuffled; one copy per labeller; key kept apart; never overwritten)
 scripts/11_calibrate_judge.py      --labels-only: pre-discussion agreement and Fleiss' kappa from the label columns alone (consensus columns not read); full: decision 4 against the consensus labels on the rows every labeller reached (issued items, sheet order, displayed text and answers bound by digest; agreement curve, leave-one-scene-out acceptance on judge.acceptance as exact fractions, sensitivity rows)
 scripts/12_merge_label_copies.py   merge the labellers' copies into the master sheet (same items, order and text; conflicts refused)
+config/explore_512tok.yaml         exploratory copy of the pilot config at the released 512-token decoding length (manifests/explore_512tok_2026-11-16.md); never study data
+config/vqa512.yaml                 the VQA amendment: pilot config with max_tokens 512, frozen separately (freeze_config.py --amendment vqa512); 03/05/08/10/11 take --amendment vqa512, run_matrix.sh AMENDMENT=vqa512
+scripts/13_label_ui.py             local browser tool for labelling one person's copy (manifests/labelling_guide.md beside each item; sheet order enforced; backed-up atomic writes of the label column only; --check)
 scripts/serve_judge.sh             open-weights judge on a second vLLM port for the VQA judge trial (any OpenAI-compatible endpoint works via --base-url)
 scripts/host_pull.sh               update the GPU host's checkout: backs up colliding untracked and modified files, fast-forwards, compares
 scripts/quantize_awq.py            own AWQ W4A16 checkpoint with llm-compressor, calibration-split prompts, manifest
 scripts/run_matrix.sh              serve -> all conditions -> stop, per precision; resumable; DRY_RUN=1 prints the plan
 scripts/rescore.py                 recompute MCQ fields after a rule change
 scripts/vast_setup.sh, hpc_pilot.sbatch
-tests/                             115 offline unit tests (pytest)
+tests/                             122 offline unit tests (pytest)
 ```
 
 ## Scope
@@ -100,6 +103,8 @@ tests/                             115 offline unit tests (pytest)
 **In progress (week 10).** Judge chosen (DeepSeek V4 flash via the team's proxy) and validated on development answers ([manifests/judge_validation_2026-11-11.md](manifests/judge_validation_2026-11-11.md)); human labels for the threshold, then the judge freeze and VQA judging of the matrix; report tables from `results/final/tables.md`; mitigation if time permits.
 
 **Decided November 13** ([manifests/judge_decisions_2026-11-13.md](manifests/judge_decisions_2026-11-13.md)): production VQA score = mean of three judgings (`judge.production_replicates`, frozen with the judge), label pool = every development VQA answer from a development run on the frozen servers (262 items), three blind labellers with a consensus label, threshold rule fixed before any label exists. **November 14** ([manifests/session3_2026-11-14.md](manifests/session3_2026-11-14.md)): development run done under the core freeze (191 answers per precision, zero errors), every development VQA answer judged three times (786 calls, all distinct, nothing stale), the blind sheet issued (`manifests/judge_label_sheet_2026-11-14.csv`, 262 items, one copy per labeller beside it, key in `results/dev/label_sheet_key.json`), and the calibration implemented (`qflip.calibrate`, scripts 10, 11 and 12, bars in `judge.acceptance`) with tests on synthetic labels; the reviewer's pass on the tooling (five findings: displayed text not bound to the labels, no frozen-development input guard, sheet order and item set not enforced, a kappa of exactly 0.40 failing in floating point, no pre-discussion mode) is fixed. Open: the three labellings, the discussion, the calibration run, the judge freeze.
+
+**VQA amendment (November 16, [manifests/explore_512tok_2026-11-16.md](manifests/explore_512tok_2026-11-16.md)).** 99% of the VQA answers stopped at the frozen 128-token cap (the released decoding is 512). VQA is regenerated at 512 under a separate, enforced amendment freeze into its own directories; the MCQ study and its results are untouched. Sequence: amendment freeze from a clean commit, development run (262 answers), 786 fresh judgings, replacement blind sheets, labelling with `scripts/13_label_ui.py` by `manifests/labelling_guide.md`, calibration under the unchanged acceptance rules, judge freeze, final VQA run (4,576 answers, about 5.75 GPU hours), matrix judging. The November 14 sheets are withdrawn unlabelled.
 
 **Not started.** VQA judging of the matrix (after the judge freeze), explorer (weeks 10–11), mitigation (12), report (13–14).
 

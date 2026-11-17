@@ -41,7 +41,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from qflip.config import load_config  # noqa: E402
 from qflip.drivebench import load_questions  # noqa: E402
-from qflip.freeze import FreezeError  # noqa: E402
+from qflip.freeze import AMENDMENTS, FreezeError, amendment  # noqa: E402
 from qflip.guard import check_judge_server, prepare_judging  # noqa: E402
 from qflip.judge import (  # noqa: E402
     backend_description,
@@ -243,7 +243,7 @@ def run_compat_check(client, settings: dict, prompt: str, fallback: bool) -> int
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("files", nargs="*", help="result .jsonl files from 03/06")
-    ap.add_argument("--config", default="config/pilot.yaml")
+    ap.add_argument("--config", help="default config/pilot.yaml, or the amendment's config with --amendment")
     ap.add_argument("--model", help="override judge.model from config")
     ap.add_argument("--base-url", help="override judge.base_url from config (any OpenAI-compatible endpoint; refused on final-split files when it differs from the frozen judge)")
     ap.add_argument("--desc", default="data/visual_description.json")
@@ -258,7 +258,14 @@ def main():
     ap.add_argument("--no-provenance", action="store_true", help="pilot files written before sidecars existed; never for final-split files")
     ap.add_argument("--reparse", action="store_true", help="re-read every stored reply in the files' sidecars under the current extractor, in place; no call, no key")
     ap.add_argument("--judge-manifest", default="manifests/serve_judge.txt", help="serve manifest of a local judge (checked against the frozen revision on final files)")
+    ap.add_argument("--amendment", choices=sorted(AMENDMENTS), help="answer files produced under this amendment: its config (unless --config is given) and its freeze")
     args = ap.parse_args()
+    frozen_kw = {}
+    if args.amendment:
+        am = amendment(args.amendment)
+        args.config = args.config or am["config"]
+        frozen_kw = {"frozen_path": am["frozen"], "amendment": am["name"]}
+    args.config = args.config or "config/pilot.yaml"
 
     # the files are the raw answer files; a glob such as results/final/*_*.jsonl also
     # matches the sidecars this script writes once replicate 0 exists
@@ -284,14 +291,14 @@ def main():
     # before any call: final-split files need the core freeze and the judge
     # freeze, and refuse --model or config values that differ from it.
     try:
-        prep = prepare_judging(args.files, cfg, cli_model=args.model, no_provenance=args.no_provenance, split_file=args.split_file, exclusions_file=args.exclusions_file)
+        prep = prepare_judging(args.files, cfg, cli_model=args.model, no_provenance=args.no_provenance, split_file=args.split_file, exclusions_file=args.exclusions_file, **frozen_kw)
     except (ProvenanceError, FreezeError) as e:
         sys.exit(str(e))
     except JudgeSettingsError as e:
         sys.exit(f"{e} (team item 2: pass --model or set config judge.model)")
     settings, prov, backend = prep["settings"], prep["provenance"], prep["backend"]
     if args.files:
-        print(f"provenance ok: split={prov['split']} ({prov['analysis_class']}), {len(prov['files'])} files" + (f", judge frozen {prep['judge_frozen']['date']}" if prep["judge_frozen"] else ""))
+        print(f"provenance ok: split={prov['split']} ({prov['analysis_class']}), {len(prov['files'])} files" + (f", judge frozen {prep['judge_frozen']['date']}" if prep["judge_frozen"] else "") + (f", amendment {prov['amendment']}" if prov.get("amendment") else ""))
     # resume, freeze evidence and production scoring share one predicate: a record counts
     # only under the expected backend description; on final files also the frozen response model
     expected_backend = dict(backend)

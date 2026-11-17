@@ -10,6 +10,7 @@ Writes two files per (precision, condition):
     python scripts/03_smoke_drivebench.py --precision bf16 --condition LowLight
     python scripts/03_smoke_drivebench.py --precision bf16 --n 0   # all questions
     python scripts/03_smoke_drivebench.py --precision bf16 --n 0 --split final --out-dir results/final   # full run
+    python scripts/03_smoke_drivebench.py --precision bf16 --n 0 --split final --out-dir results/final_vqa512 --amendment vqa512   # VQA cells under the 512-token amendment
 
 Question selection is deterministic (seeded), stratified so every eligible cell
 appears, and identical across precisions and conditions. Default split is
@@ -33,7 +34,8 @@ from qflip.drivebench import load_questions  # noqa: E402
 from qflip.gpu import PeakMemorySampler  # noqa: E402
 from qflip.guard import prepare_run  # noqa: E402
 from qflip.records import append_record, load_done_ids, read_records  # noqa: E402
-from qflip.runner import read_system_prompt, run_question, select_stratified  # noqa: E402
+from qflip.freeze import AMENDMENTS, amendment  # noqa: E402
+from qflip.runner import CELL_GROUPS, filter_cells, read_system_prompt, run_question, select_stratified  # noqa: E402
 from qflip.split import filter_split  # noqa: E402
 
 
@@ -41,15 +43,25 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--precision", choices=["bf16", "int4"], required=True)
     ap.add_argument("--condition", default="clean")
-    ap.add_argument("--config", default="config/pilot.yaml")
+    ap.add_argument("--config", help="default config/pilot.yaml, or the amendment's config with --amendment")
     ap.add_argument("--n", type=int, default=None, help="questions to run; 0 = all; default from config")
     ap.add_argument("--split", default="development", help="scene split: development (default), calibration, final (needs the freeze), final_exposed, all")
     ap.add_argument("--split-file", default="manifests/scene_split.json")
     ap.add_argument("--exclusions-file", default="manifests/scene_exclusions.json")
     ap.add_argument("--out-dir", help="results directory; default pilot.results_dir from config (results/pilot)")
     ap.add_argument("--require-freeze", action="store_true", help="refuse unless config and server manifest equal the core freeze, whatever the split (always on for final); the sidecar records the check. Used for the development calibration run")
+    ap.add_argument("--cells", default="all", choices=list(CELL_GROUPS), help="run these cells only (default all)")
+    ap.add_argument("--amendment", choices=sorted(AMENDMENTS), help="run under this amendment: its config (unless --config is given explicitly), its freeze (required), its cells only")
     args = ap.parse_args()
 
+    frozen_path = None
+    if args.amendment:
+        am = amendment(args.amendment)
+        args.config = args.config or am["config"]
+        frozen_path = am["frozen"]
+        args.cells = am["cells"]
+        args.require_freeze = True
+    args.config = args.config or "config/pilot.yaml"
     cfg = load_config(args.config)
     if args.condition not in cfg["data"]["conditions"]:
         sys.exit(f"condition {args.condition!r} not in config; known: {list(cfg['data']['conditions'])}")
@@ -57,7 +69,7 @@ def main():
     client = make_client(cfg)
     n = cfg["pilot"]["n_questions"] if args.n is None else args.n
 
-    questions = select_stratified(filter_split(load_questions(cfg["data"]["annotations"]), args.split, args.split_file, args.exclusions_file), n)
+    questions = select_stratified(filter_cells(filter_split(load_questions(cfg["data"]["annotations"]), args.split, args.split_file, args.exclusions_file), args.cells), n)
     system_prompt = read_system_prompt(cfg)
     out_dir = Path(args.out_dir or cfg["pilot"]["results_dir"])
     jsonl = out_dir / f"{args.precision}_{args.condition}.jsonl"
@@ -65,7 +77,7 @@ def main():
     # Raises before any record is written.
     prepare_run(cfg, config_path=args.config, precision=args.precision, condition=args.condition, split=args.split,
                 result_file=jsonl, split_file=args.split_file, exclusions_file=args.exclusions_file,
-                require_freeze=True if args.require_freeze else None)
+                require_freeze=True if args.require_freeze else None, **({"frozen_path": frozen_path, "amendment": args.amendment} if frozen_path else {}))
     done = load_done_ids(jsonl)
     todo = [q for q in questions if q.question_id not in done]
     print(f"{len(questions)} selected, {len(done)} done, {len(todo)} to run -> {jsonl}")
