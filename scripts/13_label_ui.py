@@ -6,7 +6,7 @@ Opens http://127.0.0.1:8765 in the browser: one item per screen (cell, the
 cell's section of the labelling guide, question, reference answer and model
 answer side by side), keys 1 and 0 or two buttons, left and right arrows to
 revisit. Every label is written to that person's copy
-(`manifests/judge_label_sheet_2026-11-14.<name>.csv`) before the screen
+(`manifests/judge_label_sheet_2026-11-17.<name>.csv`) before the screen
 advances: the copy is rewritten through a temporary file in the same folder,
 the previous version kept as `<copy>.bak`, and the written file is read back
 and compared to what was intended before the request succeeds. One instance
@@ -43,7 +43,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from qflip.calibrate import BLIND_COLUMNS, CalibrationError, label_column, parse_label  # noqa: E402
 
-DEFAULT_SHEET = "manifests/judge_label_sheet_2026-11-14.csv"
+DEFAULT_SHEET = "manifests/judge_label_sheet_2026-11-17.csv"
 DEFAULT_GUIDE = "manifests/labelling_guide.md"
 
 

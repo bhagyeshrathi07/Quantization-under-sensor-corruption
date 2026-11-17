@@ -190,7 +190,7 @@ def test_copy_is_validated_before_serving(tmp_path):
         ui.Copy(p, "ronak")
     # the real copies pass
     for name in ("ronak", "bhagyesh", "akshay"):
-        real = ROOT / "manifests" / f"judge_label_sheet_2026-11-14.{name}.csv"
+        real = ROOT / "manifests" / f"judge_label_sheet_2026-11-17.{name}.csv"
         if real.exists():
             c = ui.Copy(real, name)
             assert len(c.rows) == 262 and c.cols == [*ui.BLIND_COLUMNS, f"label_{name}"]

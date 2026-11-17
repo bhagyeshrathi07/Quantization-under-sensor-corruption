@@ -162,9 +162,12 @@ def test_analysis_and_calibration_accept_amendment_files_only_under_the_amendmen
     assert prov["amendment"] == "vqa512" and prov["analysis_class"] == "exploratory"
     cal = prepare_calibration_files(files, cfg512, split_file=w["split"], exclusions_file=w["excl"], frozen_path=fp, amendment="vqa512")
     assert cal["analysis_class"] == "calibration" and cal["amendment"] == "vqa512"
-    # under the core freeze the same development files are not calibration material (another freeze produced them)
-    with pytest.raises(FreezeError, match="freeze_checked"):
+    # under the core freeze the same development files are not calibration material: they were produced under the amendment
+    with pytest.raises(FreezeError, match="select it with --amendment vqa512"):
         prepare_calibration_files(files, w["cfg"], split_file=w["split"], exclusions_file=w["excl"], frozen_path=core_fp)
+    # and the amendment's files are never handled as plain core files, on the development split either
+    with pytest.raises(FreezeError, match="select it with --amendment vqa512"):
+        validate_analysis_files(files, cfg512, split_file=w["split"], exclusions_file=w["excl"], frozen_path=core_fp)
     # development paths enforce the selected amendment too: 128-token answers copied VQA-only (core identity, core hash), a wrong live
     # config, and an amendment whose base moved are refused on the development split, not labelled "amendment vqa512"
     core_dev = _files(w, tmp_path / "dev_core_copy", w["cfg_path"], {"bf16": vqa_rows, "int4": vqa_rows}, freeze_checked=freeze_identity(load_frozen(core_fp)))
@@ -204,6 +207,13 @@ def test_analysis_and_calibration_accept_amendment_files_only_under_the_amendmen
     out = validate_analysis_files(fin, cfg512, split_file=w["split"], exclusions_file=w["excl"], frozen_path=fp, amendment="vqa512")
     # final population, but the amendment is a secondary measure: never "confirmatory" (review of November 16, fourth pass)
     assert out["analysis_class"] == "exploratory" and out["amendment"] == "vqa512" and out["split"] == "final" and out["frozen"]["git_commit"] == "deadbeef"
+    with pytest.raises(FreezeError, match="select it with --amendment vqa512"):
+        validate_analysis_files(fin, w["cfg"], split_file=w["split"], exclusions_file=w["excl"], frozen_path=core_fp)
+    # a final amendment file whose sidecar lost its identity would still fail the core hash under the core freeze
+    stripped = [json.loads(Path(str(f) + ".meta.json").read_text()) for f in fin]
+    for f, m in zip(fin, stripped):
+        m.pop("freeze_checked")
+        Path(str(f) + ".meta.json").write_text(json.dumps(m))
     with pytest.raises(FreezeError, match="core_config_sha256"):
         validate_analysis_files(fin, w["cfg"], split_file=w["split"], exclusions_file=w["excl"], frozen_path=core_fp)
     core_fin = _files(w, tmp_path / "final_core", w["cfg_path"], {"bf16": [{"cell": "planning/VQA"}], "int4": [{"cell": "planning/VQA"}]}, split="final")

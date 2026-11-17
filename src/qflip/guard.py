@@ -268,6 +268,10 @@ def validate_analysis_files(
     # files must have been produced under it (identity, sidecars, live config, cells) and the amendment
     # must still fit the core freeze. The population (split) keeps its own checks below; the inferential
     # status of amendment files is exploratory whatever the split: the VQA amendment is a secondary measure.
+    produced_under = {m.get("freeze_checked", {}).get("amendment") for m in metas.values() if isinstance(m.get("freeze_checked"), dict)} - {None}
+    if not amendment and produced_under:
+        # files produced under an amendment are handled under that amendment on every split, never as plain core files
+        raise FreezeError(f"these files were produced under amendment {sorted(produced_under)}; select it with --amendment {sorted(produced_under)[0]}")
     if amendment:
         am_frozen = load_frozen_checked(frozen_path, "analysis under the amendment", amendment)
         amendment_cells_check(files, am_frozen)

@@ -3,12 +3,12 @@ manifests/judge_decisions_2026-11-13.md (decision 4), and report whether the
 judge is accepted.
 
     # before the discussion: inter-labeller statistics from the label columns alone (no key, no scores)
-    python scripts/11_calibrate_judge.py --labels-only --sheet manifests/judge_label_sheet_2026-11-14.csv --labellers ronak bhagyesh akshay
+    python scripts/11_calibrate_judge.py --labels-only --sheet manifests/judge_label_sheet_2026-11-17.csv --labellers ronak bhagyesh akshay
 
     # after the consensus column is complete
-    python scripts/11_calibrate_judge.py results/dev/bf16_clean.jsonl results/dev/int4_clean.jsonl \
-        --sheet manifests/judge_label_sheet_2026-11-14.csv --key results/dev/label_sheet_key.json \
-        --out results/dev/judge_calibration.json
+    python scripts/11_calibrate_judge.py results/dev_vqa512/bf16_clean.jsonl results/dev_vqa512/int4_clean.jsonl --amendment vqa512 \
+        --sheet manifests/judge_label_sheet_2026-11-17.csv --key results/dev_vqa512/label_sheet_key.json \
+        --out results/dev_vqa512/judge_calibration.json
 
 The sheet is read and checked first; the key is opened only when every
 labeller's labels are the sheet's first rows (items are labelled in sheet

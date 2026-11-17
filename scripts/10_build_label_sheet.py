@@ -1,9 +1,9 @@
 """Build the blind label sheet for the judge calibration, its key, and one
 copy per labeller.
 
-    python scripts/10_build_label_sheet.py results/dev/bf16_clean.jsonl results/dev/int4_clean.jsonl \
+    python scripts/10_build_label_sheet.py results/dev_vqa512/bf16_clean.jsonl results/dev_vqa512/int4_clean.jsonl --amendment vqa512 \
         --labellers ronak bhagyesh akshay \
-        --sheet manifests/judge_label_sheet_2026-11-14.csv --key results/dev/label_sheet_key.json --copies
+        --sheet manifests/judge_label_sheet_2026-11-17.csv --key results/dev_vqa512/label_sheet_key.json --copies
 
 Inputs must be development-split answers produced under the core freeze
 (qflip.guard.prepare_calibration_files: sidecars, population, `freeze_checked`
@@ -127,7 +127,7 @@ def write_csv(rows: list[dict], cols: list[str], path: Path) -> None:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("files", nargs="+", help="raw answer files (one per precision, same condition), e.g. results/dev/bf16_clean.jsonl results/dev/int4_clean.jsonl")
+    ap.add_argument("files", nargs="+", help="raw answer files (one per precision, same condition), e.g. results/dev_vqa512/bf16_clean.jsonl results/dev_vqa512/int4_clean.jsonl --amendment vqa512")
     ap.add_argument("--labellers", nargs="+", required=True, help="one label column per name, e.g. ronak bhagyesh akshay")
     ap.add_argument("--sheet", required=True, help="output master CSV (never overwritten)")
     ap.add_argument("--key", required=True, help="output key JSON (never overwritten)")

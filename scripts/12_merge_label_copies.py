@@ -1,7 +1,7 @@
 """Merge the labellers' independent copies into the master label sheet.
 
-    python scripts/12_merge_label_copies.py --sheet manifests/judge_label_sheet_2026-11-14.csv \
-        manifests/judge_label_sheet_2026-11-14.ronak.csv manifests/judge_label_sheet_2026-11-14.bhagyesh.csv manifests/judge_label_sheet_2026-11-14.akshay.csv
+    python scripts/12_merge_label_copies.py --sheet manifests/judge_label_sheet_2026-11-17.csv \
+        manifests/judge_label_sheet_2026-11-17.ronak.csv manifests/judge_label_sheet_2026-11-17.bhagyesh.csv manifests/judge_label_sheet_2026-11-17.akshay.csv
 
 Each copy (written by 10 --copies) carries the blind columns and one
 `label_<name>` column. A copy must hold the master's items in the master's
