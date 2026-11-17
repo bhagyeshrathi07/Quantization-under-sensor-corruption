@@ -1,6 +1,8 @@
 # Labelling guide for the judge calibration sheet
 
-Draft of November 16, 2026, for the three labellers to agree on before anyone labels. The sheets of November 14 are withdrawn (the 512-token VQA amendment, `explore_512tok_2026-11-16.md`); this guide applies to the replacement sheets. Once agreed, the wording here is the "rubric's correctness criterion" of decision 3 in `judge_decisions_2026-11-13.md`, and `scripts/13_label_ui.py` shows the cell's section beside every item. Change this file only before labelling starts; a change afterwards would mean labels given under two criteria.
+Rules fixed on November 17, 2026 (drafted November 16, the three open choices settled on the reviewer's recommendation; the choices were made before any label existed and not to improve the acceptance rate). This is the study's own, independent correctness criterion for a model answer, the "rubric's correctness criterion" of decision 3 in `judge_decisions_2026-11-13.md`. It is not the judge's scoring scheme: the released judge templates score other things as well (the planning template awards points for the probability of the action being safe or feasible, the perception template awards action and motion points), and they stay exactly as released during the calibration. The calibration gate of decision 4 tests whether the judge's scores predict this criterion well enough; if they do not, VQA stays unassessed. `scripts/13_label_ui.py` shows the cell's section beside every item. The sheets of November 14 are withdrawn (the 512-token amendment, `explore_512tok_2026-11-16.md`); this guide applies to `judge_label_sheet_2026-11-17.csv`. Nothing here changes once labelling has started; a change afterwards would mean labels given under two criteria.
+
+Agreed by: Ronak Patel (November 17, 2026); Bhagyesh and Akshay: pending, to be recorded here before they label.
 
 ## What the label means
 
@@ -18,7 +20,7 @@ Only the content decides. Length, style, markdown, headings, confidence words an
 - Hedging: an answer that commits to the reference's content with softeners ("probably", "should", "may need to") is a match. An answer that offers alternatives ("turn left or go straight") is `0` unless the reference offers the same alternatives.
 - Contradictions inside the answer (says "stop" then "keep moving"): `0`.
 - Empty answer, refusal, "I cannot determine this from the image", a question back, an answer to a different question: `0`.
-- Cut-off answers: generation was capped at 128 tokens (a frozen core setting), and 260 of the 262 answers on the sheet stop at that cap, often mid-sentence. The judge sees the same cut-off text. Label what is there: a core element the answer did not reach is missing, so `0`. Do not guess how the answer would have continued.
+- Cut-off answers: some answers end at the generation cap, mid-sentence. The judge sees the same text. Apply the agreed rubric to the text shown: a core element the answer did not reach is missing, so `0`; do not infer how an unfinished answer would continue.
 - Numbers and counts: when the reference's point is a number, it must match. Approximate wording ("a few") against an exact reference gives `0`.
 - When torn after one careful read, pick the label you lean to and keep going; the discussion covers disagreements. Do not skip an item: the tool does not allow it, and a blank breaks the sheet-order rule.
 
@@ -29,7 +31,7 @@ All 60 items ask "What are the important objects in the current scene?". The ref
 - `1`: every object the reference names appears in the answer with a matching category (a "white van" for "a white van"; "a cyclist" for "a person riding a bicycle"; a generic "vehicle" matches a car, sedan, SUV, van or truck only when colour or position confirms it), and no stated position or colour contradicts the reference.
 - `0`: a reference object missing from the answer, or named with a contradicting colour or position (reference "black car to the back", answer "black car ahead").
 - Objects the answer adds (buildings, lane markings, signs, far traffic) are ignored. The IDs are never required.
-- To discuss before labelling: this rule asks for every reference object, so an answer that lists four of five is `0`. The alternative (a majority of the reference objects) is looser. Pick one here and keep it for all 60 items.
+- Rule chosen: every reference object is required (an answer that lists four of five is `0`), matching the completeness rule above. Clear paraphrases count; each reference object is matched separately to one distinct object in the answer (one "a vehicle" in the answer does not cover two reference vehicles).
 
 ## prediction/VQA
 
@@ -50,19 +52,19 @@ Three question types among the 180 items.
 
 "What actions could the ego vehicle take based on <object>? Why take this action and what's the probability?" (60 items). The reference has the form "The action is to keep going at the same speed. The reason is that there is no safety issue. The probability is high." Core elements: the action, and the probability's direction (high or low).
 
-- `1`: the answer's recommended action matches the reference's in meaning, and its statement about how likely the ego vehicle is to take that action points the same way as the reference (high, likely, most probable versus low, unlikely). The reason must not contradict the reference's reason; a differently worded reason is fine.
+- `1`: the answer's recommended action matches the reference's in meaning, and the answer states how likely the ego vehicle is to take that action, pointing the same way as the reference (high, likely, most probable versus low, unlikely). The reason must not contradict the reference's reason; a differently worded reason is fine.
 - `0`: a different or opposite action, a probability pointing the other way, or no action at all. An answer that lists several possible actions without recommending one is `0` unless the reference's action is the one it settles on.
-- To agree before labelling: what the probability is about. In the dataset (DriveLM planning), "the probability is high" is the probability that the ego vehicle takes that action, not that the action is safe. Proposed: the answer must say something about the likelihood of the action being taken or chosen ("most likely action", "will probably continue", "high probability of keeping its speed", "high confidence"), pointing the same way as the reference. Wording about safety alone ("this is safe", "low risk") does not supply the probability element; an answer with the right action and no likelihood statement is `0`. If the team prefers to drop the probability element altogether and label the action alone, record that here before labelling and keep it for all 60 items.
+- Rule chosen: the probability element stays and means the likelihood that the ego vehicle takes that action (the dataset's meaning, DriveLM planning), not that the action is safe. The answer must state that likelihood for the chosen action ("most likely action", "will probably continue", "high probability of keeping its speed"), pointing the same way as the reference. Wording about safety alone ("this is safe", "low risk") does not supply it, and a bare "high confidence" counts only when it is explicitly about taking that action. An answer with the right action and no likelihood statement is `0`.
 
 "What actions taken by the ego vehicle can lead to a collision with <object>?" (60 items). The reference names the dangerous actions ("Back up"; "Accelerating and going straight"). Core elements: those actions.
 
 - `1`: every action the reference names appears in the answer as a collision-causing action (in meaning: "reversing" for "back up"; "speeding up while continuing forward" for "accelerating and going straight").
 - `0`: a reference action missing, or an answer that concludes there is no collision risk from the reference's actions.
-- References that say "None.": the dataset says no action of the ego vehicle leads to a collision with that object. To agree before labelling. Proposed: `1` when the answer concludes that no (reasonable) action collides with the object, or that the object poses no collision risk; `0` when the answer names actions that would collide. An answer that only lists hypothetical dangers without a conclusion is `0`.
+- References that say "None." (rule chosen): the dataset says no action of the ego vehicle in the described scenario leads to a collision with that object. `1` requires an explicit conclusion that no collision-causing action is indicated for that object in this scenario (or that the object poses no collision risk). Naming an applicable collision-causing action, or giving no conclusion (listing hypothetical dangers and stopping), is `0`. The answer need not claim that a collision is impossible under every imaginable action.
 
 ## Practice items (synthetic, not from the sheet)
 
-Agree on these together before labelling. Reference first, then the answer, then the proposed label.
+Read these together before labelling. Reference first, then the answer, then the label under the rules above (reviewer-checked November 17: 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0).
 
 1. perception. Reference: "There is a white van to the front of the ego vehicle and a black sedan to the back of the ego vehicle." Answer lists "a white van ahead, parked under a canopy; a black car visible behind; a multi-storey building; lane markings". Label `1` (both objects present, extras ignored).
 2. perception. Same reference. Answer lists "a white van ahead; a bus approaching; buildings". Label `0` (black sedan missing).
@@ -76,6 +78,8 @@ Agree on these together before labelling. Reference first, then the answer, then
 10. planning, collision. Reference: "Back up." Answer: "Reversing without checking the rear camera would hit the vehicle behind." Label `1` ("reversing" is "back up").
 11. planning, collision. Reference: "Accelerating and going straight." Answer: "There is no collision risk with this object as long as the ego vehicle keeps its lane." Label `0` (concludes no risk).
 12. any cell. Answer: "I cannot determine this from the image." Label `0`.
+13. planning, collision, reference "None.". Answer: "The parked car on the right is well off the ego vehicle's path; no action the ego vehicle would take here leads to a collision with it." Label `1` (explicit conclusion of no collision-causing action in this scenario).
+14. planning, collision, reference "None.". Answer: "A collision could occur if the ego vehicle drifts right, accelerates suddenly, or fails to brake in time." Label `0` (names applicable collision-causing actions; no conclusion that none applies).
 
 ## After labelling
 
