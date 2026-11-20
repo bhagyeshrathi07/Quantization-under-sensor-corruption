@@ -192,7 +192,12 @@ def test_copy_is_validated_before_serving(tmp_path):
     for name in ("ronak", "bhagyesh", "akshay"):
         real = ROOT / "manifests" / f"judge_label_sheet_2026-11-17.{name}.csv"
         if real.exists():
-            c = ui.Copy(real, name)
+            try:
+                c = ui.Copy(real, name)
+            except ui.CopyError as e:
+                if "another instance" in str(e):
+                    continue  # that labeller has the tool open right now; their copy is theirs
+                raise
             assert len(c.rows) == 262 and c.cols == [*ui.BLIND_COLUMNS, f"label_{name}"]
             c.close()
 
@@ -200,9 +205,9 @@ def test_copy_is_validated_before_serving(tmp_path):
 def test_check_mode_and_guide_sections(tmp_path):
     p = tmp_path / "sheet.ronak.csv"
     write_copy(p, "ronak", labels=[1, 0, None, None, None])
-    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "13_label_ui.py"), "--labeller", "ronak", "--copy", p, "--check"], cwd=ROOT, env=ENV, capture_output=True, text=True)
-    assert r.returncode == 0 and "5 items, 2 labelled, next D003" in r.stdout
-    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "13_label_ui.py"), "--labeller", "akshay", "--copy", p, "--check"], cwd=ROOT, env=ENV, capture_output=True, text=True)
+    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "13_label_ui.py"), "--labeller", "ronak", "--copy", p, "--assignment", "none", "--check"], cwd=ROOT, env=ENV, capture_output=True, text=True)
+    assert r.returncode == 0 and "5 items for ronak (D001 to D005, every item), 2 labelled, next D003" in r.stdout
+    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "13_label_ui.py"), "--labeller", "akshay", "--copy", p, "--assignment", "none", "--check"], cwd=ROOT, env=ENV, capture_output=True, text=True)
     assert r.returncode == 1 and "not akshay's copy" in r.stderr
     sections = ui.guide_sections(ROOT / "manifests" / "labelling_guide.md")
     for cell in ("perception/VQA", "prediction/VQA", "planning/VQA"):

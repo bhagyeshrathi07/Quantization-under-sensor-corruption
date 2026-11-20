@@ -47,6 +47,8 @@ from qflip.calibrate import (  # noqa: E402
     acceptance_bars,
     calibrate,
     classify_sheet,
+    inter_labeller_stats,
+    load_assignment,
     display_sha256,
     fleiss_kappa,
     item_dict,
@@ -77,6 +79,12 @@ def read_rows(path: Path) -> tuple[list[dict], list[str]]:
     return rows, cols
 
 
+def default_assignment(sheet: Path) -> Path | None:
+    """The sheet's assignment file (`<stem>.assignment.json` beside it) when one exists."""
+    p = sheet.with_name(f"{sheet.stem}.assignment.json")
+    return p if p.exists() else None
+
+
 def labellers_of(cols: list[str], given: list[str] | None) -> list[str]:
     found = [c[len("label_"):] for c in cols if c.startswith("label_")]
     if given:
@@ -90,29 +98,16 @@ def labellers_of(cols: list[str], given: list[str] | None) -> list[str]:
 
 
 def inter_labeller(complete: dict, labellers: list[str]) -> dict:
-    """Pre-discussion statistics over the complete items."""
-    order = sorted(complete)
-    labels_by = {n: [complete[i]["labels"][n] for i in order] for n in labellers}
-    rows = [[complete[i]["labels"][n] for n in labellers] for i in order]
-    out = {
-        "n_items": len(order),
-        "pairwise_agreement": pairwise_agreement(labels_by),
-        "fleiss_kappa": fleiss_kappa(rows),
-        "labelled_correct_per_labeller": {n: sum(labels_by[n]) for n in labellers},
-        "majority_correct": sum(majority_label(r) for r in rows),
-        "unanimous": sum(1 for r in rows if len(set(r)) == 1),
-    }
-    if all(complete[i]["consensus"] is not None for i in order):
-        out["consensus_correct"] = sum(complete[i]["consensus"] for i in order)
-        out["consensus_differs_from_majority"] = sum(1 for i in order if complete[i]["consensus"] != majority_label([complete[i]["labels"][n] for n in labellers]))
-    return out
+    """Pre-discussion statistics over the complete items (qflip.calibrate.inter_labeller_stats)."""
+    return inter_labeller_stats(complete, labellers)
 
 
 def print_inter(inter: dict) -> None:
     fk = inter["fleiss_kappa"]
-    print("inter-labeller (pre-discussion): " + ", ".join(f"{k} {v:.3f}" for k, v in inter["pairwise_agreement"].items())
-          + f"; Fleiss kappa {fk if fk is None else round(fk, 3)}; unanimous {inter['unanimous']}/{inter['n_items']}; "
-          + "correct per labeller " + ", ".join(f"{n} {c}" for n, c in inter["labelled_correct_per_labeller"].items()) + f"; majority correct {inter['majority_correct']}"
+    pw = ", ".join(f"{k} {v['agreement']:.3f} (n={v['n']})" if v["agreement"] is not None else f"{k} none shared" for k, v in inter["pairwise_agreement"].items())
+    print(f"inter-labeller (pre-discussion): {pw}; Fleiss kappa {fk if fk is None else round(fk, 3)} on {inter['n_items_all_labellers']} item(s) with every labeller; "
+          f"unanimous {inter['unanimous']}/{inter['n_items_multi']} multi-labelled; "
+          + "correct per labeller " + ", ".join(f"{n} {c}/{inter['labelled_per_labeller'][n]}" for n, c in inter["labelled_correct_per_labeller"].items()) + f"; majority correct {inter['majority_correct']}"
           + (f"; consensus correct {inter['consensus_correct']}, differs from majority on {inter['consensus_differs_from_majority']}" if "consensus_correct" in inter else ""))
 
 
@@ -130,6 +125,7 @@ def main():
     ap.add_argument("--exclusions-file", default="manifests/scene_exclusions.json")
     ap.add_argument("--no-provenance", action="store_true", help="sidecar-less synthetic files only (tests); the result is exploratory and nothing is frozen from it")
     ap.add_argument("--amendment", choices=sorted(AMENDMENTS), help="answer files produced under this amendment: its config (unless --config is given) and its freeze")
+    ap.add_argument("--assignment", help="label assignment JSON (scripts/15_label_assignment.py): who labels which items; default the sheet's assignment file when one exists, 'none' for everyone labels everything")
     args = ap.parse_args()
     frozen_kw = {}
     if args.amendment:
@@ -141,10 +137,14 @@ def main():
     # 1. the sheet alone
     rows, cols = read_rows(Path(args.sheet))
     labellers = labellers_of(cols, args.labellers)
+    assignment_path = default_assignment(Path(args.sheet)) if args.assignment is None else (None if args.assignment == "none" else Path(args.assignment))
     try:
-        complete, unfinished, progress = classify_sheet(rows, labellers, need_consensus=not args.labels_only)
+        assignment = load_assignment(assignment_path, rows, labellers) if assignment_path else None
+        complete, unfinished, progress = classify_sheet(rows, labellers, need_consensus=not args.labels_only, assignment=assignment)
     except CalibrationError as e:
         sys.exit(f"{args.sheet}: {e}")
+    if assignment:
+        print(f"assignment {assignment_path}: " + ", ".join(f"{n} {len(v)}" for n, v in assignment.items()))
     what = "all label columns" if args.labels_only else f"all {len(labellers)} labels and consensus"
     print(f"sheet: {len(rows)} items; {len(complete)} complete ({what}), {len(unfinished)} unfinished; labelled per labeller: " + ", ".join(f"{n} {k}" for n, k in progress.items()))
     partial = max(progress.values()) - min(progress.values()) if progress else 0
@@ -239,9 +239,9 @@ def main():
         if agg is None:
             no_aggregate.append((item_id, side["stale"].get(k["question_id"], "not judged")))
             continue
-        labels = [lab["labels"][n] for n in labellers]
+        labels = list(lab["labels"].values())  # the item's own labellers (one each under an assignment, three without)
         rep0 = side["rep0"].get(k["question_id"])
-        items.append(Item(item_id, rec["scene_token"], float(agg["score"]), lab["consensus"], majority_label(labels), float(rep0["score"]) if rep0 else None))
+        items.append(Item(item_id, rec["scene_token"], float(agg["score"]), lab["consensus"], majority_label(labels) if len(labels) % 2 else lab["consensus"], float(rep0["score"]) if rep0 else None))
     if shown_differs:
         sys.exit(f"{len(shown_differs)} item(s) whose sheet text (cell, question, ground truth, answer) differs from the issued one ({shown_differs[:5]}); the labels were given for other text")
     if record_differs:

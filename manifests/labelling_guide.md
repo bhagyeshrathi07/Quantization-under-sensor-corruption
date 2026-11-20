@@ -4,6 +4,8 @@ Rules fixed on November 17, 2026 (drafted November 16, the three open choices se
 
 Agreed by: Ronak Patel (November 17, 2026); Bhagyesh and Akshay: pending, to be recorded here before they label.
 
+Who labels what (November 19): one person per item, in blocks (`judge_label_sheet_2026-11-17.assignment.json`): Ronak D001 to D088, Bhagyesh D089 to D175, Akshay D176 to D262. The tool shows you your block only. Label alone, in order; the model labellers' opinions are shown only after your whole block is committed, and the three of you settle the disagreements together.
+
 ## What the label means
 
 One label per item: `1` the model's answer is correct, `0` it is not. Correct means: read against the reference answer (the dataset's ground truth), the model's answer states the same core content. The reference is the standard, not the scene: no labeller sees the images, exactly as the judge does not. Where the reference itself looks wrong, label against the reference anyway and note the item for the discussion.

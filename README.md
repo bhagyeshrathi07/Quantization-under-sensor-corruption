@@ -66,14 +66,17 @@ scripts/11_calibrate_judge.py      --labels-only: pre-discussion agreement and F
 scripts/12_merge_label_copies.py   merge the labellers' copies into the master sheet (same items, order and text; conflicts refused)
 config/explore_512tok.yaml         exploratory copy of the pilot config at the released 512-token decoding length (manifests/explore_512tok_2026-11-16.md); never study data
 config/vqa512.yaml                 the VQA amendment: pilot config with max_tokens 512, frozen separately (freeze_config.py --amendment vqa512); 03/05/08/10/11 take --amendment vqa512, run_matrix.sh AMENDMENT=vqa512
-scripts/13_label_ui.py             local browser tool for labelling one person's copy (manifests/labelling_guide.md beside each item; sheet order enforced; backed-up atomic writes of the label column only; --check)
+scripts/13_label_ui.py             local browser tool for labelling one person's copy (manifests/labelling_guide.md beside each item; the labeller's assigned block, in order; reference words highlighted in the model answer; backed-up atomic writes of the label column only; --check)
+scripts/14_llm_label.py            side study: a model labels its own copy under the same guide (prompts per batch; --backend codex; never merged into the master sheet)
+scripts/15_label_assignment.py     who labels which items: contiguous blocks in sheet order, written beside the sheet and picked up by 13 and 11
+scripts/16_disagreements.py        a human's disagreements with the model labellers, with the models' reasons, for the consensus discussion (only after the human's block is complete)
 scripts/serve_judge.sh             open-weights judge on a second vLLM port for the VQA judge trial (any OpenAI-compatible endpoint works via --base-url)
 scripts/host_pull.sh               update the GPU host's checkout: backs up colliding untracked and modified files, fast-forwards, compares
 scripts/quantize_awq.py            own AWQ W4A16 checkpoint with llm-compressor, calibration-split prompts, manifest
 scripts/run_matrix.sh              serve -> all conditions -> stop, per precision; resumable; DRY_RUN=1 prints the plan
 scripts/rescore.py                 recompute MCQ fields after a rule change
 scripts/vast_setup.sh, hpc_pilot.sbatch
-tests/                             122 offline unit tests (pytest)
+tests/                             126 offline unit tests (pytest)
 ```
 
 ## Scope

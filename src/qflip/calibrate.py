@@ -358,19 +358,53 @@ def parse_label(raw: str | None, where: str) -> int | None:
     raise CalibrationError(f"{where}: label {raw!r} is not 0, 1 or empty")
 
 
-def classify_sheet(rows: list[dict], labellers: list[str], need_consensus: bool) -> tuple[dict, list[str], dict[str, int]]:
-    """Which items are complete and which are the unfinished tail, under the
-    labelling rule (items are labelled in sheet order, each labeller
-    independently, and if time runs out the calibration uses the items every
-    labeller finished). Each labeller's labelled items must be the sheet's
-    first rows (a labelled row after a blank one is refused: the sheet was not
-    labelled by the rule). The complete items are the common prefix: the rows
-    every labeller has reached. The tail (rows some labellers did not reach)
-    is unfinished; labels on it are kept and counted, never used. With
-    `need_consensus` (the calibration) every complete item must carry a
-    consensus and no tail item may (a consensus needs all three labels).
-    Without it (the pre-discussion report) the consensus columns are not read.
-    Returns ({item: {labels, consensus, reason}}, [unfinished items in order],
+def load_assignment(path, rows: list[dict], labellers: list[str], require_all: bool = True) -> dict[str, list[str]]:
+    """{labeller: [items in sheet order]} from the assignment JSON written by
+    scripts/15_label_assignment.py. Every item must be on the sheet and listed
+    in sheet order. With `require_all` (the sheet-wide checks of 11 and 15):
+    every listed labeller must be one of the sheet's and every sheet item must
+    be assigned to at least one labeller. Without it (one labeller's copy, 13
+    and 16): only the given labellers' lists are read and checked."""
+    import json
+    from pathlib import Path as _P
+
+    data = json.loads(_P(path).read_text())
+    assignment = data.get("assignment") if isinstance(data, dict) else None
+    if not isinstance(assignment, dict) or not assignment:
+        raise CalibrationError(f"{path}: no 'assignment' block")
+    order = [(r.get("item") or "").strip() for r in rows]
+    pos = {it: i for i, it in enumerate(order)}
+    unknown = [n for n in assignment if n not in labellers]
+    if unknown and require_all:
+        raise CalibrationError(f"{path}: labeller(s) {unknown} are not on the sheet ({labellers})")
+    covered = set()
+    out = {}
+    for n in labellers:
+        items = [str(x) for x in (assignment.get(n) or [])]
+        missing = [it for it in items if it not in pos]
+        if missing:
+            raise CalibrationError(f"{path}: {n} is assigned items not on the sheet ({missing[:3]})")
+        if [pos[it] for it in items] != sorted(pos[it] for it in items) or len(set(items)) != len(items):
+            raise CalibrationError(f"{path}: {n}'s items must be listed once each, in sheet order")
+        covered |= set(items)
+        out[n] = items
+    uncovered = [it for it in order if it not in covered]
+    if uncovered and require_all:
+        raise CalibrationError(f"{path}: {len(uncovered)} sheet item(s) assigned to nobody ({uncovered[:3]})")
+    return out
+
+
+def classify_sheet(rows: list[dict], labellers: list[str], need_consensus: bool, assignment: dict[str, list[str]] | None = None) -> tuple[dict, list[str], dict[str, int]]:
+    """Which items are complete and which are unfinished, under the labelling
+    rule: each labeller labels their assigned items (every item, when there is
+    no assignment) independently and in sheet order, so a labeller's labels
+    must be the first rows of their assignment (a labelled row after a blank
+    one, or a label outside the assignment, is refused). An item is finished
+    when every labeller assigned to it has labelled it. With `need_consensus`
+    (the calibration) a finished item must carry a consensus and an
+    unfinished one must not; without it (the pre-discussion report) the
+    consensus columns are not read. Returns ({item: {labels (of the assigned
+    labellers), consensus, reason, labellers}}, [unfinished items in order],
     {labeller: rows labelled})."""
     parsed, seen = [], set()
     for row in rows:
@@ -382,28 +416,67 @@ def classify_sheet(rows: list[dict], labellers: list[str], need_consensus: bool)
         seen.add(item)
         labels = {n: parse_label(row.get(label_column(n)), f"{item} {n}") for n in labellers}
         parsed.append((item, labels, row))
+    assigned = assignment if assignment is not None else {n: [it for it, _, _ in parsed] for n in labellers}
     progress = {}
     for n in labellers:
-        done = [lab[n] is not None for _, lab, _ in parsed]
+        mine = assigned.get(n, [])
+        mine_set = set(mine)
+        outside = [item for item, lab, _ in parsed if lab[n] is not None and item not in mine_set]
+        if outside:
+            raise CalibrationError(f"{n} labelled {outside[0]}, which is not in {n}'s assignment")
+        done = [next(lab for item, lab, _ in parsed if item == it)[n] is not None for it in mine]
         k = sum(done)
         if done[:k] != [True] * k:
             first_blank = next(i for i, d in enumerate(done) if not d)
-            later = next(parsed[i][0] for i in range(first_blank, len(done)) if done[i])
-            raise CalibrationError(f"{n} labelled {later} but not {parsed[first_blank][0]} before it: items are labelled in sheet order, so a labeller's labels must be the sheet's first rows")
+            later = next(mine[i] for i in range(first_blank, len(done)) if done[i])
+            raise CalibrationError(f"{n} labelled {later} but not {mine[first_blank]} before it: items are labelled in sheet order, so a labeller's labels must be the first rows of their assignment")
         progress[n] = k
-    reach = min(progress.values()) if progress else 0
     complete, unfinished = {}, []
-    for i, (item, labels, row) in enumerate(parsed):
+    for item, labels, row in parsed:
+        who = [n for n in labellers if item in set(assigned.get(n, []))]
+        finished = all(labels[n] is not None for n in who)
         cons, reason = None, ""
         if need_consensus:
             cons = parse_label(row.get("consensus"), f"{item} consensus")
             reason = (row.get("consensus_reason") or "").strip()
-            if i < reach and cons is None:
-                raise CalibrationError(f"item {item} has every label but no consensus; the key stays closed until the consensus covers every item all labellers finished")
-            if i >= reach and cons is not None:
-                raise CalibrationError(f"item {item} has a consensus but not every labeller reached it; a consensus is given only on items all labellers finished")
-        if i < reach:
-            complete[item] = {"labels": labels, "consensus": cons, "reason": reason}
+            if finished and cons is None:
+                raise CalibrationError(f"item {item} has every label but no consensus; the key stays closed until the consensus covers every item all its labellers finished")
+            if not finished and cons is not None:
+                raise CalibrationError(f"item {item} has a consensus but not every labeller reached it; a consensus is given only on items all its labellers finished")
+        if finished:
+            complete[item] = {"labels": {n: labels[n] for n in who}, "consensus": cons, "reason": reason, "labellers": who}
         else:
             unfinished.append(item)
     return complete, unfinished, progress
+
+
+def inter_labeller_stats(complete: dict, labellers: list[str]) -> dict:
+    """Pre-discussion statistics over the complete items: pairwise agreement on
+    the items a pair shares, Fleiss' kappa on the items every labeller
+    labelled (None when there are none), correct counts per labeller, the
+    majority label per item over its own labellers, unanimity on items with
+    more than one labeller."""
+    order = sorted(complete)
+    pairwise = {}
+    for a, b in combinations(sorted(labellers), 2):
+        shared = [i for i in order if a in complete[i]["labels"] and b in complete[i]["labels"]]
+        pairwise[f"{a}/{b}"] = {"n": len(shared), "agreement": (sum(1 for i in shared if complete[i]["labels"][a] == complete[i]["labels"][b]) / len(shared)) if shared else None}
+    full = [i for i in order if all(n in complete[i]["labels"] for n in labellers)]
+    rows = [[complete[i]["labels"][n] for n in labellers] for i in full]
+    multi = [i for i in order if len(complete[i]["labels"]) > 1]
+    out = {
+        "n_items": len(order),
+        "n_items_all_labellers": len(full),
+        "pairwise_agreement": pairwise,
+        "fleiss_kappa": fleiss_kappa(rows) if rows else None,
+        "labelled_correct_per_labeller": {n: sum(complete[i]["labels"][n] for i in order if n in complete[i]["labels"]) for n in labellers},
+        "labelled_per_labeller": {n: sum(1 for i in order if n in complete[i]["labels"]) for n in labellers},
+        "majority_correct": sum(majority_label(list(complete[i]["labels"].values())) for i in order if len(complete[i]["labels"]) % 2),
+        "n_items_even_labellers": sum(1 for i in order if len(complete[i]["labels"]) % 2 == 0),  # no majority defined there
+        "unanimous": sum(1 for i in multi if len(set(complete[i]["labels"].values())) == 1),
+        "n_items_multi": len(multi),
+    }
+    if all(complete[i]["consensus"] is not None for i in order) and order:
+        out["consensus_correct"] = sum(complete[i]["consensus"] for i in order)
+        out["consensus_differs_from_majority"] = sum(1 for i in order if len(complete[i]["labels"]) % 2 and complete[i]["consensus"] != majority_label(list(complete[i]["labels"].values())))
+    return out

@@ -41,9 +41,15 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from qflip.calibrate import BLIND_COLUMNS, CalibrationError, label_column, parse_label  # noqa: E402
+from qflip.calibrate import BLIND_COLUMNS, CalibrationError, label_column, load_assignment, parse_label  # noqa: E402
 
 DEFAULT_SHEET = "manifests/judge_label_sheet_2026-11-17.csv"
+
+
+def default_assignment(sheet: Path) -> Path | None:
+    """The sheet's assignment file (`<stem>.assignment.json` beside it) when one exists."""
+    p = sheet.with_name(f"{sheet.stem}.assignment.json")
+    return p if p.exists() else None
 DEFAULT_GUIDE = "manifests/labelling_guide.md"
 
 
@@ -80,7 +86,10 @@ def blind_digest(rows: list[dict]) -> str:
 class Copy:
     """One labeller's copy: rows in sheet order, their labels, safe rewrites."""
 
-    def __init__(self, path: Path, labeller: str):
+    def __init__(self, path: Path, labeller: str, assignment: Path | None = None):
+        """`assignment` (scripts/15_label_assignment.py) restricts the labeller
+        to their assigned items: only those are shown and labelled, in sheet
+        order; a label on any other row is refused at load."""
         self.path, self.labeller, self.col = path, labeller, label_column(labeller)
         self.lock = threading.Lock()
         # one tool per copy: a second instance would hold stale labels and write them over the first one's
@@ -106,43 +115,69 @@ class Copy:
                 raise CopyError(f"{path}: item id missing or repeated ({r.get('item')!r})")
             seen.add(r["item"])
         self.labels = [parse_label(r.get(self.col), f"{path} {r['item']} {labeller}") for r in self.rows]
+        # the labeller's rows, in sheet order: all of them, or the assignment's
+        self.assignment_path = assignment
+        if assignment is not None:
+            assigned = load_assignment(assignment, self.rows, [labeller], require_all=False)
+            mine = assigned.get(labeller) or []
+            if not mine:
+                raise CopyError(f"{assignment}: {labeller} has no assigned items")
+            pos = {r["item"]: i for i, r in enumerate(self.rows)}
+            self.idx = [pos[it] for it in mine]
+            outside = [self.rows[i]["item"] for i, l in enumerate(self.labels) if l is not None and i not in set(self.idx)]
+            if outside:
+                raise CopyError(f"{path}: {outside[0]} is labelled but not in {labeller}'s assignment ({assignment}); fix the copy by hand first")
+        else:
+            self.idx = list(range(len(self.rows)))
         self.check_prefix()
         self.digest = blind_digest(self.rows)
         # the file must round-trip: what we would write for the current labels is what is on disk (modulo line endings)
         if serialize(self.rows, self.cols).replace("\r\n", "\n") != text.replace("\r\n", "\n"):
             raise CopyError(f"{path}: the file does not round-trip through the CSV writer (edited by another program?); label it by hand or restore it from git")
 
+    def my_labels(self) -> list:
+        return [self.labels[i] for i in self.idx]
+
     def check_prefix(self):
-        k = self.n_labelled()
-        if any(l is None for l in self.labels[:k]):
-            first_blank = next(i for i, l in enumerate(self.labels) if l is None)
-            raise CopyError(f"{self.path}: {self.rows[first_blank]['item']} is blank but a later item is labelled; items are labelled in sheet order. Fix the copy by hand first.")
+        mine = self.my_labels()
+        k = sum(1 for l in mine if l is not None)
+        if any(l is None for l in mine[:k]):
+            first_blank = next(i for i, l in enumerate(mine) if l is None)
+            raise CopyError(f"{self.path}: {self.rows[self.idx[first_blank]]['item']} is blank but a later item is labelled; items are labelled in sheet order. Fix the copy by hand first.")
 
     def n_labelled(self) -> int:
-        return sum(1 for l in self.labels if l is not None)
+        """Labelled rows among the labeller's own (assigned) rows."""
+        return sum(1 for l in self.my_labels() if l is not None)
+
+    def n_items(self) -> int:
+        return len(self.idx)
 
     def state(self) -> dict:
-        return {"labeller": self.labeller, "copy": str(self.path), "n": len(self.rows), "labelled": self.n_labelled(), "next": self.n_labelled(),
-                "items": [{"index": i, "item": r["item"], "cell": r["cell"], "question": r["question"], "ground_truth": r["ground_truth"], "answer": r["answer"], "label": l}
-                          for i, (r, l) in enumerate(zip(self.rows, self.labels))]}
+        """The labeller's items only, indexed by position within them."""
+        return {"labeller": self.labeller, "copy": str(self.path), "n": len(self.idx), "labelled": self.n_labelled(), "next": self.n_labelled(),
+                "assignment": str(self.assignment_path) if self.assignment_path else None,
+                "items": [{"index": p, "item": self.rows[i]["item"], "cell": self.rows[i]["cell"], "question": self.rows[i]["question"], "ground_truth": self.rows[i]["ground_truth"], "answer": self.rows[i]["answer"], "label": self.labels[i]}
+                          for p, i in enumerate(self.idx)]}
 
     def set_label(self, index: int, label: int) -> dict:
+        """`index` is the position within the labeller's items."""
         with self.lock:
-            if not (0 <= index < len(self.rows)):
+            if not (0 <= index < len(self.idx)):
                 raise CopyError(f"no item at index {index}")
             if label not in (0, 1):
                 raise CopyError(f"label {label!r} is not 0 or 1")
             k = self.n_labelled()
             if index > k:
-                raise CopyError(f"item {self.rows[index]['item']} comes after the first unlabelled item {self.rows[k]['item']}; items are labelled in sheet order")
-            old = self.labels[index]
-            self.labels[index] = label
+                raise CopyError(f"item {self.rows[self.idx[index]]['item']} comes after the first unlabelled item {self.rows[self.idx[k]]['item']}; items are labelled in sheet order")
+            row = self.idx[index]
+            old = self.labels[row]
+            self.labels[row] = label
             try:
                 self.write()
             except Exception:
-                self.labels[index] = old
+                self.labels[row] = old
                 raise
-            return {"item": self.rows[index]["item"], "label": label, "labelled": self.n_labelled(), "n": len(self.rows), "changed": old is not None and old != label}
+            return {"item": self.rows[row]["item"], "label": label, "labelled": self.n_labelled(), "n": len(self.idx), "changed": old is not None and old != label}
 
     def write(self):
         if read_raw(self.path) != self.disk_text:
@@ -225,6 +260,8 @@ details .md { max-width: 80ch; }
 .md p { margin: 6px 0; } .md ul, .md ol { margin: 6px 0; padding-left: 1.4em; } .md li { margin: 3px 0; }
 .md code { font: 13px ui-monospace, monospace; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
 summary { cursor: pointer; font-weight: 600; }
+mark { background: #ffe58a; color: inherit; padding: 0 2px; border-radius: 2px; }
+@media (prefers-color-scheme: dark) { mark { background: #7a5c00; } }
 .bar { position:fixed; left:0; right:0; bottom:0; background:var(--panel); border-top:1px solid var(--line); padding:12px 24px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:center; }
 button { font: 600 18px system-ui, sans-serif; padding: 12px 28px; border-radius:8px; border:2px solid var(--line); background:var(--bg); color:var(--fg); cursor:pointer; }
 button.ok { border-color: var(--ok); } button.no { border-color: var(--no); }
@@ -241,7 +278,8 @@ kbd { font: 12px ui-monospace, monospace; border:1px solid var(--line); border-r
   <span id="progress-text" class="muted"></span>
   <progress id="progress" max="1" value="0"></progress>
   <span class="muted">keys: <kbd>1</kbd> correct <kbd>0</kbd> incorrect <kbd>&larr;</kbd> <kbd>&rarr;</kbd> move</span>
-  <label class="muted"><input type="checkbox" id="render" checked> render the model answer's markdown</label>
+  <label class="muted"><input type="checkbox" id="render" checked> render markdown</label>
+  <label class="muted"><input type="checkbox" id="hilite" checked> mark reference words in the model answer</label>
 </header>
 <main>
   <div class="cell" id="cell"></div>
@@ -302,17 +340,41 @@ function md(text) {
 }
 function render() {
   const it = S.items[cur];
-  $("progress-text").textContent = `${S.labelled} / ${S.n} labelled, showing item ${cur + 1}`;
+  $("progress-text").textContent = `${S.labelled} / ${S.n} labelled, showing item ${cur + 1} of your ${S.n}`;
   $("progress").max = S.n; $("progress").value = S.labelled;
   $("cell").textContent = it.cell; $("item-id").textContent = it.item;
   $("question").textContent = it.question; $("gt").textContent = it.ground_truth;
   if ($("render").checked) { $("answer").className = "md"; $("answer").innerHTML = md(it.answer); } else { $("answer").className = "text"; $("answer").textContent = it.answer; }
+  if ($("hilite").checked) highlight($("answer"), it.ground_truth);
   $("guide-cell").innerHTML = md(GUIDE[it.cell] || "(no section for this cell in the guide)");
   $("b1").classList.toggle("on", it.label === 1); $("b0").classList.toggle("on", it.label === 0);
   $("prev").disabled = cur === 0;
   $("next").disabled = cur >= S.labelled || cur + 1 >= S.n;
   shownAt = performance.now();
   window.scrollTo(0, 0);
+}
+// Reading aid only: words of the reference answer (4+ letters, not function words, simple plural/-ing/-ed stems) are marked
+// wherever they occur in the model answer, so the eye lands on candidate matches. It decides nothing.
+const STOP = new Set(["that","this","with","from","there","their","they","them","then","than","will","would","should","could","have","has","been","being","into","onto","also","very","about","which","what","when","where","while","because","ego","vehicle","object","objects","action","actions","these","those","such","some","same","other","only","more","most","much","many","each","both","after","before","through","over","under","next","first","second","third","firstly","secondly","thirdly","notice","noticed","camera","side","probability","reason","high","low","the","and","are","is","to","of","in","on","at","it","its","for","as","by","an","or","be","so","no","not","none"]);
+function stem(w) { const m = w.match(/^(.{4,})(ing|ed|es|s)$/); return m ? m[1] : w; }  // keep at least four letters of the stem ("speed" stays "speed")
+function refTerms(gt) {
+  const out = new Map();
+  for (const w of (gt.toLowerCase().match(/[a-z]{4,}/g) || [])) { if (!STOP.has(w)) { const st = stem(w); if (st.length >= 3) out.set(st, w); } }
+  return [...out.keys()];
+}
+function highlight(root, gt) {
+  const stems = refTerms(gt);
+  if (!stems.length) return;
+  const re = new RegExp("\\b(" + stems.join("|") + ")[a-z]*\\b", "gi");  // stems are letters only, nothing to escape
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const nodes = []; let n; while ((n = walker.nextNode())) nodes.push(n);
+  for (const node of nodes) {
+    const text = node.nodeValue; if (!re.test(text)) { re.lastIndex = 0; continue; } re.lastIndex = 0;
+    const frag = document.createDocumentFragment(); let last = 0, m;
+    while ((m = re.exec(text))) { frag.appendChild(document.createTextNode(text.slice(last, m.index))); const mk = document.createElement("mark"); mk.textContent = m[0]; frag.appendChild(mk); last = m.index + m[0].length; }
+    frag.appendChild(document.createTextNode(text.slice(last)));
+    node.parentNode.replaceChild(frag, node);
+  }
 }
 function status(msg, err) { const s = $("status"); s.textContent = msg; s.className = err ? "err" : "muted"; }
 async function load() {
@@ -345,6 +407,7 @@ function move(d) { if (!S || busy) return; const n = cur + d; if (n < 0 || n >= 
 $("b1").onclick = () => label(1); $("b0").onclick = () => label(0);
 $("prev").onclick = () => move(-1); $("next").onclick = () => move(1);
 $("render").onchange = () => { if (S) render(); };
+$("hilite").onchange = () => { if (S) render(); };
 document.addEventListener("keydown", e => {
   if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
   if (e.repeat) return;  // a held key labels nothing: one key press, one label
@@ -390,7 +453,7 @@ def make_handler(copy: Copy, page: str):
                 index, label, item = body.get("index"), body.get("label"), body.get("item")
                 if not isinstance(index, int) or isinstance(index, bool) or not isinstance(label, int) or isinstance(label, bool):
                     return self._json(400, {"error": "index and label must be integers"})
-                if item is not None and (not 0 <= index < len(copy.rows) or copy.rows[index]["item"] != item):
+                if item is not None and (not 0 <= index < copy.n_items() or copy.rows[copy.idx[index]]["item"] != item):
                     return self._json(409, {"error": f"item {item} is not at index {index}; reload the page"})
                 self._json(200, copy.set_label(index, label))
             except (CopyError, CalibrationError) as e:
@@ -429,6 +492,7 @@ def main():
     ap.add_argument("--labeller", required=True, help="your name as on the sheet, e.g. ronak")
     ap.add_argument("--sheet", default=DEFAULT_SHEET, help="the master sheet; the copy is <sheet>.<labeller>.csv")
     ap.add_argument("--copy", help="the copy to label (default: next to --sheet)")
+    ap.add_argument("--assignment", help="who labels which items (scripts/15_label_assignment.py); default: the sheet's <stem>.assignment.json when it exists; 'none' to label every item")
     ap.add_argument("--guide", default=DEFAULT_GUIDE)
     ap.add_argument("--port", type=int, default=8765)
     ap.add_argument("--no-browser", action="store_true")
@@ -437,11 +501,14 @@ def main():
     path = Path(args.copy) if args.copy else copy_path(Path(args.sheet), args.labeller)
     if not path.exists():
         sys.exit(f"{path} not found; your copy is written by scripts/10_build_label_sheet.py --copies and committed with the sheet")
+    assignment = default_assignment(Path(args.sheet)) if args.assignment is None else (None if args.assignment == "none" else Path(args.assignment))
     try:
-        copy = Copy(path, args.labeller)
+        copy = Copy(path, args.labeller, assignment)
     except (CopyError, CalibrationError) as e:
         sys.exit(str(e))
-    print(f"{path}: {len(copy.rows)} items, {copy.n_labelled()} labelled" + ("" if copy.n_labelled() >= len(copy.rows) else f", next {copy.rows[copy.n_labelled()]['item']}"))
+    first, last = copy.rows[copy.idx[0]]["item"], copy.rows[copy.idx[-1]]["item"]
+    print(f"{path}: {copy.n_items()} items for {args.labeller} ({first} to {last}" + (f", assignment {assignment}" if assignment else ", every item") + f"), {copy.n_labelled()} labelled"
+          + ("" if copy.n_labelled() >= copy.n_items() else f", next {copy.rows[copy.idx[copy.n_labelled()]]['item']}"))
     if args.check:
         copy.close()
         return
@@ -463,7 +530,7 @@ def main():
     finally:
         server.server_close()
         copy.close()
-        print(f"\n{path}: {copy.n_labelled()} / {len(copy.rows)} labelled")
+        print(f"\n{path}: {copy.n_labelled()} / {copy.n_items()} labelled")
 
 
 if __name__ == "__main__":

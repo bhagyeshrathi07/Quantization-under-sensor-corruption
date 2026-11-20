@@ -234,3 +234,5 @@ checkpoints/
 manifests/*.csv.bak
 manifests/*.csv.tmp
 manifests/*.csv.lock
+results/dev_vqa512/llm_*/*.prompt.txt
+results/dev_vqa512/llm_*/*.items.json
