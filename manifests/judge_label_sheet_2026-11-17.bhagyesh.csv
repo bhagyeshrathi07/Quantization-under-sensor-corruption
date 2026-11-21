@@ -2049,7 +2049,7 @@ Given these observations, the most likely actions that could lead to a collision
 - Braking suddenly without reducing speed relative to the target vehicle.
 - Changing lanes without proper signaling or checking for oncoming traffic.
 
-These actions would increase the risk of collision with the target vehicle.",
+These actions would increase the risk of collision with the target vehicle.",0
 D090,prediction/VQA,What object should the ego vehicle notice first when the ego vehicle is getting to the next possible location? What is the state of the object that is first noticed by the ego vehicle and what action should the ego vehicle take? What object should the ego vehicle notice second when the ego vehicle is getting to the next possible location? What is the state of the object perceived by the ego vehicle as second and what action should the ego vehicle take? What object should the ego vehicle notice third? What is the state of the object perceived by the ego vehicle as third and what action should the ego vehicle take?,"Firstly, notice that pedestrian wearing black shorts at front camera. The object is going ahead, so the ego vehicle should continue going ahead at the same speed. Secondly, notice that black sedan at front camera. The object is stationary, so the ego vehicle should keep going ahead at the same speed. Thirdly, notice that black sedan at back camera. The object is going ahead, so the ego vehicle should continue going ahead at the same speed.","### Analysis:
 
 The task involves identifying the objects the ego vehicle should notice in sequence as it approaches its next possible location. The analysis will be based on the objects visible in the images and their potential impact on the ego vehicle's path and safety.
@@ -2083,7 +2083,7 @@ The task involves identifying the objects the ego vehicle should notice in seque
 
 3. **Third Object:** Building and Slope (Image 2)
    - State: Residential/commercial structure with a slope.
-   - Action: Adjust speed to navigate the slope safely.",
+   - Action: Adjust speed to navigate the slope safely.",0
 D091,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c1,CAM_BACK,0.5104,0.6028>?",Brake suddenly.,"To determine what actions the ego vehicle might take that could lead to a collision with the vehicle ahead, let's analyze the situation step-by-step:
 
 1. **Current Position**: The ego vehicle is positioned behind another vehicle, specifically in the same lane as the vehicle ahead.
@@ -2108,7 +2108,7 @@ In summary, the actions that could lead to a collision include:
 - Speeding.
 - Failure to observe traffic signals.
 
-These actions highlight the importance of maintaining a safe following distance, reducing speed when necessary, and adhering to traffic rules to ensure safe driving practices.",
+These actions highlight the importance of maintaining a safe following distance, reducing speed when necessary, and adhering to traffic rules to ensure safe driving practices.",0
 D092,prediction/VQA,What object should the ego vehicle notice first when the ego vehicle is getting to the next possible location? What is the state of the object that is first noticed by the ego vehicle and what action should the ego vehicle take? What object should the ego vehicle notice second when the ego vehicle is getting to the next possible location? What is the state of the object perceived by the ego vehicle as second and what action should the ego vehicle take? What object should the ego vehicle notice third? What is the state of the object perceived by the ego vehicle as third and what action should the ego vehicle take?,"Firstly, notice a woman wearing blue jeans at right camera. The object is going ahead, so the ego vehicle should slow down and continue going ahead. Secondly, notice black sedan at front camera. The object is stationary, so the ego vehicle should slow down and continue going ahead. Thirdly, notice silver truck at back camera. The object is going ahead, so the ego vehicle should turn right.","To determine the sequence of objects the ego vehicle should notice and the actions it should take, we need to analyze the scene step-by-step:
 
 ### Step-by-Step Analysis:
@@ -2140,7 +2140,7 @@ D092,prediction/VQA,What object should the ego vehicle notice first when the ego
 
 3. **Third Object:** Vehicles Ahead
    - **State:** Stopped
-   - **Action:** Maintain current position",
+   - **Action:** Maintain current position",0
 D093,planning/VQA,"In this scenario, what are safe actions to take for the ego vehicle?","Slightly offset to the left, brake gently to a stop.","To determine safe actions for the ego vehicle, we need to analyze the environment and potential hazards:
 
 1. **Image 1 (CAM_FRONT)**: The road is wet, indicating recent rain, which can reduce traction and increase stopping distances. There's a car ahead, but it appears to be moving slowly, possibly due to the weather conditions. The road is clear of other vehicles, so there's no immediate risk of collision.
@@ -2165,7 +2165,7 @@ D093,planning/VQA,"In this scenario, what are safe actions to take for the ego v
 
 4. **Prepare for Braking**: Be ready to brake suddenly if needed, as the wet road surface increases the likelihood of hydroplaning.
 
-5.",
+5.",0
 D094,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c1,CAM_BACK,0.4078,0.6083>?",Brake suddenly.,"To determine if there is a potential collision risk with the white bus located at coordinates [0.4078, 0.6083] in the image, we need to analyze the relative positions and movements of the ego vehicle and the bus.
 
 ### Step-by-Step Analysis:
@@ -2188,12 +2188,12 @@ D094,planning/VQA,"What actions taken by the ego vehicle can lead to a collision
 ### Conclusion:
 The ego vehicle is not taking any actions that would lead to a collision with the white bus. The ego vehicle is stopped at a red light, and the bus is also stopped behind it, waiting for its turn to proceed. Therefore, there is no immediate risk of collision under the current conditions.
 
-**Answer**: No, the ego vehicle is not taking any actions that would lead to a collision with the white bus.",
+**Answer**: No, the ego vehicle is not taking any actions that would lead to a collision with the white bus.",0
 D095,prediction/VQA,What object should the ego vehicle notice first when the ego vehicle is getting to the next possible location? What is the state of the object that is first noticed by the ego vehicle and what action should the ego vehicle take? What object should the ego vehicle notice second when the ego vehicle is getting to the next possible location? What is the state of the object perceived by the ego vehicle as second and what action should the ego vehicle take? What object should the ego vehicle notice third? What is the state of the object perceived by the ego vehicle as third and what action should the ego vehicle take?,"Firstly, notice that black suv at front camera. The object is stationary, so the ego vehicle should continue ahead at the same speed. Secondly, notice that gray sedan at front camera. The object is stationary, so the ego vehicle should continue ahead at the same speed. Thirdly, notice that gray sedan at back camera. The object is moving ahead, so the ego vehicle should continue ahead at the same speed.","The ego vehicle should first notice the large truck parked on the side of the road. The truck is stationary and appears to be parked in front of a warehouse. The ego vehicle should slow down and prepare to stop if necessary, as there may be other vehicles approaching or pedestrians crossing the street.
 
 The second object the ego vehicle should notice is the white car driving towards it on the opposite lane. The white car is moving at a moderate speed and appears to be turning onto the same road as the ego vehicle. The ego vehicle should slow down and prepare to yield to the oncoming traffic, as it is the right-of-way in this situation.
 
-The third object the ego vehicle should notice is the large warehouse building on the right side of the road. The warehouse is stationary and appears to be a commercial property. The ego vehicle should continue driving at a safe speed and maintain a safe distance from the warehouse, as there may be other vehicles or pedestrians nearby.",
+The third object the ego vehicle should notice is the large warehouse building on the right side of the road. The warehouse is stationary and appears to be a commercial property. The ego vehicle should continue driving at a safe speed and maintain a safe distance from the warehouse, as there may be other vehicles or pedestrians nearby.",0
 D096,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_BACK_RIGHT,0.3547,0.7130>? Why take this action and what's the probability?","The action is to keep going at the same speed. The reason is that the object has little reference value for the ego vehicle, high probability.","To determine the possible actions the ego vehicle can take based on the image, let's analyze the scene:
 
 1. **Identify the ego vehicle**: The ego vehicle is the gray car in the foreground, as indicated by the bounding box.
@@ -2218,7 +2218,7 @@ Given these observations, here are some potential actions the ego vehicle could 
 ### Recommendation:
 Based on the current scene, the most probable action is for the ego vehicle to **continue straight**. This is because the road appears clear, and there are no immediate obstacles or traffic signals that necessitate stopping or turning.
 
-The probability of continuing straight is high due to the lack of visible hazards and the apparent clear path ahead.",
+The probability of continuing straight is high due to the lack of visible hazards and the apparent clear path ahead.",1
 D097,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c1,CAM_BACK,0.3783,0.5889>?",Brake suddenly.,"To determine if there is a potential collision risk with the vehicle at the coordinates [0.3783, 0.5889] in the image, we need to analyze the relative positions and movements of the vehicles involved.
 
 1. **Identify the Ego Vehicle**: The ego vehicle is the one from which the image is captured, likely the vehicle from which this analysis is being conducted.
@@ -2238,7 +2238,7 @@ Given these observations, the following actions by the ego vehicle could lead to
 - **Braking**: If the target vehicle stops unexpectedly, the ego vehicle should brake to avoid a collision.
 - **Swerving**: If the target vehicle turns, the ego vehicle should swerve to avoid a collision.
 
-In summary, the ego vehicle should be prepared to either brake or swerve to avoid a collision with the target vehicle at the given coordinates.",
+In summary, the ego vehicle should be prepared to either brake or swerve to avoid a collision with the target vehicle at the given coordinates.",0
 D098,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a red car to the front of the ego vehicle, a blue and white commercial vehicle to the front of the ego vehicle, a black pickup truck to the front of the ego vehicle, a white truck to the front of the ego vehicle, and a green light to the front of the ego vehicle. The IDs of these objects are <c1,CAM_FRONT,0.8292,0.5250>, <c2,CAM_FRONT,0.1042,0.6347>, <c3,CAM_FRONT,0.4748,0.5524>, <c4,CAM_FRONT,0.3286,0.5130>, and <c5,CAM_FRONT,0.6604,0.3031>.","The important objects in the current scene include:
 
 1. **Road**: The road is wet due to rain, reflecting the surroundings and creating a slippery surface. This is crucial for understanding the driving conditions and potential hazards like reduced traction.
@@ -2257,7 +2257,7 @@ D098,perception/VQA,What are the important objects in the current scene? Those o
 
 8. **Sidewalks and Fences**: Sidewalks and fences are present, which can be obstacles for pedestrians and cyclists. Drivers should be cautious when approaching these areas.
 
-These objects are critical for safe driving as they influence the driver's perception of the environment, the vehicle's position, and the potential risks associated with the scene.",
+These objects are critical for safe driving as they influence the driver's perception of the environment, the vehicle's position, and the potential risks associated with the scene.",0
 D099,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c2,CAM_FRONT_RIGHT,0.3442,0.5444>?",Accelerating and going straight.,"To determine what actions the ego vehicle might take that could lead to a collision with the truck labeled <c2,CAM_FRONT_RIGHT,0.3442,0.5444>, let's analyze the scene:
 
 1. **Relative Position**: The ego vehicle is positioned behind the truck, indicating that it is following the truck.
@@ -2278,7 +2278,7 @@ To avoid a collision, the ego vehicle should:
 - Adjust speed according to traffic conditions and weather.
 - Be aware of the truck's movements and adjust accordingly.
 
-In conclusion, the ego vehicle should not lead to a collision with the truck unless there is a sudden and unexpected change in behavior that violates standard driving practices.",
+In conclusion, the ego vehicle should not lead to a collision with the truck unless there is a sudden and unexpected change in behavior that violates standard driving practices.",0
 D100,planning/VQA,"In this scenario, what are safe actions to take for the ego vehicle?","Keep going at the same speed, decelerate gradually without braking.","The safe actions that can be taken by the ego vehicle in this scenario include:
 
 1. **Maintain a safe distance**: The road appears clear ahead, but it is essential to maintain a safe following distance from the car directly in front of the ego vehicle. This will allow for sufficient reaction time if the car in front brakes suddenly.
@@ -2291,7 +2291,7 @@ D100,planning/VQA,"In this scenario, what are safe actions to take for the ego v
 
 5. **Be prepared for changes in lighting**: The sky is darkening, indicating that it may soon become night. The ego vehicle should ensure that its headlights are functioning properly and adjust its speed accordingly to maintain visibility.
 
-By taking these precautions, the ego vehicle can safely navigate through this section of the road.",
+By taking these precautions, the ego vehicle can safely navigate through this section of the road.",0
 D101,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a bicycle on the roadside to the front of the ego vehicle, a black sedan to the front of the ego vehicle, and a trash can to the front of the ego vehicle. The IDs of these objects are <c1,CAM_FRONT,0.3583,0.5537>, <c2,CAM_FRONT,0.1148,0.5047>, and <c3,CAM_FRONT,0.7821,0.6447>.","The important objects in the current scene include:
 
 1. **Road**: The road is the primary surface for driving and should be monitored for traffic, pedestrians, and other vehicles.
@@ -2302,7 +2302,7 @@ D101,perception/VQA,What are the important objects in the current scene? Those o
 6. **Trash Bins**: Trash bins are important to avoid hitting them while driving.
 7. **Signage**: Any visible signs or markings on the road or buildings should be noted for navigation or safety reasons.
 
-These objects are crucial for safe driving and should be continuously monitored by the vehicle's systems.",
+These objects are crucial for safe driving and should be continuously monitored by the vehicle's systems.",0
 D102,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c1,CAM_FRONT,0.6739,0.5750>?",Slight right turn.,"To determine if there is a potential collision risk with the vehicle at the coordinates [0.6739, 0.5750] in front of the ego vehicle, we need to analyze the relative positions and movements of both vehicles.
 
 ### Step-by-Step Analysis:
@@ -2335,7 +2335,7 @@ To avoid a collision, the ego vehicle should:
 
 Thus, the correct answer is:
 - **Action**: Failing to stop at the red light.
-- **Explanation**: If the ego vehicle does not stop at the red light, it will likely collide with the target vehicle since they are very close and the traffic light is red, indicating a stop sign.",
+- **Explanation**: If the ego vehicle does not stop at the red light, it will likely collide with the target vehicle since they are very close and the traffic light is red, indicating a stop sign.",0
 D103,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a silver sedan to the front of the ego vehicle, a white truck to the front left of the ego vehicle, and pedestrians crossing the road to the front right of the ego vehicle. The IDs of these objects are <c1,CAM_FRONT,0.4161,0.5547>, <c2,CAM_FRONT_LEFT,0.5418,0.5173>, and <c3,CAM_FRONT_RIGHT,0.1156,0.7759>.","The important objects in the current scene include:
 
 1. **Construction Site**: The area where construction is taking place, as indicated by the presence of a truck labeled ""Eng Huat Construction Pte Ltd"" and construction materials. This is crucial for understanding potential hazards like uneven terrain or obstacles.
@@ -2348,7 +2348,7 @@ D103,perception/VQA,What are the important objects in the current scene? Those o
 
 5. **Road Signs and Barriers**: The signs and barriers on the road indicate restrictions or directions that should be followed for safe navigation.
 
-These objects are critical for making informed decisions about the driving path, speed, and potential hazards in this environment.",
+These objects are critical for making informed decisions about the driving path, speed, and potential hazards in this environment.",0
 D104,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a man in a gray shirt to the back left of the ego vehicle, a gray sedan to the front of the ego vehicle, and a worker with a white hat to the front right of the ego vehicle. The IDs of these objects are <c1,CAM_BACK_LEFT,0.7286,0.5870>, <c2,CAM_FRONT,0.4308,0.5842>, and <c3,CAM_FRONT_RIGHT,0.4766,0.6917>.","The important objects in the current scene include:
 
 1. **Construction Barriers**: These are crucial as they indicate ongoing construction work and may affect traffic flow or parking availability. Drivers should be cautious of these barriers when navigating through the area.
@@ -2367,7 +2367,7 @@ D104,perception/VQA,What are the important objects in the current scene? Those o
 
 8. **Trash Bins**: The trash bins suggest waste management practices in the area, which can be relevant for environmental awareness while driving.
 
-These objects are critical for understanding the environment and making informed driving decisions, such as avoiding obstacles, adhering to traffic rules, and anticipating pedestrian movements.",
+These objects are critical for understanding the environment and making informed driving decisions, such as avoiding obstacles, adhering to traffic rules, and anticipating pedestrian movements.",0
 D105,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c1,CAM_BACK,0.3783,0.5889>?",Brake suddenly.,"To determine what actions the ego vehicle might take that could lead to a collision with the truck labeled <c1,CAM_BACK,0.3783,0.5889>, let's analyze the scene:
 
 1. **Relative Position**: The truck is positioned directly ahead of the ego vehicle, indicating that it is in the same lane and possibly blocking the path of the ego vehicle if it attempts to change lanes.
@@ -2390,7 +2390,7 @@ To avoid such collisions, the ego vehicle should:
 
 Therefore, the actions that could lead to a collision are:
 - Accelerating while the traffic light is red.
-- Attempting to change lanes without signaling or ensuring clearance.",
+- Attempting to change lanes without signaling or ensuring clearance.",0
 D106,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c1,CAM_FRONT_LEFT,0.3614,0.6241>?",Slight left turn.,"To determine what actions the ego vehicle might take that could lead to a collision with the pedestrian in the image, let's analyze the situation step-by-step:
 
 1. **Identify the Pedestrian**: The pedestrian is located near the curb, walking away from the direction of the ego vehicle's path. This suggests they are moving in a safe distance from the road.
@@ -2408,7 +2408,7 @@ D106,planning/VQA,"What actions taken by the ego vehicle can lead to a collision
    - **Reduce Speed**: If the pedestrian is close to the road, reduce speed to ensure the vehicle can stop safely.
    - **Avoid Sudden Acceleration/Deceleration**: Maintain a steady speed and avoid sudden movements that could cause loss of control.
 
-Given these considerations, the ego vehicle should maintain a safe distance from the pedestrian and reduce its speed if necessary to avoid potential collisions.",
+Given these considerations, the ego vehicle should maintain a safe distance from the pedestrian and reduce its speed if necessary to avoid potential collisions.",0
 D107,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_BACK,0.7864,0.5759>? Why take this action and what's the probability?",The action is to turn left because there is no safety issue. The probability of this action is high.,"Based on the image provided, let's analyze the situation:
 
 ### Object Analysis:
@@ -2434,7 +2434,7 @@ D107,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_BACK
 The most probable action would be to move forward cautiously, checking for any obstacles such as pedestrians, other vehicles, or signs indicating restricted areas. This action requires careful observation and adherence to traffic rules and signage.
 
 ### Explanation:
-The ego vehicle should proceed with caution, as the fenced-off area suggests restricted access. Moving forward allows the vehicle to assess the situation better and determine the safest path forward. The probability of encountering obstacles increases if the vehicle moves forward, necessitating careful navigation and readiness to stop if necessary.",
+The ego vehicle should proceed with caution, as the fenced-off area suggests restricted access. Moving forward allows the vehicle to assess the situation better and determine the safest path forward. The probability of encountering obstacles increases if the vehicle moves forward, necessitating careful navigation and readiness to stop if necessary.",0
 D108,planning/VQA,"In this scenario, what are safe actions to take for the ego vehicle?","Decelerate gradually without braking, and maintain the same speed.","To determine safe actions for the ego vehicle, we need to analyze the environment and potential hazards:
 
 1. **CAM_FRONT**: The road is clear ahead, with no visible vehicles or pedestrians. The road appears to be well-maintained, and there are no obstacles in the way. The traffic light is not visible, but the road seems to be free of any red lights or stop signs.
@@ -2457,7 +2457,7 @@ Based on the analysis of the images, the following safe actions can be taken by 
 - **Check the traffic light** if one is present, to ensure that it is safe to proceed.
 - **Avoid sudden braking or sharp turns**, as they may cause accidents or damage to the vehicle.
 
-Overall, the environment appears to be safe for the ego vehicle to continue driving forward, as long as the driver remains vigilant and follows the rules of the road.",
+Overall, the environment appears to be safe for the ego vehicle to continue driving forward, as long as the driver remains vigilant and follows the rules of the road.",0
 D109,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a white truck to the back of the ego vehicle, a white sedan to the back of the ego vehicle, a white bus to the front of the ego vehicle, and a white sedan to the front of the ego vehicle. The IDs of these objects are <c1,CAM_BACK,0.5558,0.5324>, <c2,CAM_BACK,0.4849,0.5500>, <c3,CAM_FRONT,0.4130,0.5278>, and <c4,CAM_FRONT,0.5544,0.5431>.","The important objects in the current scene include:
 
 1. **Vehicles**: There are several vehicles visible, including cars, trucks, and a bus. These are crucial for understanding traffic conditions and potential hazards.
@@ -2476,7 +2476,7 @@ D109,perception/VQA,What are the important objects in the current scene? Those o
 
 8. **Parked Cars**: The parked cars on the side of the road are important for understanding parking availability and potential blind spots.
 
-These objects are essential for making informed decisions regarding speed, lane changes, and potential hazards during driving.",
+These objects are essential for making informed decisions regarding speed, lane changes, and potential hazards during driving.",0
 D110,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c1,CAM_FRONT_LEFT,0.6000,0.6750>?",No such action will lead to a collision.,"To determine if there is a potential collision risk with the object at coordinate [0.6000, 0.6750] in the image, we need to analyze the scene and the possible actions of the ego vehicle.
 
 ### Step-by-Step Analysis:
@@ -2504,7 +2504,7 @@ Given the current state of the image, the ego vehicle could potentially collide 
 - The driver should ensure that the turning radius is sufficient when making a left turn.
 - The ego vehicle should be cautious of any sudden movements or changes in the environment, especially around parked cars.
 
-By taking these precautions, the risk of collision can be minimized.",
+By taking these precautions, the risk of collision can be minimized.",0
 D111,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a black SUV to the back of the ego vehicle, a black unknown to the front left of the ego vehicle, a gray SUV to the back left of the ego vehicle, and an orange roadblock to the back of the ego vehicle. The IDs of these objects are <c1,CAM_BACK,0.7864,0.5759>, <c2,CAM_FRONT_LEFT,0.5500,0.5287>, <c3,CAM_BACK_LEFT,0.6630,0.7074>, and <c4,CAM_BACK,0.2224,0.7056>.","The important objects in the current scene include:
 
 1. **Construction Site**: The area is under construction, as indicated by the presence of cranes, fencing, and construction materials. This is crucial for understanding traffic flow and potential hazards.
@@ -2521,7 +2521,7 @@ D111,perception/VQA,What are the important objects in the current scene? Those o
 
 7. **Parking Lot**: The parking lot where the vehicles are parked is also important for understanding the layout and potential traffic patterns.
 
-These objects will be considered for future reasoning and driving decisions, particularly when navigating through the area, avoiding hazards, and ensuring safe passage.",
+These objects will be considered for future reasoning and driving decisions, particularly when navigating through the area, avoiding hazards, and ensuring safe passage.",0
 D112,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c1,CAM_FRONT,0.9859,0.7139>?",Moderate right turn.,"To determine if there is a potential collision risk with the vehicle at the coordinates [0.9859, 0.7139] in front of the ego vehicle, we need to analyze the scene and the relative positions and movements of the vehicles involved.
 
 ### Step-by-Step Analysis:
@@ -2545,7 +2545,7 @@ D112,planning/VQA,"What actions taken by the ego vehicle can lead to a collision
 ### Conclusion:
 The target vehicle is stationary and there is no indication of any imminent movement that would pose a collision risk. Therefore, the actions taken by the ego vehicle, such as maintaining a safe distance and avoiding sudden lane changes, would prevent a collision with the target vehicle.
 
-**Answer**: No, the actions taken by the ego vehicle do not lead to a collision with the target vehicle.",
+**Answer**: No, the actions taken by the ego vehicle do not lead to a collision with the target vehicle.",0
 D113,planning/VQA,"In this scenario, what are safe actions to take for the ego vehicle?","Turn right, slightly offset to the right.","To determine safe actions for the ego vehicle, we need to analyze the environment and potential hazards:
 
 1. **CAM_FRONT**: The truck is stopped at a crosswalk, and there's no immediate threat of collision. However, the wet road surface suggests reduced traction, so the ego vehicle should maintain a safe distance and be prepared to stop quickly if necessary.
@@ -2568,7 +2568,7 @@ D113,planning/VQA,"In this scenario, what are safe actions to take for the ego v
 4. **Follow Traffic Signals and Signs**: Obey traffic signals and signs, especially when approaching intersections.
 5. **Stay Alert and Reactive**: Be ready to react to any unexpected changes in the environment, such as sudden braking or turning by other vehicles.
 
-By following these safe actions, the ego vehicle can navigate the wet road conditions and avoid potential hazards.",
+By following these safe actions, the ego vehicle can navigate the wet road conditions and avoid potential hazards.",0
 D114,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a brown SUV to the front left of the ego vehicle, a blue pants pedestrian to the front right of the ego vehicle, a pedestrian in black pants to the front of the ego vehicle, and a white commercial vehicle to the front of the ego vehicle. The IDs of these objects are <c1,CAM_FRONT_LEFT,0.6370,0.5797>, <c2,CAM_FRONT_RIGHT,0.6531,0.6047>, <c3,CAM_FRONT,0.5302,0.5130>, and <c4,CAM_FRONT,0.3469,0.5139>.","The important objects in the current scene include:
 
 1. **Buildings**: These are significant as they indicate urban infrastructure and potential obstacles for navigation.
@@ -2578,7 +2578,7 @@ D114,perception/VQA,What are the important objects in the current scene? Those o
 5. **Trees and Vegetation**: These can affect visibility and may block certain views.
 6. **Signs and Markings**: Road signs and markings help in understanding traffic rules and regulations.
 
-These objects are essential for making informed decisions about navigation, speed, and safety while driving.",
+These objects are essential for making informed decisions about navigation, speed, and safety while driving.",0
 D115,planning/VQA,"In this scenario, what are safe actions to take for the ego vehicle?",Decelerate gradually without braking and maintain the current speed.,"The safe actions for the ego vehicle in this scenario would be:
 
 1. **Stop at the traffic light**: The traffic light is red, indicating that the ego vehicle should stop and wait for the light to turn green before proceeding.
@@ -2591,7 +2591,7 @@ D115,planning/VQA,"In this scenario, what are safe actions to take for the ego v
 
 5. **Follow traffic rules**: The ego vehicle should follow all traffic rules, including yielding to pedestrians and other vehicles when required.
 
-By taking these precautions, the ego vehicle can ensure a safe and smooth journey through the intersection.",
+By taking these precautions, the ego vehicle can ensure a safe and smooth journey through the intersection.",0
 D116,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a white small car to the front of the ego vehicle, a red small car to the front right of the ego vehicle, and a red light to the front of the ego vehicle. The IDs of these objects are <c1,CAM_FRONT,0.6739,0.5750>, <c2,CAM_FRONT_RIGHT,0.0261,0.5981>, and <c3,CAM_FRONT,0.5239,0.3076>.","In the current scene captured by the camera, the following important objects can be identified:
 
 1. **Vehicles**: 
@@ -2624,7 +2624,7 @@ D116,perception/VQA,What are the important objects in the current scene? Those o
 8. **Construction Materials**:
    - Scaffolding and construction materials are visible on the building under renovation.
 
-These objects are crucial for understanding traffic patterns, pedestrian activity, and potential hazards such as construction zones. They will be essential for making informed decisions about navigation, speed adjustments, and maintaining safe distances while driving.",
+These objects are crucial for understanding traffic patterns, pedestrian activity, and potential hazards such as construction zones. They will be essential for making informed decisions about navigation, speed adjustments, and maintaining safe distances while driving.",0
 D117,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a black sedan to the front right of the ego vehicle, a motorcycle to the front of the ego vehicle, a silver sedan to the back of the ego vehicle, a white sedan to the back of the ego vehicle, and a motorcycle to the front of the ego vehicle. The IDs of these objects are <c1,CAM_FRONT_RIGHT,0.7146,0.5602>, <c2,CAM_FRONT,0.6989,0.6028>, <c3,CAM_BACK,0.4177,0.6019>, <c4,CAM_BACK,0.5261,0.5861>, and <c5,CAM_FRONT,0.8724,0.7047>.","The important objects in the current scene include:
 
 1. **Road**: The road is the primary surface for driving and is crucial for navigation and maintaining lane discipline.
@@ -2634,7 +2634,7 @@ D117,perception/VQA,What are the important objects in the current scene? Those o
 5. **Signage**: Road signs and markings provide critical information about traffic rules and directions.
 6. **Motorcycles and Cars**: These vehicles are present on the road and must be monitored for safe driving practices.
 
-These objects are important for future reasoning and driving decisions as they affect traffic flow, safety, and compliance with traffic regulations.",
+These objects are important for future reasoning and driving decisions as they affect traffic flow, safety, and compliance with traffic regulations.",0
 D118,prediction/VQA,What object should the ego vehicle notice first when the ego vehicle is getting to the next possible location? What is the state of the object that is first noticed by the ego vehicle and what action should the ego vehicle take? What object should the ego vehicle notice second when the ego vehicle is getting to the next possible location? What is the state of the object perceived by the ego vehicle as second and what action should the ego vehicle take? What object should the ego vehicle notice third? What is the state of the object perceived by the ego vehicle as third and what action should the ego vehicle take?,"Firstly, notice that gray sedan at front camera. The object is going ahead, so the ego vehicle should slow down and continue going ahead. Secondly, notice that worker with a white hat at right camera. The object is stationary, so the ego vehicle should maintain its current speed and continue going ahead. Thirdly, notice that man in a gray shirt at left rear camera. The object is turning left, so the ego vehicle should maintain its current speed and continue going ahead.","### Analysis:
 
 The task involves identifying the objects the ego vehicle should notice sequentially as it approaches its next possible location. The analysis will be based on the objects visible in the images and their potential impact on the ego vehicle's path and safety.
@@ -2668,7 +2668,7 @@ The task involves identifying the objects the ego vehicle should notice sequenti
 
 3. **Third Object:** Building on the right.
    - **State:** Multi-story structure.
-   - **Action:** Continue driving at a moderate speed, being cautious of potential hazards.",
+   - **Action:** Continue driving at a moderate speed, being cautious of potential hazards.",0
 D119,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c1,CAM_FRONT,0.7364,0.5908>?","No action taken by the ego vehicle will lead to a collision with <c1,CAM_FRONT,0.7364,0.5908>.","To determine if there is a potential collision risk with the car at the coordinates [0.7364, 0.5908] in front of the ego vehicle, we need to analyze the relative positions and movements of both vehicles.
 
 ### Step-by-Step Analysis:
@@ -2708,7 +2708,7 @@ D119,planning/VQA,"What actions taken by the ego vehicle can lead to a collision
 3. **Monitor Traffic Closely**:
    - Continuously monitor the traffic around you, especially in front of you, to anticipate any sudden movements or changes in behavior from other vehicles.
 
-By following these",
+By following these",0
 D120,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a white SUV to the back of the ego vehicle, a white motorhome to the front right of the ego vehicle, a black sedan to the front of the ego vehicle, and a red light to the front of the ego vehicle. The IDs of these objects are <c1,CAM_BACK,0.6000,0.5491>, <c2,CAM_FRONT_RIGHT,0.4373,0.6236>, <c3,CAM_FRONT,0.5052,0.5686>, and <c4,CAM_FRONT,0.6431,0.5178>.","In the current scene captured by the camera, the following important objects can be identified:
 
 1. **Road**: The wet road surface is reflective due to recent rain, indicating potential slippery conditions. This is crucial for understanding the driving environment and predicting vehicle behavior.
@@ -2727,7 +2727,7 @@ D120,perception/VQA,What are the important objects in the current scene? Those o
 
 8. **Traffic Signs**: Although not clearly visible, signs may be present to regulate traffic and pedestrian movement.
 
-These objects are essential for understanding the driving environment and making informed decisions regarding speed, lane changes, and potential hazards.",
+These objects are essential for understanding the driving environment and making informed decisions regarding speed, lane changes, and potential hazards.",0
 D121,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_FRONT_RIGHT,0.5880,0.5436>? Why take this action and what's the probability?","The action is to keep going at the same speed. The reason is to follow the traffic rules, and the probability is high.","To analyze the situation depicted in the image, let's break down the key elements:
 
 1. **Ego Vehicle's Position**: The ego vehicle appears to be stopped at a traffic light, as indicated by the red light visible in the image.
@@ -2751,7 +2751,7 @@ D121,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_FRON
 
 ### Conclusion
 
-The most appropriate action for the ego vehicle is to **wait for the traffic light to change**. This is because the traffic light is currently red, and waiting ensures compliance with traffic regulations and safety. The probability of this action being taken is high, as it aligns with standard driving practices and safety protocols.",
+The most appropriate action for the ego vehicle is to **wait for the traffic light to change**. This is because the traffic light is currently red, and waiting ensures compliance with traffic regulations and safety. The probability of this action being taken is high, as it aligns with standard driving practices and safety protocols.",0
 D122,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c1,CAM_BACK,0.6000,0.5491>?",No such action will lead to a collision.,"To determine what actions the ego vehicle might take that could lead to a collision with the object at coordinates [0.6000, 0.5491] in the image, let's analyze the scene:
 
 1. **Identify the Object**: The object at coordinates [0.6000, 0.5491] appears to be a pedestrian crossing the street ahead of the ego vehicle.
@@ -2768,7 +2768,7 @@ Given these potential actions, the most critical factor would be the failure to 
 
 **Failure to yield to the pedestrian crossing the street.**
 
-This analysis assumes standard traffic rules and typical pedestrian behavior.",
+This analysis assumes standard traffic rules and typical pedestrian behavior.",0
 D123,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_BACK,0.3783,0.5889>? Why take this action and what's the probability?",The action is to decelerate gradually without braking because there is no safety issue. The probability is high.,"To determine the possible actions the ego vehicle can take based on the given image, let's analyze the scene:
 
 1. **Identify Key Objects and Their Statuses**:
@@ -2792,7 +2792,7 @@ D123,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_BACK
    - **Looking for Traffic Movements**: The probability of this action is moderate, as the ego vehicle should always be aware of its surroundings, but it is less likely than waiting for the light to change.
 
 **Conclusion**:
-The most probable action for the ego vehicle is to **wait** for the light to turn green. This action ensures compliance with traffic laws and avoids any potential accidents. The probability of this action is high, as it aligns with standard driving practices in urban environments.",
+The most probable action for the ego vehicle is to **wait** for the light to turn green. This action ensures compliance with traffic laws and avoids any potential accidents. The probability of this action is high, as it aligns with standard driving practices in urban environments.",0
 D124,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c3,CAM_FRONT,0.4748,0.5524>?","Accelerating and going straight can lead to a collision with <c3,CAM_FRONT,0.4748,0.5524>.","To determine what actions the ego vehicle might take that could lead to a collision with the vehicle at coordinates <c3,CAM_FRONT,0.4748,0.5524>, let's analyze the scene:
 
 1. **Identify the ego vehicle**: The ego vehicle appears to be the white van in the foreground on the left side of the image.
@@ -2810,7 +2810,7 @@ Given these observations, the following actions by the ego vehicle could lead to
 - Turning sharply without signaling.
 - Failing to yield the right-of-way during a turn.
 
-To avoid such collisions, the ego vehicle should maintain a safe distance from other vehicles, signal clearly before turning, and ensure proper speed control.",
+To avoid such collisions, the ego vehicle should maintain a safe distance from other vehicles, signal clearly before turning, and ensure proper speed control.",1
 D125,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a silver sedan to the back right of the ego vehicle, a gray SUV to the front right of the ego vehicle, a gray SUV to the front left of the ego vehicle, and a white truck to the front of the ego vehicle. The IDs of these objects are <c1,CAM_BACK_RIGHT,0.8094,0.7398>, <c2,CAM_FRONT_RIGHT,0.3442,0.5444>, <c3,CAM_FRONT_LEFT,0.4995,0.5658>, and <c4,CAM_FRONT,0.6901,0.4074>.","In the current scene captured by the camera, the following important objects can be identified:
 
 1. **Truck**: A white delivery truck is prominently visible in the foreground of Image 1 and Image 3. It appears to be moving forward, possibly indicating traffic flow or delivery activity.
@@ -2827,7 +2827,7 @@ D125,perception/VQA,What are the important objects in the current scene? Those o
 
 7. **Weather Conditions**: The wet road surfaces and overcast sky suggest rainy weather conditions, which are critical for safe driving decisions.
 
-These objects are crucial for understanding the context of the environment and predicting potential hazards or opportunities for maneuvering safely.",
+These objects are crucial for understanding the context of the environment and predicting potential hazards or opportunities for maneuvering safely.",0
 D126,planning/VQA,"In this scenario, what are safe actions to take for the ego vehicle?","Decelerate gradually without braking, brake gently to a stop, and back up.","To determine safe actions for the ego vehicle, let's analyze the environment and potential hazards:
 
 1. **CAM_FRONT**:
@@ -2867,7 +2867,7 @@ D126,planning/VQA,"In this scenario, what are safe actions to take for the ego v
 - **Check Mirrors Regularly**: Ensure that all mirrors are checked regularly to maintain awareness of surroundings.
 - **Prepare for Potential Hazards**: Be prepared to stop if necessary due to unexpected changes in the road conditions or the presence of workers or vehicles.
 
-By following these steps, the ego vehicle can safely navigate through the current environment.",
+By following these steps, the ego vehicle can safely navigate through the current environment.",0
 D127,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c1,CAM_FRONT,0.5120,0.6000>?",Accelerating and going straight.,"To determine what actions the ego vehicle might take that could lead to a collision with the object at the coordinates [0.5120, 0.6000] in the image, we need to analyze the scene and the potential paths of the ego vehicle.
 
 1. **Identify the Object**: The object at the coordinates [0.5120, 0.6000] appears to be a car located further down the road, closer to the center of the image.
@@ -2886,7 +2886,7 @@ D127,planning/VQA,"What actions taken by the ego vehicle can lead to a collision
 
 Given the current scenario, the most likely action that could lead to a collision is if the ego vehicle does not detect the car ahead in time and fails to brake or change lanes appropriately. Therefore, the key factor here is the ego vehicle's ability to detect and respond to other vehicles on the road.
 
-**Answer**: The ego vehicle's failure to detect the car ahead in time and not braking or changing lanes appropriately could lead to a collision.",
+**Answer**: The ego vehicle's failure to detect the car ahead in time and not braking or changing lanes appropriately could lead to a collision.",1
 D128,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_BACK,0.5558,0.5324>? Why take this action and what's the probability?",The action is to keep going at the same speed. The reason is that there is no safety issue. The probability is high.,"To determine the appropriate action for the ego vehicle, we need to analyze the scene and the position of the object in question, <c1,CAM_BACK,0.5558,0.5324>. Here’s a step-by-step analysis:
 
 1. **Identify the Object**: The object at <c1,CAM_BACK,0.5558,0.5324> appears to be a white truck located ahead on the road. It is positioned in the same lane as the ego vehicle but slightly to the right, indicating it might be moving in the same direction.
@@ -2907,7 +2907,7 @@ D128,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_BACK
    - The probability of accelerating or decelerating would depend on the specific traffic conditions and the driver's goals.
 
 **Conclusion**:
-The most probable action for the ego vehicle is to follow the white truck at a safe distance. This action ensures a smooth and predictable journey, considering the wet road conditions and the clear path ahead. The probability of this action is high, as it aligns with standard driving practices in such conditions.",
+The most probable action for the ego vehicle is to follow the white truck at a safe distance. This action ensures a smooth and predictable journey, considering the wet road conditions and the clear path ahead. The probability of this action is high, as it aligns with standard driving practices in such conditions.",1
 D129,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_BACK,0.7864,0.5759>? Why take this action and what's the probability?",The action is to turn left because there is no safety issue. The probability of this action is high.,"To determine the possible actions the ego vehicle can take based on the image, let's analyze the scene:
 
 1. **Identify Key Elements in the Image**:
@@ -2932,7 +2932,7 @@ D129,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_BACK
 
 Given the current state of the ego vehicle being parked and the presence of construction barriers, the most probable action is to **continue parking**. The probability of moving out of the lot or waiting for construction to end depends on external factors such as the ego vehicle's destination and the duration of the construction.
 
-**Action**: Continue parking.",
+**Action**: Continue parking.",0
 D130,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a black car to the front left of the ego vehicle, a black SUV to the front right of the ego vehicle, a unclear to the back of the ego vehicle, a white sedan to the front of the ego vehicle, and a red car to the front of the ego vehicle. The IDs of these objects are <c1,CAM_FRONT_LEFT,0.6000,0.6750>, <c2,CAM_FRONT_RIGHT,0.6703,0.4981>, <c3,CAM_BACK,0.4547,0.5936>, <c4,CAM_FRONT,0.3667,0.6398>, and <c5,CAM_FRONT,0.5745,0.6269>.","In the current scene captured by the camera, the following important objects can be identified:
 
 1. **Buildings**: There are several buildings visible in the background, including what appears to be a commercial or institutional building with illuminated windows. These structures are significant as they indicate the location might be near a business district or campus.
@@ -2949,7 +2949,7 @@ D130,perception/VQA,What are the important objects in the current scene? Those o
 
 7. **Traffic Lines**: The painted lines on the road serve as guides for drivers, ensuring safe navigation around curves and intersections.
 
-These objects are critical for understanding the context of the scene and will be essential for making informed decisions about driving safely within this environment.",
+These objects are critical for understanding the context of the scene and will be essential for making informed decisions about driving safely within this environment.",0
 D131,prediction/VQA,What object should the ego vehicle notice first when the ego vehicle is getting to the next possible location? What is the state of the object that is first noticed by the ego vehicle and what action should the ego vehicle take? What object should the ego vehicle notice second when the ego vehicle is getting to the next possible location? What is the state of the object perceived by the ego vehicle as second and what action should the ego vehicle take? What object should the ego vehicle notice third? What is the state of the object perceived by the ego vehicle as third and what action should the ego vehicle take?,"Firstly, notice that a person wearing gray clothes at left rear camera. The object is stationary, so the ego vehicle should keep going ahead at the same speed. Secondly, notice that white truck at front camera. The object is stationary, so the ego vehicle should slow down and go ahead. Thirdly, notice that white sedan at front camera. The object is going ahead, so the ego vehicle should slow down and go ahead.","### Analysis:
 
 #### Step-by-step reasoning:
@@ -2981,7 +2981,7 @@ D131,prediction/VQA,What object should the ego vehicle notice first when the ego
 
 3. **Third Object:** Building on the right side of the road.
    - **State:** Stationary.
-   - **Action:** Continue at a steady speed and be aware of surroundings.",
+   - **Action:** Continue at a steady speed and be aware of surroundings.",0
 D132,planning/VQA,"In this scenario, what are safe actions to take for the ego vehicle?","Decelerate gradually without braking, brake gently to a stop, and back up.","For the ego vehicle, here are some safe actions it can take based on the current scene:
 
 1. **Drive cautiously**: The road appears to be under construction, indicated by the barriers and construction materials visible on the sides of the road. The ego vehicle should drive slowly and maintain a safe distance from any potential obstacles or workers.
@@ -2998,7 +2998,7 @@ D132,planning/VQA,"In this scenario, what are safe actions to take for the ego v
 
 7. **Prepare for lane changes**: If the construction zone requires lane changes, the ego vehicle should communicate its intentions clearly to other drivers and follow proper signaling procedures.
 
-By taking these precautions, the ego vehicle can navigate through the construction zone safely while minimizing risks to itself and others on the road.",
+By taking these precautions, the ego vehicle can navigate through the construction zone safely while minimizing risks to itself and others on the road.",0
 D133,planning/VQA,"In this scenario, what are safe actions to take for the ego vehicle?","Keep going at the same speed, slightly offset to the left, and slightly offset to the right.","To determine safe actions for the ego vehicle, let's analyze the scene step-by-step:
 
 ### Current Scenario:
@@ -3031,7 +3031,7 @@ D133,planning/VQA,"In this scenario, what are safe actions to take for the ego v
 7. **Stay alert**:
    - Maintain awareness of your surroundings, including pedestrians and cyclists who may be harder to see due to the wet conditions.
 
-By taking these precautions, the ego vehicle can navigate safely through this scenario.",
+By taking these precautions, the ego vehicle can navigate safely through this scenario.",0
 D134,planning/VQA,"In this scenario, what are safe actions to take for the ego vehicle?","Keep going at the same speed, accelerate, and continue ahead.","To determine safe actions for the ego vehicle, let's analyze the scene step-by-step:
 
 1. **CAM_FRONT**: The view shows a road with a truck ahead, indicating that there is traffic. There are no immediate obstacles or pedestrians visible.
@@ -3059,7 +3059,7 @@ Based on these observations:
 3. **Avoid Obstructions**: Ensure there are no obstacles or pedestrians in the path ahead.
 4. **Prepare for Lane Changes**: If the ego vehicle needs to change lanes, ensure it is safe to do so without interfering with other vehicles.
 
-Overall, the ego vehicle should proceed cautiously, maintaining a safe speed and distance while being attentive to the traffic conditions.",
+Overall, the ego vehicle should proceed cautiously, maintaining a safe speed and distance while being attentive to the traffic conditions.",0
 D135,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is an orange and white traffic cone to the front of the ego vehicle, a pedestrian with a yellow hat to the front left of the ego vehicle, a silver sedan to the back right of the ego vehicle, a brown sedan to the back of the ego vehicle, a silver business car to the back left of the ego vehicle, and a white landmark line to the front of the ego vehicle. The IDs of these objects are <c1,CAM_FRONT,0.4891,0.9262>, <c2,CAM_FRONT_LEFT,0.7886,0.6667>, <c3,CAM_BACK_RIGHT,0.5156,0.7602>, <c4,CAM_BACK,0.5062,0.6648>, <c5,CAM_BACK_LEFT,0.2526,0.6426>, and <c6,CAM_FRONT,0.6107,0.9260>.","In the current scene, the following important objects can be identified:
 
 1. **Construction Site**: The area is under construction, indicated by the presence of traffic cones, barriers, and a construction vehicle. This suggests ongoing work that may affect traffic flow and requires caution.
@@ -3078,7 +3078,7 @@ D135,perception/VQA,What are the important objects in the current scene? Those o
 
 8. **Road Markings**: White lane markings are visible, guiding traffic flow and ensuring safety.
 
-These objects are crucial for understanding the current state of the environment and predicting potential hazards or changes in traffic patterns due to the construction work.",
+These objects are crucial for understanding the current state of the environment and predicting potential hazards or changes in traffic patterns due to the construction work.",0
 D136,planning/VQA,"In this scenario, what are safe actions to take for the ego vehicle?","Keep going at the same speed, decelerate gradually without braking.","To determine safe actions for the ego vehicle, let's analyze the scene step by step:
 
 ### Step 1: Identify the current situation
@@ -3104,7 +3104,7 @@ D136,planning/VQA,"In this scenario, what are safe actions to take for the ego v
 - **Check blind spots**: Ensure there are no vehicles approaching from the sides before changing lanes or merging into traffic.
 
 ### Conclusion
-The current situation is relatively safe, but the ego vehicle should remain vigilant and maintain a safe following distance. It should also be prepared to react to any changes in the traffic flow or road conditions. Safe actions include maintaining a steady speed, staying in the lane, and being ready to brake if necessary.",
+The current situation is relatively safe, but the ego vehicle should remain vigilant and maintain a safe following distance. It should also be prepared to react to any changes in the traffic flow or road conditions. Safe actions include maintaining a steady speed, staying in the lane, and being ready to brake if necessary.",0
 D137,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a silver sedan to the back right of the ego vehicle, a gray SUV to the front right of the ego vehicle, a gray SUV to the front left of the ego vehicle, and a white truck to the front of the ego vehicle. The IDs of these objects are <c1,CAM_BACK_RIGHT,0.8094,0.7398>, <c2,CAM_FRONT_RIGHT,0.3442,0.5444>, <c3,CAM_FRONT_LEFT,0.4995,0.5658>, and <c4,CAM_FRONT,0.6901,0.4074>.","The important objects in the current scene include:
 
 1. **Truck**: A white delivery truck is visible in the center of the image, moving forward. It is essential for understanding traffic flow and potential hazards like blind spots or sudden stops.
@@ -3119,7 +3119,7 @@ D137,perception/VQA,What are the important objects in the current scene? Those o
 
 6. **Fence and Trees**: The fence and trees on the right side of the image can obstruct visibility if not accounted for during driving.
 
-These objects should be considered for future reasoning and driving decisions, such as maintaining a safe distance from other vehicles, being aware of potential obstacles, and adjusting speed according to weather conditions.",
+These objects should be considered for future reasoning and driving decisions, such as maintaining a safe distance from other vehicles, being aware of potential obstacles, and adjusting speed according to weather conditions.",0
 D138,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a white sedan to the front of the ego vehicle, a person wearing gray clothes to the back left of the ego vehicle, and a white truck to the front of the ego vehicle. The IDs of these objects are <c1,CAM_FRONT,0.5120,0.6000>, <c2,CAM_BACK_LEFT,0.9261,0.5694>, and <c3,CAM_FRONT,0.4667,0.5861>.","The important objects in the current scene include:
 
 1. **Buildings**: Large modern buildings on both sides of the road, which are significant for navigation and understanding the urban environment.
@@ -3129,7 +3129,7 @@ D138,perception/VQA,What are the important objects in the current scene? Those o
 5. **Man with a Document**: A person standing near the roadside holding a document, which could be relevant if the vehicle needs to stop or interact with him.
 6. **Bag**: A large bag placed on the grass near the man, possibly indicating some activity or work being done in that area.
 
-These objects are crucial for safe driving as they provide context about the surroundings, potential hazards, and possible interactions.",
+These objects are crucial for safe driving as they provide context about the surroundings, potential hazards, and possible interactions.",0
 D139,planning/VQA,"In this scenario, what are safe actions to take for the ego vehicle?","Keep going at the same speed, slightly offset to the right.","To determine safe actions for the ego vehicle, let's analyze the scene step by step:
 
 1. **CAM_FRONT**: The view shows a large white dome structure, a parking lot, and some pedestrians. There is no immediate threat of collision here, but the area appears to be a public space with people walking around. The pedestrian crossing sign indicates that pedestrians may cross the road, so the ego vehicle should be cautious and ready to stop if necessary.
@@ -3149,7 +3149,7 @@ D139,planning/VQA,"In this scenario, what are safe actions to take for the ego v
 1. **Maintain a Safe Speed**: Drive at a moderate speed, considering the environment and potential hazards.
 2. **Be Aware of Pedestrians**: Be cautious of pedestrians, especially near the waterfront and public spaces, and be prepared to stop if necessary.
 3. **Avoid Construction Zones**: Drive cautiously near construction sites, maintaining a safe distance and being aware of potential hazards such as falling debris or uneven ground.
-4. **Be Prepared for Unexpected Changes**: Be ready to stop or",
+4. **Be Prepared for Unexpected Changes**: Be ready to stop or",0
 D140,planning/VQA,"In this scenario, what are safe actions to take for the ego vehicle?",Decelerate gradually without braking.,"To determine safe actions for the ego vehicle, let's analyze the scene step by step:
 
 1. **CAM_FRONT_LEFT Image**: 
@@ -3187,7 +3187,7 @@ D140,planning/VQA,"In this scenario, what are safe actions to take for the ego v
    - Keep an eye out for any sudden changes in traffic patterns or pedestrian movements.
    - Be cautious when entering the curve as seen in the front-right image.
 
-By following these steps, the ego vehicle can safely navigate through the intersection while adhering to traffic rules and maintaining awareness of its surroundings.",
+By following these steps, the ego vehicle can safely navigate through the intersection while adhering to traffic rules and maintaining awareness of its surroundings.",0
 D141,prediction/VQA,What object should the ego vehicle notice first when the ego vehicle is getting to the next possible location? What is the state of the object that is first noticed by the ego vehicle and what action should the ego vehicle take? What object should the ego vehicle notice second when the ego vehicle is getting to the next possible location? What is the state of the object perceived by the ego vehicle as second and what action should the ego vehicle take? What object should the ego vehicle notice third? What is the state of the object perceived by the ego vehicle as third and what action should the ego vehicle take?,"Firstly, notice that a person wearing gray clothes at left rear camera. The object is stationary, so the ego vehicle should keep going ahead at the same speed. Secondly, notice that white truck at front camera. The object is stationary, so the ego vehicle should slow down and go ahead. Thirdly, notice that white sedan at front camera. The object is going ahead, so the ego vehicle should slow down and go ahead.","### Analysis:
 
 The task involves identifying the objects the ego vehicle should notice and the actions it should take while navigating towards its next possible location. Here's a step-by-step analysis:
@@ -3232,7 +3232,7 @@ The task involves identifying the objects the ego vehicle should notice and the 
 
 - **Third Object:** The building on the right side.
   - **State:** Large building with glass windows.
-  - **Action:** Keep the building in sight for potential future maneuvers.",
+  - **Action:** Keep the building in sight for potential future maneuvers.",0
 D142,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c1,CAM_FRONT,0.6604,0.6314>?",Sharp left turn.,"To determine if there is a risk of collision with the object at coordinates <c1,CAM_FRONT,0.6604,0.6314>, let's analyze the scene:
 
 1. **Identify the Object**: The object at coordinates <c1,CAM_FRONT,0.6604,0.6314> appears to be a car located in the intersection area. It is positioned near the center of the lane, facing forward.
@@ -3250,7 +3250,7 @@ D142,planning/VQA,"What actions taken by the ego vehicle can lead to a collision
 5. **Risk Assessment**:
    - Based on the current observation, there is no immediate risk of collision with the car ahead. However, it is crucial to monitor the behavior of all vehicles around the intersection, including pedestrians and cyclists, as they may pose additional risks.
 
-**Conclusion**: The ego vehicle should continue its planned path through the intersection, assuming no sudden changes in traffic conditions or unexpected behavior from other vehicles. However, continuous monitoring of the environment is essential for safe driving.",
+**Conclusion**: The ego vehicle should continue its planned path through the intersection, assuming no sudden changes in traffic conditions or unexpected behavior from other vehicles. However, continuous monitoring of the environment is essential for safe driving.",0
 D143,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c1,CAM_BACK,0.5073,0.5778>?",Back up.,"To determine what actions the ego vehicle might take that could lead to a collision with the truck labeled as `<c1,CAM_BACK,0.5073,0.5778>`, let's analyze the scene:
 
 1. **Relative Position**: The ego vehicle is positioned behind the truck, indicating that it is following the truck.
@@ -3271,7 +3271,7 @@ To ensure safety, the ego vehicle should:
 - Use appropriate signals when changing lanes or accelerating.
 - Be aware of the truck's movements and adjust accordingly.
 
-In conclusion, the ego vehicle should not lead to a collision with the truck unless there is a failure in signaling, sudden acceleration, or an unexpected lane change without proper communication.",
+In conclusion, the ego vehicle should not lead to a collision with the truck unless there is a failure in signaling, sudden acceleration, or an unexpected lane change without proper communication.",0
 D144,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c1,CAM_FRONT_LEFT,0.6370,0.5797>?",Moderate left turn.,"To determine if there is a potential collision risk with the vehicle at the coordinates [0.6370, 0.5797] in the image, we need to analyze the relative positions and movements of the ego vehicle and the other vehicles in the scene.
 
 ### Step-by-Step Analysis:
@@ -3297,7 +3297,7 @@ D144,planning/VQA,"What actions taken by the ego vehicle can lead to a collision
 ### Conclusion:
 The current positioning of the ego vehicle and the target vehicle does not indicate an immediate risk of collision. However, the potential for a collision exists if either vehicle were to move. The key factors to consider are the speed and direction of movement of both vehicles.
 
-For safe driving, the ego vehicle should monitor the movements of the target vehicle and adjust its own position accordingly to avoid any potential collisions.",
+For safe driving, the ego vehicle should monitor the movements of the target vehicle and adjust its own position accordingly to avoid any potential collisions.",0
 D145,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a black car to the front of the ego vehicle, a person riding a bicycle to the front of the ego vehicle, a person wearing a pink shirt and black pants to the front of the ego vehicle, a white SUV to the front right of the ego vehicle, a black sedan to the back right of the ego vehicle, and a black sedan to the back of the ego vehicle. The IDs of these objects are <c1,CAM_FRONT,0.6604,0.6314>, <c2,CAM_FRONT,0.2052,0.6092>, <c3,CAM_FRONT,0.0203,0.5991>, <c4,CAM_FRONT_RIGHT,0.4313,0.6758>, <c5,CAM_BACK_RIGHT,0.2409,0.7426>, and <c6,CAM_BACK,0.1351,0.6314>.","In the current scene captured by the camera, the following important objects can be identified:
 
 1. **The Dome Structure**: This is a large white dome-shaped structure that appears to be a landmark or part of a facility. It could potentially be a venue for events or exhibitions given its design.
@@ -3318,7 +3318,7 @@ D145,perception/VQA,What are the important objects in the current scene? Those o
 
 9. **Sky and Clouds**: The sky is partly cloudy, indicating fair weather conditions.
 
-These objects are crucial for understanding the context of the scene and can influence decisions regarding navigation, speed adjustments, and potential hazards.",
+These objects are crucial for understanding the context of the scene and can influence decisions regarding navigation, speed adjustments, and potential hazards.",0
 D146,prediction/VQA,What object should the ego vehicle notice first when the ego vehicle is getting to the next possible location? What is the state of the object that is first noticed by the ego vehicle and what action should the ego vehicle take? What object should the ego vehicle notice second when the ego vehicle is getting to the next possible location? What is the state of the object perceived by the ego vehicle as second and what action should the ego vehicle take? What object should the ego vehicle notice third? What is the state of the object perceived by the ego vehicle as third and what action should the ego vehicle take?,"Firstly, notice that silver sedan at back camera. The object is stationary, so the ego vehicle should continue moving forward at the same speed. Secondly, notice that white truck at back camera. The object is moving forward, so the ego vehicle should continue moving forward at the same speed. Thirdly, notice that white sedan at front camera. The object is stationary, so the ego vehicle should continue moving forward at the same speed.","### Analysis:
 
 #### Step-by-step reasoning:
@@ -3362,7 +3362,7 @@ D146,prediction/VQA,What object should the ego vehicle notice first when the ego
 
 3. **Third Object:** Building  
    - **State:** Stationary  
-   - **Action:** Continue driving at a steady pace.",
+   - **Action:** Continue driving at a steady pace.",0
 D147,prediction/VQA,What object should the ego vehicle notice first when the ego vehicle is getting to the next possible location? What is the state of the object that is first noticed by the ego vehicle and what action should the ego vehicle take? What object should the ego vehicle notice second when the ego vehicle is getting to the next possible location? What is the state of the object perceived by the ego vehicle as second and what action should the ego vehicle take? What object should the ego vehicle notice third? What is the state of the object perceived by the ego vehicle as third and what action should the ego vehicle take?,"Firstly, notice person on the side of the road at front camera. The object is going ahead, so the ego vehicle should keep going ahead at the same speed. Secondly, notice people walking on the roadside at front camera. The object is going ahead, so the ego vehicle should keep going ahead at the same speed. Thirdly, notice orange car at right rear camera. The object is going ahead, so the ego vehicle should keep going ahead at the same speed.","### Analysis:
 
 #### Step-by-step reasoning:
@@ -3394,7 +3394,7 @@ D147,prediction/VQA,What object should the ego vehicle notice first when the ego
 
 3. **Third Object:** Building across the road.
    - **State:** Stationary.
-   - **Action:** Continue to slow down and be aware of any approaching vehicles or pedestrians.",
+   - **Action:** Continue to slow down and be aware of any approaching vehicles or pedestrians.",0
 D148,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a white truck to the back of the ego vehicle, a silver sedan to the back of the ego vehicle, and a white sedan to the front of the ego vehicle. The IDs of these objects are <c1,CAM_BACK,0.5511,0.5314>, <c2,CAM_BACK,0.3036,0.6352>, and <c3,CAM_FRONT,0.5440,0.5407>.","In the current scene captured by the camera, the following important objects can be identified:
 
 1. **Buildings**: Large commercial or industrial buildings dominate the background, providing context about the urban environment.
@@ -3413,7 +3413,7 @@ D148,perception/VQA,What are the important objects in the current scene? Those o
 
 8. **Rain**: The wet conditions and misty atmosphere indicate current rainy weather, impacting visibility and traction.
 
-These objects are critical for understanding the driving environment and making informed decisions regarding speed, lane changes, and potential hazards.",
+These objects are critical for understanding the driving environment and making informed decisions regarding speed, lane changes, and potential hazards.",0
 D149,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_BACK,0.5130,0.6352>? Why take this action and what's the probability?","The action is to keep going at the same speed. The reason is to avoid a collision, which is high probability.","To determine the potential actions of the ego vehicle based on the given image coordinates, let's analyze the scene:
 
 1. **Identify Relevant Objects**:
@@ -3436,7 +3436,7 @@ D149,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_BACK
 Given the current conditions (green light, no immediate obstacles), the most likely action for the ego vehicle is to **continue straight**.
 
 **Conclusion**:
-The ego vehicle should continue straight based on the current traffic signal and road conditions. The probability of this action being taken is high.",
+The ego vehicle should continue straight based on the current traffic signal and road conditions. The probability of this action being taken is high.",1
 D150,planning/VQA,"In this scenario, what are safe actions to take for the ego vehicle?","Keep going at the same speed, decelerate gradually without braking.","Based on the images provided:
 
 1. **CAM_FRONT**: The scene shows a wet road with no immediate traffic ahead. There is a car parked on the left side of the intersection, but it does not appear to be moving.
@@ -3465,7 +3465,7 @@ D150,planning/VQA,"In this scenario, what are safe actions to take for the ego v
 
 6. **Check blind spots**: Always check for potential hazards in blind spots before changing lanes or turning.
 
-By following these steps, the ego vehicle can safely navigate through the area while adhering to traffic rules and maintaining awareness of its surroundings.",
+By following these steps, the ego vehicle can safely navigate through the area while adhering to traffic rules and maintaining awareness of its surroundings.",0
 D151,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_FRONT_LEFT,0.6370,0.5797>? Why take this action and what's the probability?","The action is to keep going at the same speed. The reason is that there is no safety issue, and the probability is high.","To determine the possible actions the ego vehicle can take based on the image, let's analyze the scene:
 
 1. **Identify the ego vehicle**: The ego vehicle is the black SUV parked in the foreground, as indicated by the bounding box around it.
@@ -3491,7 +3491,7 @@ Given the current scenario, the most likely action is to park in the available s
 
 **Action**: Park in the available space next to the silver car.
 
-**Explanation**: This action is safe because the space is clear, and there are no immediate obstacles. The probability of this action being taken is high if the space is indeed free.",
+**Explanation**: This action is safe because the space is clear, and there are no immediate obstacles. The probability of this action being taken is high if the space is indeed free.",0
 D152,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_FRONT,0.3583,0.5537>? Why take this action and what's the probability?",The action is to decelerate gradually without braking. The reason is that there is no safety issue. The probability is high.,"To determine the possible actions of the ego vehicle based on the image provided, let's analyze the scene:
 
 1. **Identify Key Elements**:
@@ -3512,7 +3512,7 @@ D152,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_FRON
 
 Given the current image, the most likely action for the ego vehicle is to continue straight. This action aligns with the safest and most straightforward path given the current conditions.
 
-**Action Recommendation**: Continue straight.",
+**Action Recommendation**: Continue straight.",0
 D153,planning/VQA,"In this scenario, what are safe actions to take for the ego vehicle?","Keep going at the same speed, slightly offset to the right.","To determine safe actions for the ego vehicle, let's analyze the scene step-by-step:
 
 ### Current Scenario:
@@ -3537,7 +3537,7 @@ D153,planning/VQA,"In this scenario, what are safe actions to take for the ego v
 6. **Stay alert for construction vehicles**: Be prepared for construction vehicles entering or exiting the area.
 
 ### Conclusion:
-The ego vehicle should proceed cautiously, maintaining a safe distance from the construction site and being vigilant about potential hazards such as construction materials or pedestrians. Brake if necessary and be prepared to adjust its path if required.",
+The ego vehicle should proceed cautiously, maintaining a safe distance from the construction site and being vigilant about potential hazards such as construction materials or pedestrians. Brake if necessary and be prepared to adjust its path if required.",0
 D154,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a white truck to the back of the ego vehicle, a white sedan to the front left of the ego vehicle, a brown car to the back of the ego vehicle, and a white sedan to the back left of the ego vehicle. The IDs of these objects are <c1,CAM_BACK,0.5344,0.5009>, <c2,CAM_FRONT_LEFT,0.6552,0.5703>, <c3,CAM_BACK,0.9366,0.5776>, and <c4,CAM_BACK_LEFT,0.6458,0.6056>.","The important objects in the current scene include:
 
 1. **Buildings**: These are significant as they indicate the urban environment and potential destinations or landmarks that the vehicle might need to navigate around or pass by.
@@ -3547,7 +3547,7 @@ D154,perception/VQA,What are the important objects in the current scene? Those o
 5. **Signage**: The signs provide important information about directions, parking availability, and other relevant details.
 6. **Vehicles**: Other vehicles on the road are essential for understanding traffic flow and maintaining safe distances.
 
-These objects will be critical for future reasoning and driving decisions, such as identifying safe paths, avoiding obstacles, and adhering to traffic rules.",
+These objects will be critical for future reasoning and driving decisions, such as identifying safe paths, avoiding obstacles, and adhering to traffic rules.",0
 D155,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_FRONT,0.6739,0.5750>? Why take this action and what's the probability?",The action is to remain stationary. The reason for this action is to follow traffic rules. The probability of this action is low.,"To determine the possible actions of the ego vehicle based on the given image, let's analyze the scene step by step:
 
 1. **Identify the Ego Vehicle**: The white SUV in the foreground is the ego vehicle.
@@ -3566,7 +3566,7 @@ The probability of the ego vehicle taking the correct action (stopping) is high 
 - The road conditions are clear, and there is no indication of any emergency situations.
 
 ### Conclusion:
-The ego vehicle should stop at the red light. The probability of this action being taken correctly is very high due to the clear traffic signal and the absence of immediate hazards.",
+The ego vehicle should stop at the red light. The probability of this action being taken correctly is very high due to the clear traffic signal and the absence of immediate hazards.",0
 D156,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a white van to the front of the ego vehicle, a white SUV to the front of the ego vehicle, a black car to the back of the ego vehicle, a white bus to the back of the ego vehicle, and a white truck to the back left of the ego vehicle. The IDs of these objects are <c1,CAM_FRONT,0.9859,0.7139>, <c2,CAM_FRONT,0.1886,0.5803>, <c3,CAM_BACK,0.5339,0.5861>, <c4,CAM_BACK,0.4161,0.5370>, and <c5,CAM_BACK_LEFT,0.8808,0.4547>.","In the current scene captured by the camera, the following important objects can be identified:
 
 1. **Vehicles**: 
@@ -3591,7 +3591,7 @@ D156,perception/VQA,What are the important objects in the current scene? Those o
 5. **Canopy Structure**:
    - A large canopy providing shade over the parking area.
 
-These objects are crucial for understanding the layout of the environment, potential hazards, and navigation options. The presence of vehicles and infrastructure indicates this is likely a public or commercial area where traffic management is essential.",
+These objects are crucial for understanding the layout of the environment, potential hazards, and navigation options. The presence of vehicles and infrastructure indicates this is likely a public or commercial area where traffic management is essential.",0
 D157,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_BACK,0.5511,0.5314>? Why take this action and what's the probability?",The action is to keep going at the same speed because there is no safety issue. The probability is high.,"To determine the appropriate action for the ego vehicle, we need to analyze the scene and the relative positions of the vehicles and objects in the image. Here’s a step-by-step analysis:
 
 1. **Identify Key Objects**:
@@ -3616,7 +3616,7 @@ D157,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_BACK
    - **Lane Changing**: If there is space on the side lanes, the probability of lane changing is high, but it depends on the traffic situation and the ego vehicle's current position.
 
 **Conclusion**:
-The most likely action for the ego vehicle is to **accelerate cautiously**. This is because the road is wet, and the vehicles ahead appear to be moving very slowly. Accelerating cautiously will help the ego vehicle maintain a safe following distance while adapting to the wet road conditions. The probability of this action is moderate, as it requires careful observation of the vehicles ahead and the road conditions.",
+The most likely action for the ego vehicle is to **accelerate cautiously**. This is because the road is wet, and the vehicles ahead appear to be moving very slowly. Accelerating cautiously will help the ego vehicle maintain a safe following distance while adapting to the wet road conditions. The probability of this action is moderate, as it requires careful observation of the vehicles ahead and the road conditions.",0
 D158,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_FRONT,0.0469,0.6453>? Why take this action and what's the probability?",The action is to decelerate gradually without braking. The reason is to avoid a collision. The probability is high.,"To determine the possible actions the ego vehicle can take based on the image, let's analyze the key elements:
 
 1. **Road Conditions**:
@@ -3652,7 +3652,7 @@ The most likely action for the ego vehicle is to continue straight due to the cl
 - Make a right turn: Moderate
 - Stop: Low
 
-This analysis helps in making informed decisions about the vehicle's next move based on the current driving context.",
+This analysis helps in making informed decisions about the vehicle's next move based on the current driving context.",0
 D159,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a white SUV to the back of the ego vehicle, a white motorhome to the front right of the ego vehicle, a black sedan to the front of the ego vehicle, and a red light to the front of the ego vehicle. The IDs of these objects are <c1,CAM_BACK,0.6000,0.5491>, <c2,CAM_FRONT_RIGHT,0.4373,0.6236>, <c3,CAM_FRONT,0.5052,0.5686>, and <c4,CAM_FRONT,0.6431,0.5178>.","The important objects in the current scene include:
 
 1. **Bicycles**: There is a row of bicycles parked on the side of the road, which could potentially be obstacles if they are not secured properly. The presence of bicycles suggests that this area might be used by cyclists, so it's important to be cautious when driving near them.
@@ -3671,7 +3671,7 @@ D159,perception/VQA,What are the important objects in the current scene? Those o
 
 8. **Weather conditions**: The weather appears to be rainy, which can affect visibility and traction. It's important to adjust driving speed and be more cautious when driving in such conditions.
 
-These objects should be considered for future reasoning and driving decision-making, as they can impact the safety and efficiency of the driving experience.",
+These objects should be considered for future reasoning and driving decision-making, as they can impact the safety and efficiency of the driving experience.",0
 D160,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_FRONT_RIGHT,0.5880,0.5436>? Why take this action and what's the probability?","The action is to keep going at the same speed. The reason is to follow the traffic rules, and the probability is high.","Based on the image provided, let's analyze the situation:
 
 ### Object Analysis:
@@ -3695,7 +3695,7 @@ The recommended action for the ego vehicle is to:
 - **Wait**: Wait for the traffic light to turn green.
 
 ### Explanation:
-Stopping and waiting ensures compliance with traffic laws and enhances safety by allowing other vehicles and pedestrians to proceed safely when the light turns green. This action minimizes the risk of accidents and ensures smooth traffic flow.",
+Stopping and waiting ensures compliance with traffic laws and enhances safety by allowing other vehicles and pedestrians to proceed safely when the light turns green. This action minimizes the risk of accidents and ensures smooth traffic flow.",0
 D161,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_FRONT_LEFT,0.3614,0.6241>? Why take this action and what's the probability?","The action is to keep going at the same speed. The reason is that the object has little reference value for the ego vehicle, with a high probability.","Based on the image provided, let's analyze the situation:
 
 ### Object Analysis:
@@ -3717,7 +3717,7 @@ D161,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_FRON
 The ego vehicle should prioritize pedestrian safety by yielding to pedestrians when necessary. Given the dim lighting and the presence of a pedestrian, it is prudent to assume that the pedestrian may have the right-of-way. However, without specific traffic signals or road markings indicating otherwise, the ego vehicle should continue at its current speed and direction until it reaches an intersection where it must stop or yield.
 
 ### Conclusion:
-The ego vehicle should continue straight unless there are specific traffic signals or road signs indicating otherwise. The probability of stopping at an intersection due to a pedestrian crossing signal or yielding to pedestrians is moderate given the current conditions.",
+The ego vehicle should continue straight unless there are specific traffic signals or road signs indicating otherwise. The probability of stopping at an intersection due to a pedestrian crossing signal or yielding to pedestrians is moderate given the current conditions.",1
 D162,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a pedestrian in red clothes to the front of the ego vehicle, a white sedan to the back of the ego vehicle, a white sedan to the front of the ego vehicle, a red car to the front of the ego vehicle, and a white sedan car to the front left of the ego vehicle. The IDs of these objects are <c1,CAM_FRONT,0.7364,0.5908>, <c2,CAM_BACK,0.2099,0.6139>, <c3,CAM_FRONT,0.3333,0.6444>, <c4,CAM_FRONT,0.9448,0.6120>, and <c5,CAM_FRONT_LEFT,0.4609,0.6028>.","The important objects in the current scene include:
 
 1. Trees: The trees are visible on both sides of the road, providing shade and a natural boundary. They can affect visibility and should be taken into account when driving.
@@ -3730,7 +3730,7 @@ D162,perception/VQA,What are the important objects in the current scene? Those o
 
 5. Streetlights: The streetlights illuminate the road, making it easier to see during low-light conditions. However, they can also create glare, so drivers need to adjust their headlights accordingly.
 
-These objects are essential for understanding the environment and making informed decisions while driving.",
+These objects are essential for understanding the environment and making informed decisions while driving.",0
 D163,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_BACK,0.6000,0.5491>? Why take this action and what's the probability?","The action is to keep going at the same speed. The reason is that the object has little reference value for the ego vehicle, with a high probability.","To determine the appropriate action for the ego vehicle based on the image, let's analyze the key elements:
 
 1. **Weather Conditions**: The road appears wet, suggesting recent rain or ongoing light precipitation. This can affect traction and visibility, increasing the risk of hydroplaning and reducing the driver's ability to see further ahead.
@@ -3761,7 +3761,7 @@ Given these observations, here are potential actions the ego vehicle could take:
 ### Recommended Action: Slow Down
 The recommended action is to slow down. This action aligns with the need to reduce stopping distance, improve traction, and maintain control of the vehicle in wet conditions. The probability of this action being taken is high given the current weather and road conditions.
 
-By slowing down",
+By slowing down",0
 D164,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a black sedan to the front right of the ego vehicle, a motorcycle to the front of the ego vehicle, a silver sedan to the back of the ego vehicle, a white sedan to the back of the ego vehicle, and a motorcycle to the front of the ego vehicle. The IDs of these objects are <c1,CAM_FRONT_RIGHT,0.7146,0.5602>, <c2,CAM_FRONT,0.6989,0.6028>, <c3,CAM_BACK,0.4177,0.6019>, <c4,CAM_BACK,0.5261,0.5861>, and <c5,CAM_FRONT,0.8724,0.7047>.","In the current scene captured by the camera, the following important objects can be identified:
 
 1. **Road**: The road is the primary surface that defines the driving path. It includes lane markings, a ""SLOW"" sign, and directional arrows indicating traffic flow.
@@ -3780,8 +3780,8 @@ D164,perception/VQA,What are the important objects in the current scene? Those o
 
 8. **Hillside**: The sloping hillside on the right side of the road adds elevation changes to the terrain, which could influence driving decisions regarding speed and braking.
 
-These objects are critical for understanding the context of the driving environment and should be considered for safe navigation and decision-making.",
-D165,prediction/VQA,What object should the ego vehicle notice first when the ego vehicle is getting to the next possible location? What is the state of the object that is first noticed by the ego vehicle and what action should the ego vehicle take? What object should the ego vehicle notice second when the ego vehicle is getting to the next possible location? What is the state of the object perceived by the ego vehicle as second and what action should the ego vehicle take? What object should the ego vehicle notice third? What is the state of the object perceived by the ego vehicle as third and what action should the ego vehicle take?,"Firstly, notice that trash can at front camera. The object is a traffic sign and the ego vehicle should continue ahead at the same speed. Secondly, notice that bicycle on the roadside at front camera. The object is stationary and the ego vehicle should continue ahead at the same speed. Thirdly, notice that black sedan at front camera. The object is moving ahead and the ego vehicle should continue ahead at the same speed.",The ego vehicle should first notice the wall covered with green ivy. The wall is stationary and there is no immediate action required from the ego vehicle. The second object the ego vehicle should notice is the gate. The gate is closed and there is no immediate action required from the ego vehicle. The third object the ego vehicle should notice is the trash bin. The trash bin is stationary and there is no immediate action required from the ego vehicle.,
+These objects are critical for understanding the context of the driving environment and should be considered for safe navigation and decision-making.",0
+D165,prediction/VQA,What object should the ego vehicle notice first when the ego vehicle is getting to the next possible location? What is the state of the object that is first noticed by the ego vehicle and what action should the ego vehicle take? What object should the ego vehicle notice second when the ego vehicle is getting to the next possible location? What is the state of the object perceived by the ego vehicle as second and what action should the ego vehicle take? What object should the ego vehicle notice third? What is the state of the object perceived by the ego vehicle as third and what action should the ego vehicle take?,"Firstly, notice that trash can at front camera. The object is a traffic sign and the ego vehicle should continue ahead at the same speed. Secondly, notice that bicycle on the roadside at front camera. The object is stationary and the ego vehicle should continue ahead at the same speed. Thirdly, notice that black sedan at front camera. The object is moving ahead and the ego vehicle should continue ahead at the same speed.",The ego vehicle should first notice the wall covered with green ivy. The wall is stationary and there is no immediate action required from the ego vehicle. The second object the ego vehicle should notice is the gate. The gate is closed and there is no immediate action required from the ego vehicle. The third object the ego vehicle should notice is the trash bin. The trash bin is stationary and there is no immediate action required from the ego vehicle.,0
 D166,planning/VQA,"What actions could the ego vehicle take based on <c2,CAM_FRONT_LEFT,0.7886,0.6667>? Why take this action and what's the probability?","The action is to remain stationary. The reason for taking this action is to follow the traffic rules, with a high probability.","Based on the image provided, let's analyze the situation:
 
 ### Object Analysis:
@@ -3805,7 +3805,7 @@ Given the presence of the worker and the stop sign, the ego vehicle should consi
 ### Conclusion:
 The most appropriate action for the ego vehicle would be to stop. This aligns with standard traffic rules and ensures safety around the worker and the stop sign. The probability of this action being taken is high due to the clear indication of stopping required by the worker and the stop sign.
 
-If the ego vehicle decides to proceed, it should do so cautiously, maintaining a safe distance from the worker and the bus.",
+If the ego vehicle decides to proceed, it should do so cautiously, maintaining a safe distance from the worker and the bus.",1
 D167,planning/VQA,"In this scenario, what are safe actions to take for the ego vehicle?","Keep going at the same speed, turn left, slightly offset to the left.","To determine safe actions for the ego vehicle, let's analyze the environment depicted in the images:
 
 1. **CAM_FRONT**: The scene shows a construction site with barriers labeled ""FRENCH"" and vehicles parked nearby. There is no immediate threat but the area appears to be under construction, which could mean potential hazards like uneven surfaces or hidden obstacles.
@@ -3836,7 +3836,7 @@ D167,planning/VQA,"In this scenario, what are safe actions to take for the ego v
 
 7. **Prepare for Unexpected Movements**: Be ready to stop or adjust direction if necessary, especially when approaching areas where construction activity is likely to occur.
 
-By following these precautions, the ego vehicle can navigate through the construction site safely.",
+By following these precautions, the ego vehicle can navigate through the construction site safely.",0
 D168,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a white truck to the back of the ego vehicle, a white sedan to the back of the ego vehicle, a white bus to the front of the ego vehicle, and a white sedan to the front of the ego vehicle. The IDs of these objects are <c1,CAM_BACK,0.5558,0.5324>, <c2,CAM_BACK,0.4849,0.5500>, <c3,CAM_FRONT,0.4130,0.5278>, and <c4,CAM_FRONT,0.5544,0.5431>.","In the current scene captured by the camera, the following important objects can be identified:
 
 1. **Buildings**: These include commercial structures such as warehouses, parking garages, and possibly office spaces. They are significant because they indicate urban infrastructure and potential areas where vehicles might need to navigate around.
@@ -3855,7 +3855,7 @@ D168,perception/VQA,What are the important objects in the current scene? Those o
 
 8. **Traffic Signals**: Although not explicitly visible, the presence of poles and wires suggests that traffic signals may be nearby, affecting traffic flow.
 
-These objects collectively influence driving decisions regarding speed, lane changes, and awareness of potential hazards.",
+These objects collectively influence driving decisions regarding speed, lane changes, and awareness of potential hazards.",0
 D169,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c1,CAM_FRONT,0.3583,0.5537>?",Accelerating and going straight.,"To determine what actions the ego vehicle might take that could lead to a collision with the object at coordinates [0.3583, 0.5537] in the image, let's analyze the scene:
 
 1. **Identify the Object**: The object at coordinates [0.3583, 0.5537] appears to be a tree located near the center of the image, slightly to the left of the road.
@@ -3879,7 +3879,7 @@ Given these points, the potential actions leading to a collision with the tree i
 - **Improper Lane Change**: If the ego vehicle attempts to change lanes without checking for obstacles.
 - **Failure to Yield**: If the ego vehicle does not yield to pedestrians or other vehicles sharing the road.
 
-To avoid such collisions, the ego vehicle should maintain a safe speed, regularly check its sensors, manage lanes properly, and yield appropriately.",
+To avoid such collisions, the ego vehicle should maintain a safe speed, regularly check its sensors, manage lanes properly, and yield appropriately.",0
 D170,perception/VQA,What are the important objects in the current scene? Those objects will be considered for the future reasoning and driving decision.,"There is a white sedan to the front of the ego vehicle, a person wearing gray clothes to the back left of the ego vehicle, and a white truck to the front of the ego vehicle. The IDs of these objects are <c1,CAM_FRONT,0.5120,0.6000>, <c2,CAM_BACK_LEFT,0.9261,0.5694>, and <c3,CAM_FRONT,0.4667,0.5861>.","In the current scene captured by the camera, the following important objects can be identified:
 
 1. **Buildings**: Large structures on both sides of the road, likely office buildings or commercial spaces. These are significant as they indicate urban infrastructure and potential pedestrian activity.
@@ -3896,7 +3896,7 @@ D170,perception/VQA,What are the important objects in the current scene? Those o
 
 7. **Car**: A vehicle is seen in the distance, providing context about other road users and traffic conditions.
 
-These objects are critical for understanding the environment and making informed decisions regarding safe driving practices.",
+These objects are critical for understanding the environment and making informed decisions regarding safe driving practices.",0
 D171,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c1,CAM_BACK,0.7864,0.5759>?",Brake suddenly.,"To determine if there is a potential collision risk with the object at the coordinates [0.7864, 0.5759] in the image, we need to analyze the scene and the possible actions of the ego vehicle.
 
 1. **Identify the Object**: The object at the coordinates [0.7864, 0.5759] appears to be a car parked on the right side of the image. It is located in a parking lot area, and there are no visible signs of movement or activity around it.
@@ -3909,7 +3909,7 @@ D171,planning/VQA,"What actions taken by the ego vehicle can lead to a collision
 
 4. **Conclusion**: Based on the analysis, the ego vehicle does not appear to be in a position where it would collide with the car at the coordinates [0.7864, 0.5759]. The car is parked and there is sufficient space between the two vehicles.
 
-Therefore, the answer is: **No**, the actions taken by the ego vehicle do not lead to a collision with the car at the coordinates [0.7864, 0.5759].",
+Therefore, the answer is: **No**, the actions taken by the ego vehicle do not lead to a collision with the car at the coordinates [0.7864, 0.5759].",0
 D172,planning/VQA,"In this scenario, what are safe actions to take for the ego vehicle?","Keep going at the same speed, slightly offset to the left, and slightly offset to the right.","Based on the images provided:
 
 1. **CAM_FRONT**: The scene shows a road with a car approaching from the opposite direction. There is no immediate obstacle ahead of the ego vehicle.
@@ -3932,7 +3932,7 @@ D172,planning/VQA,"In this scenario, what are safe actions to take for the ego v
 - **Signal if Necessary**: If turning or changing lanes, ensure proper signaling to avoid collisions.
 - **Avoid Distractions**: Keep both hands on the wheel and eyes on the road to maintain control over the vehicle.
 
-There are no immediate obstacles or hazards detected in the current scenario, so the primary focus should be on maintaining a safe distance and following traffic rules.",
+There are no immediate obstacles or hazards detected in the current scenario, so the primary focus should be on maintaining a safe distance and following traffic rules.",0
 D173,prediction/VQA,What object should the ego vehicle notice first when the ego vehicle is getting to the next possible location? What is the state of the object that is first noticed by the ego vehicle and what action should the ego vehicle take? What object should the ego vehicle notice second when the ego vehicle is getting to the next possible location? What is the state of the object perceived by the ego vehicle as second and what action should the ego vehicle take? What object should the ego vehicle notice third? What is the state of the object perceived by the ego vehicle as third and what action should the ego vehicle take?,"Firstly, notice that gray sedan at front camera. The object is going ahead, so the ego vehicle should slow down and continue going ahead. Secondly, notice that worker with a white hat at right camera. The object is stationary, so the ego vehicle should maintain its current speed and continue going ahead. Thirdly, notice that man in a gray shirt at left rear camera. The object is turning left, so the ego vehicle should maintain its current speed and continue going ahead.","### Analysis:
 
 #### Step-by-step reasoning:
@@ -3976,7 +3976,7 @@ D173,prediction/VQA,What object should the ego vehicle notice first when the ego
 
 3. **Third Object:** Parked vehicles.
    - **State:** Stationary.
-   - **Action:** Proceed cautiously, maintaining awareness.",
+   - **Action:** Proceed cautiously, maintaining awareness.",0
 D174,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c2,CAM_FRONT_LEFT,0.6552,0.5703>?",No such action will lead to a collision.,"To determine what actions the ego vehicle might take that could lead to a collision with the object at coordinates [0.6552, 0.5703] in the image, let's analyze the scene:
 
 1. **Identify the Object**: The object at coordinates [0.6552, 0.5703] appears to be a parked car located on the right side of the image, near the curb.
@@ -4008,7 +4008,7 @@ Therefore, the actions that could lead to a collision with the parked car includ
 - Speeding up too quickly.
 - Failing to yield properly.
 
-These actions highlight the importance of careful observation and adherence to traffic rules while driving.",
+These actions highlight the importance of careful observation and adherence to traffic rules while driving.",0
 D175,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_FRONT_LEFT,0.6370,0.5797>? Why take this action and what's the probability?","The action is to keep going at the same speed. The reason is that there is no safety issue, and the probability is high.","To determine the possible actions of the ego vehicle based on the image provided, let's analyze the scene step by step:
 
 ### Step-by-Step Analysis:
@@ -4034,7 +4034,7 @@ D175,planning/VQA,"What actions could the ego vehicle take based on <c1,CAM_FRON
 ### Conclusion:
 Based on the current image, the most likely action for the ego vehicle is to **continue straight**, given that the road is clear and there are no immediate obstacles. The probability of this action is high due to the lack of immediate traffic or pedestrian interference.
 
-If additional context or future frames indicate a need to turn right or park, those actions would be considered next.",
+If additional context or future frames indicate a need to turn right or park, those actions would be considered next.",1
 D176,planning/VQA,"What actions taken by the ego vehicle can lead to a collision with <c2,CAM_FRONT_LEFT,0.7886,0.6667>?",Slight left turn.,"To determine what actions the ego vehicle might take that could lead to a collision with the worker holding the stop sign, let's analyze the scene:
 
 1. **Identify the Worker**: The worker is standing in the crosswalk area, holding a stop sign, indicating they are directing traffic. Their position suggests they are actively managing the flow of vehicles.
