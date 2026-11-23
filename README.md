@@ -69,14 +69,16 @@ config/vqa512.yaml                 the VQA amendment: pilot config with max_toke
 scripts/13_label_ui.py             local browser tool for labelling one person's copy (manifests/labelling_guide.md beside each item; the labeller's assigned block, in order; reference words highlighted in the model answer; backed-up atomic writes of the label column only; --check); --consensus: the discussion mode on the master sheet (human and model labels with reasons side by side, consensus and comment per item, "accept the human label on every agreed item"; writes the consensus columns only)
 scripts/14_llm_label.py            side study: a model labels its own copy under the same guide (prompts per batch; --backend codex; never merged into the master sheet)
 scripts/15_label_assignment.py     who labels which items: contiguous blocks in sheet order, written beside the sheet and picked up by 13 and 11
-scripts/16_disagreements.py        a human's disagreements with the model labellers, with the models' reasons, for the consensus discussion (only after the human's block is complete)
+scripts/16_disagreements.py        a human's disagreements with the model labellers, with the models' reasons, for the consensus discussion (only after every block is complete)
+scripts/17_vqa_tables.py           report tables V1-V4 from the consensus sheet, its key and the calibration JSON (human-adjudicated VQA correctness per cell and precision, paired outcomes, calibration summary, labellers against the consensus)
+scripts/18_failure_examples.py     harmful MCQ flips for the report from 05's JSON and the raw answers (lowest BF16 margin first, caps per cell and condition; question, options, both answers, option probabilities, image paths with what is missing locally)
 scripts/serve_judge.sh             open-weights judge on a second vLLM port for the VQA judge trial (any OpenAI-compatible endpoint works via --base-url)
 scripts/host_pull.sh               update the GPU host's checkout: backs up colliding untracked and modified files, fast-forwards, compares
 scripts/quantize_awq.py            own AWQ W4A16 checkpoint with llm-compressor, calibration-split prompts, manifest
 scripts/run_matrix.sh              serve -> all conditions -> stop, per precision; resumable; DRY_RUN=1 prints the plan
 scripts/rescore.py                 recompute MCQ fields after a rule change
 scripts/vast_setup.sh, hpc_pilot.sbatch
-tests/                             126 offline unit tests (pytest)
+tests/                             129 offline unit tests (pytest)
 ```
 
 ## Scope

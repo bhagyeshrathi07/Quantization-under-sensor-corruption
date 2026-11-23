@@ -110,7 +110,7 @@ VQA columns come from judged repeats when available (plan section 7); text chang
 
 Budgets (proposal 5.2): TTFT p95 ≤ 2 s {bf16: pass, int4: pass}; decode p50 ≥ 15 tok/s {bf16: pass, int4: pass}; INT4 peak memory reduction 46.9% (≥ 25%: pass). Pooled percentiles are over the concatenated requests of sessions sharing checkpoint, serve settings and host.
 
-### T7. Harmful examples (55)
+### T7. Harmful examples (showing 15 of 55)
 
 | Question | Condition | Cell | Views | BF16 margin | BF16 → INT4 |
 | --- | --- | --- | --- | --- | --- |
@@ -129,43 +129,3 @@ Budgets (proposal 5.2): TTFT p95 ≤ 2 s {bf16: pass, int4: pass}; decode p50 �
 | fb3aaad9-80153dcc-31375f4724 | Fog | behavior/MCQ | 6 | 0.11 | D → A |
 | 0e247ba6-2700a5b2-61f2d7e302 | Fog | perception/MCQ | 1 | 0.06 | B → C |
 | 4284a8d9-81bb5113-0a02cf102e | Fog | perception/MCQ | 1 | 0.09 | A → C |
-| 78c5f7d7-4c4e1e94-7c5b6c0951 | Fog | perception/MCQ | 1 | 0.00 | B → C |
-| 9f5f2211-3e1d882d-f26a2baf80 | Fog | perception/MCQ | 1 | 0.20 | B → C |
-| b79d940d-dae47bb9-f793ae6b05 | Fog | perception/MCQ | 1 | 0.08 | A → C |
-| bc4fd5a0-f317f943-9bffebf0bf | Fog | perception/MCQ | 1 | 0.04 | A → C |
-| dcdea563-0f6432a5-67d468e53a | Fog | perception/MCQ | 1 | 0.05 | A → C |
-| e15260c4-7a639c70-6a24bed67f | Fog | perception/MCQ | 1 | 0.05 | A → C |
-| 37284f81-fcafd394-fd175ec751 | LowLight | behavior/MCQ | 6 | 0.07 | C → B |
-| 73030fb6-8de7ec06-24e410c705 | LowLight | behavior/MCQ | 6 | 0.00 | C → D |
-| c2d5a5e7-7a8188fd-1bc89a72e7 | LowLight | behavior/MCQ | 6 | 0.04 | C → B |
-| e5a3df5f-474e5ee2-a6c3f000be | LowLight | behavior/MCQ | 6 | 0.00 | A → D |
-| eac3102e-ee4ed593-439f888048 | LowLight | behavior/MCQ | 6 | 0.09 | B → A |
-| 240d1548-e154fa0b-d49b35d24f | LowLight | perception/MCQ | 1 | 0.05 | B → C |
-| 4284a8d9-81bb5113-0a02cf102e | LowLight | perception/MCQ | 1 | 0.04 | A → C |
-| 57f5503b-27ec52e7-d84762f12f | LowLight | perception/MCQ | 1 | 0.04 | B → A |
-| 78c5f7d7-4c4e1e94-7c5b6c0951 | LowLight | perception/MCQ | 1 | 0.16 | B → C |
-| bc4fd5a0-f317f943-9bffebf0bf | LowLight | perception/MCQ | 1 | 0.08 | A → C |
-| c6da5920-378b6469-df35ab0211 | LowLight | perception/MCQ | 1 | 0.16 | B → C |
-| d0b2d916-f1999ab8-59ac357ab5 | LowLight | perception/MCQ | 1 | 0.00 | A → C |
-| 16c90eed-9ffb0eec-d7caaa08c0 | NoImage | behavior/MCQ | 6 | 0.37 | C → D |
-| 19640fe4-c217fc76-42fe2a9f2a | NoImage | behavior/MCQ | 6 | 0.14 | B → A |
-| 3032b651-6e349f86-1871b4106d | NoImage | behavior/MCQ | 6 | 0.15 | B → A |
-| 45275e70-a02918af-505a702f17 | NoImage | behavior/MCQ | 6 | 0.20 | B → A |
-| 9ac6dff0-7f32be25-618b2e25be | NoImage | behavior/MCQ | 6 | 0.00 | A → D |
-| e323a27a-3c730292-62520a731f | NoImage | behavior/MCQ | 6 | 0.25 | B → D |
-| f9e460f0-8e8e071e-adeb3c3088 | NoImage | behavior/MCQ | 6 | 0.13 | B → A |
-| 10dfdae8-2e3ff290-4cbef9750e | clean | behavior/MCQ | 6 | 0.04 | D → C |
-| 4ed62829-c16bf051-fb93e76780 | clean | behavior/MCQ | 6 | 0.09 | A → C |
-| 79770033-fbc07f14-d659520519 | clean | behavior/MCQ | 6 | 0.00 | B → D |
-| befb9609-82828760-02a753b780 | clean | behavior/MCQ | 6 | 0.05 | A → D |
-| c2d5a5e7-7a8188fd-1bc89a72e7 | clean | behavior/MCQ | 6 | 0.09 | C → B |
-| c34206e6-10a4d313-6849916919 | clean | behavior/MCQ | 6 | 0.08 | C → A |
-| eac3102e-ee4ed593-439f888048 | clean | behavior/MCQ | 6 | 0.14 | B → A |
-| fb3aaad9-80153dcc-31375f4724 | clean | behavior/MCQ | 6 | 0.06 | D → A |
-| fd2d419d-3c8a9403-5da3755847 | clean | behavior/MCQ | 6 | 0.05 | C → A |
-| 1fbcc26e-03d203bc-e4cdeb1b70 | clean | perception/MCQ | 1 | 0.00 | A → C |
-| 57f5503b-27ec52e7-d84762f12f | clean | perception/MCQ | 1 | 0.00 | B → C |
-| 9f5f2211-3e1d882d-f26a2baf80 | clean | perception/MCQ | 1 | 0.05 | B → C |
-| befb9609-82828760-6ea5d1e557 | clean | perception/MCQ | 1 | 0.05 | A → C |
-| d90b94e8-786371ca-0a2bbe9b63 | clean | perception/MCQ | 1 | 0.00 | B → C |
-| dcdea563-0f6432a5-67d468e53a | clean | perception/MCQ | 1 | 0.05 | A → C |

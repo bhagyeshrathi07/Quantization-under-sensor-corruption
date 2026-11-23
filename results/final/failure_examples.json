@@ -1,0 +1,469 @@
+{
+  "source": "results/final/compare.json",
+  "n_harmful": 55,
+  "examples": [
+    {
+      "rank": 1,
+      "question_id": "1fbcc26e-03d203bc-e4cdeb1b70",
+      "scene_token": "1fbcc26ebf6948bb964d3ae74939e8ea",
+      "condition": "clean",
+      "cell": "perception/MCQ",
+      "margin": 0.0,
+      "correct": "A",
+      "bf16": "A",
+      "int4": "C",
+      "option_probs_bf16": {
+        "A": 0.34372367053400477,
+        "B": 0.34372367053400477,
+        "C": 0.2676922637720605
+      },
+      "stem": "What is the moving status of object <c1,CAM_FRONT,0.3042,0.5408>? Please select the correct answer from the following",
+      "options": {
+        "A": "Going ahead.",
+        "B": "Turn left.",
+        "C": "Turn right."
+      },
+      "images": {
+        "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n015-2018-08-01-17-04-15+0800__CAM_FRONT__1533114270162460.jpg"
+      },
+      "images_present": {
+        "CAM_FRONT": false
+      }
+    },
+    {
+      "rank": 2,
+      "question_id": "240d1548-e154fa0b-1bc4fccc56",
+      "scene_token": "240d15482599449a9bd0432fbfa688ab",
+      "condition": "Fog",
+      "cell": "behavior/MCQ",
+      "margin": 0.0,
+      "correct": "B",
+      "bf16": "B",
+      "int4": "A",
+      "option_probs_bf16": {
+        "B": 0.29034029650833537,
+        "C": 0.29034029650833537,
+        "A": 0.256224412364099,
+        "D": 0.1554079618656788
+      },
+      "stem": "Predict the behavior of the ego vehicle. Please select the correct answer from the following",
+      "options": {
+        "A": "The ego vehicle is steering to the right. The ego vehicle is driving slowly.",
+        "B": "The ego vehicle is slightly steering to the right. The ego vehicle is driving slowly.",
+        "C": "The ego vehicle is steering to the left. The ego vehicle is driving with normal speed.",
+        "D": "The ego vehicle is steering to the right. The ego vehicle is driving very fast."
+      },
+      "images": {
+        "CAM_FRONT": "data/corruption/Fog/CAM_FRONT/n015-2018-10-08-15-52-24+0800__CAM_FRONT__1538985425262460.jpg",
+        "CAM_FRONT_LEFT": "data/corruption/Fog/CAM_FRONT_LEFT/n015-2018-10-08-15-52-24+0800__CAM_FRONT_LEFT__1538985425254844.jpg",
+        "CAM_FRONT_RIGHT": "data/corruption/Fog/CAM_FRONT_RIGHT/n015-2018-10-08-15-52-24+0800__CAM_FRONT_RIGHT__1538985425270339.jpg",
+        "CAM_BACK": "data/corruption/Fog/CAM_BACK/n015-2018-10-08-15-52-24+0800__CAM_BACK__1538985425287525.jpg",
+        "CAM_BACK_LEFT": "data/corruption/Fog/CAM_BACK_LEFT/n015-2018-10-08-15-52-24+0800__CAM_BACK_LEFT__1538985425297425.jpg",
+        "CAM_BACK_RIGHT": "data/corruption/Fog/CAM_BACK_RIGHT/n015-2018-10-08-15-52-24+0800__CAM_BACK_RIGHT__1538985425277893.jpg"
+      },
+      "images_present": {
+        "CAM_FRONT": false,
+        "CAM_FRONT_LEFT": false,
+        "CAM_FRONT_RIGHT": false,
+        "CAM_BACK": false,
+        "CAM_BACK_LEFT": false,
+        "CAM_BACK_RIGHT": false
+      }
+    },
+    {
+      "rank": 3,
+      "question_id": "4ed62829-c16bf051-fb93e76780",
+      "scene_token": "4ed628299b1e45a3a73704e8cf8287a9",
+      "condition": "Fog",
+      "cell": "behavior/MCQ",
+      "margin": 0.0,
+      "correct": "A",
+      "bf16": "A",
+      "int4": "C",
+      "option_probs_bf16": {
+        "A": 0.3556805927481662,
+        "C": 0.3556805927481662,
+        "D": 0.24445545806983265,
+        "B": 0.0330834486566167
+      },
+      "stem": "Predict the behavior of the ego vehicle. Please select the correct answer from the following",
+      "options": {
+        "A": "The ego vehicle is going straight. The ego vehicle is driving fast.",
+        "B": "The ego vehicle is steering to the right. The ego vehicle is driving very fast.",
+        "C": "The ego vehicle is steering to the left. The ego vehicle is driving slowly.",
+        "D": "The ego vehicle is going straight. The ego vehicle is driving very fast."
+      },
+      "images": {
+        "CAM_FRONT": "data/corruption/Fog/CAM_FRONT/n015-2018-11-21-19-11-29+0800__CAM_FRONT__1542798960412460.jpg",
+        "CAM_FRONT_LEFT": "data/corruption/Fog/CAM_FRONT_LEFT/n015-2018-11-21-19-11-29+0800__CAM_FRONT_LEFT__1542798960404844.jpg",
+        "CAM_FRONT_RIGHT": "data/corruption/Fog/CAM_FRONT_RIGHT/n015-2018-11-21-19-11-29+0800__CAM_FRONT_RIGHT__1542798960420339.jpg",
+        "CAM_BACK": "data/corruption/Fog/CAM_BACK/n015-2018-11-21-19-11-29+0800__CAM_BACK__1542798960437525.jpg",
+        "CAM_BACK_LEFT": "data/corruption/Fog/CAM_BACK_LEFT/n015-2018-11-21-19-11-29+0800__CAM_BACK_LEFT__1542798960447423.jpg",
+        "CAM_BACK_RIGHT": "data/corruption/Fog/CAM_BACK_RIGHT/n015-2018-11-21-19-11-29+0800__CAM_BACK_RIGHT__1542798960427893.jpg"
+      },
+      "images_present": {
+        "CAM_FRONT": false,
+        "CAM_FRONT_LEFT": false,
+        "CAM_FRONT_RIGHT": false,
+        "CAM_BACK": false,
+        "CAM_BACK_LEFT": false,
+        "CAM_BACK_RIGHT": false
+      }
+    },
+    {
+      "rank": 4,
+      "question_id": "57f5503b-27ec52e7-d84762f12f",
+      "scene_token": "57f5503bf63144b8bf450315e860f58e",
+      "condition": "clean",
+      "cell": "perception/MCQ",
+      "margin": 0.0,
+      "correct": "B",
+      "bf16": "B",
+      "int4": "C",
+      "option_probs_bf16": {
+        "B": 0.34792826584177855,
+        "C": 0.34792826584177855,
+        "A": 0.27096680589025307
+      },
+      "stem": "What is the moving status of object <c2,CAM_FRONT,0.3609,0.5676>? Please select the correct answer from the following",
+      "options": {
+        "A": "Turn left.",
+        "B": "Going ahead.",
+        "C": "Turn right."
+      },
+      "images": {
+        "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n015-2018-10-08-16-03-24+0800__CAM_FRONT__1538985932262460.jpg"
+      },
+      "images_present": {
+        "CAM_FRONT": false
+      }
+    },
+    {
+      "rank": 5,
+      "question_id": "73030fb6-8de7ec06-24e410c705",
+      "scene_token": "73030fb67d3c46cfb5e590168088ae39",
+      "condition": "LowLight",
+      "cell": "behavior/MCQ",
+      "margin": 0.0,
+      "correct": "C",
+      "bf16": "C",
+      "int4": "D",
+      "option_probs_bf16": {
+        "C": 0.31584694626764886,
+        "D": 0.31584694626764886,
+        "A": 0.24598184908395687,
+        "B": 0.11619359808864924
+      },
+      "stem": "Predict the behavior of the ego vehicle. Please select the correct answer from the following",
+      "options": {
+        "A": "The ego vehicle is steering to the left. The ego vehicle is driving very fast.",
+        "B": "The ego vehicle is slightly steering to the right. The ego vehicle is driving very fast.",
+        "C": "The ego vehicle is steering to the left. The ego vehicle is driving with normal speed.",
+        "D": "The ego vehicle is steering to the right. The ego vehicle is driving slowly."
+      },
+      "images": {
+        "CAM_FRONT": "data/corruption/LowLight/CAM_FRONT/n015-2018-07-18-11-07-57+0800__CAM_FRONT__1531883531912467.jpg",
+        "CAM_FRONT_LEFT": "data/corruption/LowLight/CAM_FRONT_LEFT/n015-2018-07-18-11-07-57+0800__CAM_FRONT_LEFT__1531883531904844.jpg",
+        "CAM_FRONT_RIGHT": "data/corruption/LowLight/CAM_FRONT_RIGHT/n015-2018-07-18-11-07-57+0800__CAM_FRONT_RIGHT__1531883531920339.jpg",
+        "CAM_BACK": "data/corruption/LowLight/CAM_BACK/n015-2018-07-18-11-07-57+0800__CAM_BACK__1531883531937525.jpg",
+        "CAM_BACK_LEFT": "data/corruption/LowLight/CAM_BACK_LEFT/n015-2018-07-18-11-07-57+0800__CAM_BACK_LEFT__1531883531947423.jpg",
+        "CAM_BACK_RIGHT": "data/corruption/LowLight/CAM_BACK_RIGHT/n015-2018-07-18-11-07-57+0800__CAM_BACK_RIGHT__1531883531927893.jpg"
+      },
+      "images_present": {
+        "CAM_FRONT": false,
+        "CAM_FRONT_LEFT": false,
+        "CAM_FRONT_RIGHT": false,
+        "CAM_BACK": false,
+        "CAM_BACK_LEFT": false,
+        "CAM_BACK_RIGHT": false
+      }
+    },
+    {
+      "rank": 6,
+      "question_id": "78c5f7d7-4c4e1e94-7c5b6c0951",
+      "scene_token": "78c5f7d7b547483c906d8524a8c3190f",
+      "condition": "Fog",
+      "cell": "perception/MCQ",
+      "margin": 0.0,
+      "correct": "B",
+      "bf16": "B",
+      "int4": "C",
+      "option_probs_bf16": {
+        "B": 0.45542619160621295,
+        "C": 0.45542619160621295,
+        "A": 0.0543928986478683
+      },
+      "stem": "What is the moving status of object <c2,CAM_BACK_LEFT,0.3286,0.5861>? Please select the correct answer from the following",
+      "options": {
+        "A": "Turn right.",
+        "B": "Going ahead.",
+        "C": "Turn left."
+      },
+      "images": {
+        "CAM_BACK_LEFT": "data/corruption/Fog/CAM_BACK_LEFT/n008-2018-08-01-15-52-19-0400__CAM_BACK_LEFT__1533153707447405.jpg"
+      },
+      "images_present": {
+        "CAM_BACK_LEFT": false
+      }
+    },
+    {
+      "rank": 7,
+      "question_id": "79770033-fbc07f14-d659520519",
+      "scene_token": "797700339b014fb6aa61c1ea3778d587",
+      "condition": "clean",
+      "cell": "behavior/MCQ",
+      "margin": 0.0,
+      "correct": "B",
+      "bf16": "B",
+      "int4": "D",
+      "option_probs_bf16": {
+        "B": 0.4194908780546206,
+        "D": 0.4194908780546206,
+        "C": 0.08260266137761763,
+        "A": 0.07289659281099174
+      },
+      "stem": "Predict the behavior of the ego vehicle. Please select the correct answer from the following",
+      "options": {
+        "A": "The ego vehicle is steering to the right. The ego vehicle is driving very fast.",
+        "B": "The ego vehicle is going straight. The ego vehicle is driving slowly.",
+        "C": "The ego vehicle is going straight. The ego vehicle is driving very fast.",
+        "D": "The ego vehicle is slightly steering to the left. The ego vehicle is driving with normal speed."
+      },
+      "images": {
+        "CAM_FRONT": "data/nuscenes/samples/CAM_FRONT/n015-2018-11-14-19-09-14+0800__CAM_FRONT__1542194161662460.jpg",
+        "CAM_FRONT_LEFT": "data/nuscenes/samples/CAM_FRONT_LEFT/n015-2018-11-14-19-09-14+0800__CAM_FRONT_LEFT__1542194161654844.jpg",
+        "CAM_FRONT_RIGHT": "data/nuscenes/samples/CAM_FRONT_RIGHT/n015-2018-11-14-19-09-14+0800__CAM_FRONT_RIGHT__1542194161670339.jpg",
+        "CAM_BACK": "data/nuscenes/samples/CAM_BACK/n015-2018-11-14-19-09-14+0800__CAM_BACK__1542194161687525.jpg",
+        "CAM_BACK_LEFT": "data/nuscenes/samples/CAM_BACK_LEFT/n015-2018-11-14-19-09-14+0800__CAM_BACK_LEFT__1542194161697423.jpg",
+        "CAM_BACK_RIGHT": "data/nuscenes/samples/CAM_BACK_RIGHT/n015-2018-11-14-19-09-14+0800__CAM_BACK_RIGHT__1542194161677893.jpg"
+      },
+      "images_present": {
+        "CAM_FRONT": false,
+        "CAM_FRONT_LEFT": false,
+        "CAM_FRONT_RIGHT": false,
+        "CAM_BACK": false,
+        "CAM_BACK_LEFT": false,
+        "CAM_BACK_RIGHT": false
+      }
+    },
+    {
+      "rank": 8,
+      "question_id": "9ac6dff0-7f32be25-618b2e25be",
+      "scene_token": "9ac6dff089a84a6d8f066122443a10db",
+      "condition": "NoImage",
+      "cell": "behavior/MCQ",
+      "margin": 0.0,
+      "correct": "A",
+      "bf16": "A",
+      "int4": "D",
+      "option_probs_bf16": {
+        "A": 0.4415913574824003,
+        "D": 0.4415913574824003,
+        "C": 0.059762887877575124,
+        "B": 0.03198876873777111
+      },
+      "stem": "Predict the behavior of the ego vehicle. Please select the correct answer from the following",
+      "options": {
+        "A": "The ego vehicle is slightly steering to the left. The ego vehicle is driving with normal speed.",
+        "B": "The ego vehicle is steering to the left. The ego vehicle is driving very fast.",
+        "C": "The ego vehicle is slightly steering to the right. The ego vehicle is driving slowly.",
+        "D": "The ego vehicle is slightly steering to the right. The ego vehicle is driving with normal speed."
+      },
+      "images": {
+        "CAM_FRONT": null,
+        "CAM_FRONT_LEFT": null,
+        "CAM_FRONT_RIGHT": null,
+        "CAM_BACK": null,
+        "CAM_BACK_LEFT": null,
+        "CAM_BACK_RIGHT": null
+      },
+      "images_present": {
+        "CAM_FRONT": false,
+        "CAM_FRONT_LEFT": false,
+        "CAM_FRONT_RIGHT": false,
+        "CAM_BACK": false,
+        "CAM_BACK_LEFT": false,
+        "CAM_BACK_RIGHT": false
+      }
+    },
+    {
+      "rank": 9,
+      "question_id": "d0b2d916-f1999ab8-59ac357ab5",
+      "scene_token": "d0b2d916178a402a842c88f394d7d7e8",
+      "condition": "LowLight",
+      "cell": "perception/MCQ",
+      "margin": 0.0,
+      "correct": "A",
+      "bf16": "A",
+      "int4": "C",
+      "option_probs_bf16": {
+        "A": 0.31754174576851524,
+        "C": 0.31754174576851524,
+        "B": 0.28022960708201977
+      },
+      "stem": "What is the moving status of object <c1,CAM_BACK_LEFT,0.7995,0.5463>? Please select the correct answer from the following",
+      "options": {
+        "A": "Going ahead.",
+        "B": "Turn left.",
+        "C": "Turn right."
+      },
+      "images": {
+        "CAM_BACK_LEFT": "data/corruption/LowLight/CAM_BACK_LEFT/n015-2018-08-01-17-13-57+0800__CAM_BACK_LEFT__1533115026047423.jpg"
+      },
+      "images_present": {
+        "CAM_BACK_LEFT": false
+      }
+    },
+    {
+      "rank": 10,
+      "question_id": "d90b94e8-786371ca-0a2bbe9b63",
+      "scene_token": "d90b94e8bfd446cd9407f48665122268",
+      "condition": "clean",
+      "cell": "perception/MCQ",
+      "margin": 0.0,
+      "correct": "B",
+      "bf16": "B",
+      "int4": "C",
+      "option_probs_bf16": {
+        "B": 0.34774780787992543,
+        "C": 0.34774780787992543,
+        "A": 0.27082626508825036
+      },
+      "stem": "What is the moving status of object <c1,CAM_BACK,0.8917,0.5787>? Please select the correct answer from the following",
+      "options": {
+        "A": "Going ahead.",
+        "B": "Turn right.",
+        "C": "Turn left."
+      },
+      "images": {
+        "CAM_BACK": "data/nuscenes/samples/CAM_BACK/n015-2018-08-01-16-41-59+0800__CAM_BACK__1533113026387525.jpg"
+      },
+      "images_present": {
+        "CAM_BACK": false
+      }
+    },
+    {
+      "rank": 11,
+      "question_id": "e5a3df5f-474e5ee2-a6c3f000be",
+      "scene_token": "e5a3df5fe95149b5b974af1d14277ea7",
+      "condition": "LowLight",
+      "cell": "behavior/MCQ",
+      "margin": 0.0,
+      "correct": "A",
+      "bf16": "A",
+      "int4": "D",
+      "option_probs_bf16": {
+        "A": 0.44995644563813025,
+        "D": 0.44995644563813025,
+        "B": 0.053739633893304765,
+        "C": 0.04185246895807636
+      },
+      "stem": "Predict the behavior of the ego vehicle. Please select the correct answer from the following",
+      "options": {
+        "A": "The ego vehicle is going straight. The ego vehicle is driving with normal speed.",
+        "B": "The ego vehicle is steering to the right. The ego vehicle is driving slowly.",
+        "C": "The ego vehicle is going straight. The ego vehicle is not moving.",
+        "D": "The ego vehicle is going straight. The ego vehicle is driving slowly."
+      },
+      "images": {
+        "CAM_FRONT": "data/corruption/LowLight/CAM_FRONT/n008-2018-09-18-15-26-58-0400__CAM_FRONT__1537298889012404.jpg",
+        "CAM_FRONT_LEFT": "data/corruption/LowLight/CAM_FRONT_LEFT/n008-2018-09-18-15-26-58-0400__CAM_FRONT_LEFT__1537298889004799.jpg",
+        "CAM_FRONT_RIGHT": "data/corruption/LowLight/CAM_FRONT_RIGHT/n008-2018-09-18-15-26-58-0400__CAM_FRONT_RIGHT__1537298889020482.jpg",
+        "CAM_BACK": "data/corruption/LowLight/CAM_BACK/n008-2018-09-18-15-26-58-0400__CAM_BACK__1537298889037558.jpg",
+        "CAM_BACK_LEFT": "data/corruption/LowLight/CAM_BACK_LEFT/n008-2018-09-18-15-26-58-0400__CAM_BACK_LEFT__1537298889047405.jpg",
+        "CAM_BACK_RIGHT": "data/corruption/LowLight/CAM_BACK_RIGHT/n008-2018-09-18-15-26-58-0400__CAM_BACK_RIGHT__1537298889028113.jpg"
+      },
+      "images_present": {
+        "CAM_FRONT": false,
+        "CAM_FRONT_LEFT": false,
+        "CAM_FRONT_RIGHT": false,
+        "CAM_BACK": false,
+        "CAM_BACK_LEFT": false,
+        "CAM_BACK_RIGHT": false
+      }
+    },
+    {
+      "rank": 12,
+      "question_id": "ef5f9458-cddb14d9-509e2d8e72",
+      "scene_token": "ef5f945852e84fcc88cab506746a6636",
+      "condition": "Fog",
+      "cell": "behavior/MCQ",
+      "margin": 0.03642905174448585,
+      "correct": "D",
+      "bf16": "D",
+      "int4": "C",
+      "option_probs_bf16": {
+        "D": 0.3100263103337565,
+        "B": 0.27359725858927064,
+        "C": 0.24144873326066793,
+        "A": 0.16594512574771828
+      },
+      "stem": "Predict the behavior of the ego vehicle. Please select the correct answer from the following",
+      "options": {
+        "A": "The ego vehicle is steering to the left. The ego vehicle is driving slowly.",
+        "B": "The ego vehicle is slightly steering to the left. The ego vehicle is driving slowly.",
+        "C": "The ego vehicle is slightly steering to the right. The ego vehicle is driving slowly.",
+        "D": "The ego vehicle is going straight. The ego vehicle is not moving."
+      },
+      "images": {
+        "CAM_FRONT": "data/corruption/Fog/CAM_FRONT/n008-2018-08-29-16-04-13-0400__CAM_FRONT__1535573823862404.jpg",
+        "CAM_FRONT_LEFT": "data/corruption/Fog/CAM_FRONT_LEFT/n008-2018-08-29-16-04-13-0400__CAM_FRONT_LEFT__1535573823854799.jpg",
+        "CAM_FRONT_RIGHT": "data/corruption/Fog/CAM_FRONT_RIGHT/n008-2018-08-29-16-04-13-0400__CAM_FRONT_RIGHT__1535573823870482.jpg",
+        "CAM_BACK": "data/corruption/Fog/CAM_BACK/n008-2018-08-29-16-04-13-0400__CAM_BACK__1535573823887558.jpg",
+        "CAM_BACK_LEFT": "data/corruption/Fog/CAM_BACK_LEFT/n008-2018-08-29-16-04-13-0400__CAM_BACK_LEFT__1535573823897405.jpg",
+        "CAM_BACK_RIGHT": "data/corruption/Fog/CAM_BACK_RIGHT/n008-2018-08-29-16-04-13-0400__CAM_BACK_RIGHT__1535573823878113.jpg"
+      },
+      "images_present": {
+        "CAM_FRONT": false,
+        "CAM_FRONT_LEFT": false,
+        "CAM_FRONT_RIGHT": false,
+        "CAM_BACK": false,
+        "CAM_BACK_LEFT": false,
+        "CAM_BACK_RIGHT": false
+      }
+    }
+  ],
+  "missing_images": [
+    "data/corruption/Fog/CAM_BACK/n008-2018-08-29-16-04-13-0400__CAM_BACK__1535573823887558.jpg",
+    "data/corruption/Fog/CAM_BACK/n015-2018-10-08-15-52-24+0800__CAM_BACK__1538985425287525.jpg",
+    "data/corruption/Fog/CAM_BACK/n015-2018-11-21-19-11-29+0800__CAM_BACK__1542798960437525.jpg",
+    "data/corruption/Fog/CAM_BACK_LEFT/n008-2018-08-01-15-52-19-0400__CAM_BACK_LEFT__1533153707447405.jpg",
+    "data/corruption/Fog/CAM_BACK_LEFT/n008-2018-08-29-16-04-13-0400__CAM_BACK_LEFT__1535573823897405.jpg",
+    "data/corruption/Fog/CAM_BACK_LEFT/n015-2018-10-08-15-52-24+0800__CAM_BACK_LEFT__1538985425297425.jpg",
+    "data/corruption/Fog/CAM_BACK_LEFT/n015-2018-11-21-19-11-29+0800__CAM_BACK_LEFT__1542798960447423.jpg",
+    "data/corruption/Fog/CAM_BACK_RIGHT/n008-2018-08-29-16-04-13-0400__CAM_BACK_RIGHT__1535573823878113.jpg",
+    "data/corruption/Fog/CAM_BACK_RIGHT/n015-2018-10-08-15-52-24+0800__CAM_BACK_RIGHT__1538985425277893.jpg",
+    "data/corruption/Fog/CAM_BACK_RIGHT/n015-2018-11-21-19-11-29+0800__CAM_BACK_RIGHT__1542798960427893.jpg",
+    "data/corruption/Fog/CAM_FRONT/n008-2018-08-29-16-04-13-0400__CAM_FRONT__1535573823862404.jpg",
+    "data/corruption/Fog/CAM_FRONT/n015-2018-10-08-15-52-24+0800__CAM_FRONT__1538985425262460.jpg",
+    "data/corruption/Fog/CAM_FRONT/n015-2018-11-21-19-11-29+0800__CAM_FRONT__1542798960412460.jpg",
+    "data/corruption/Fog/CAM_FRONT_LEFT/n008-2018-08-29-16-04-13-0400__CAM_FRONT_LEFT__1535573823854799.jpg",
+    "data/corruption/Fog/CAM_FRONT_LEFT/n015-2018-10-08-15-52-24+0800__CAM_FRONT_LEFT__1538985425254844.jpg",
+    "data/corruption/Fog/CAM_FRONT_LEFT/n015-2018-11-21-19-11-29+0800__CAM_FRONT_LEFT__1542798960404844.jpg",
+    "data/corruption/Fog/CAM_FRONT_RIGHT/n008-2018-08-29-16-04-13-0400__CAM_FRONT_RIGHT__1535573823870482.jpg",
+    "data/corruption/Fog/CAM_FRONT_RIGHT/n015-2018-10-08-15-52-24+0800__CAM_FRONT_RIGHT__1538985425270339.jpg",
+    "data/corruption/Fog/CAM_FRONT_RIGHT/n015-2018-11-21-19-11-29+0800__CAM_FRONT_RIGHT__1542798960420339.jpg",
+    "data/corruption/LowLight/CAM_BACK/n008-2018-09-18-15-26-58-0400__CAM_BACK__1537298889037558.jpg",
+    "data/corruption/LowLight/CAM_BACK/n015-2018-07-18-11-07-57+0800__CAM_BACK__1531883531937525.jpg",
+    "data/corruption/LowLight/CAM_BACK_LEFT/n008-2018-09-18-15-26-58-0400__CAM_BACK_LEFT__1537298889047405.jpg",
+    "data/corruption/LowLight/CAM_BACK_LEFT/n015-2018-07-18-11-07-57+0800__CAM_BACK_LEFT__1531883531947423.jpg",
+    "data/corruption/LowLight/CAM_BACK_LEFT/n015-2018-08-01-17-13-57+0800__CAM_BACK_LEFT__1533115026047423.jpg",
+    "data/corruption/LowLight/CAM_BACK_RIGHT/n008-2018-09-18-15-26-58-0400__CAM_BACK_RIGHT__1537298889028113.jpg",
+    "data/corruption/LowLight/CAM_BACK_RIGHT/n015-2018-07-18-11-07-57+0800__CAM_BACK_RIGHT__1531883531927893.jpg",
+    "data/corruption/LowLight/CAM_FRONT/n008-2018-09-18-15-26-58-0400__CAM_FRONT__1537298889012404.jpg",
+    "data/corruption/LowLight/CAM_FRONT/n015-2018-07-18-11-07-57+0800__CAM_FRONT__1531883531912467.jpg",
+    "data/corruption/LowLight/CAM_FRONT_LEFT/n008-2018-09-18-15-26-58-0400__CAM_FRONT_LEFT__1537298889004799.jpg",
+    "data/corruption/LowLight/CAM_FRONT_LEFT/n015-2018-07-18-11-07-57+0800__CAM_FRONT_LEFT__1531883531904844.jpg",
+    "data/corruption/LowLight/CAM_FRONT_RIGHT/n008-2018-09-18-15-26-58-0400__CAM_FRONT_RIGHT__1537298889020482.jpg",
+    "data/corruption/LowLight/CAM_FRONT_RIGHT/n015-2018-07-18-11-07-57+0800__CAM_FRONT_RIGHT__1531883531920339.jpg",
+    "data/nuscenes/samples/CAM_BACK/n015-2018-08-01-16-41-59+0800__CAM_BACK__1533113026387525.jpg",
+    "data/nuscenes/samples/CAM_BACK/n015-2018-11-14-19-09-14+0800__CAM_BACK__1542194161687525.jpg",
+    "data/nuscenes/samples/CAM_BACK_LEFT/n015-2018-11-14-19-09-14+0800__CAM_BACK_LEFT__1542194161697423.jpg",
+    "data/nuscenes/samples/CAM_BACK_RIGHT/n015-2018-11-14-19-09-14+0800__CAM_BACK_RIGHT__1542194161677893.jpg",
+    "data/nuscenes/samples/CAM_FRONT/n015-2018-08-01-17-04-15+0800__CAM_FRONT__1533114270162460.jpg",
+    "data/nuscenes/samples/CAM_FRONT/n015-2018-10-08-16-03-24+0800__CAM_FRONT__1538985932262460.jpg",
+    "data/nuscenes/samples/CAM_FRONT/n015-2018-11-14-19-09-14+0800__CAM_FRONT__1542194161662460.jpg",
+    "data/nuscenes/samples/CAM_FRONT_LEFT/n015-2018-11-14-19-09-14+0800__CAM_FRONT_LEFT__1542194161654844.jpg",
+    "data/nuscenes/samples/CAM_FRONT_RIGHT/n015-2018-11-14-19-09-14+0800__CAM_FRONT_RIGHT__1542194161670339.jpg"
+  ]
+}
