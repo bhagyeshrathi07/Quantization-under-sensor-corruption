@@ -23,6 +23,7 @@ Working documents:
 | File | Purpose |
 |---|---|
 | [PROTOCOL.md](PROTOCOL.md) | Exact execution protocol: checkpoints, serving flags, prompt, scoring rules, flip classes, statistics, record schema, provenance and freeze mechanics. Ready for the core freeze since November 6; the judge protocol is frozen separately. |
+| [REPORT.md](REPORT.md) | The report: question, method, results (decision flips, the margin contrast, deployment profile, free-text evidence), discussion, limitations, reproducibility. |
 | [PILOT.md](PILOT.md) | Runbook: setup, data, serve, smoke test, runs, stability, profile, Vast.ai and HPC notes. |
 | [TEAM_REVIEW.md](TEAM_REVIEW.md) | Summary for teammates of the scope change, every decision and its reason, and the items that still need sign-off. |
 | [manifests/gate_week5.md](manifests/gate_week5.md) | Week-5 baseline gate: pilot measurements and the findings that changed the protocol. |
@@ -71,6 +72,7 @@ scripts/14_llm_label.py            side study: a model labels its own copy under
 scripts/15_label_assignment.py     who labels which items: contiguous blocks in sheet order, written beside the sheet and picked up by 13 and 11
 scripts/16_disagreements.py        a human's disagreements with the model labellers, with the models' reasons, for the consensus discussion (only after every block is complete)
 scripts/17_vqa_tables.py           report tables V1-V4 from the consensus sheet, its key and the calibration JSON (human-adjudicated VQA correctness per cell and precision, paired outcomes, calibration summary, labellers against the consensus)
+scripts/19_figures.py              report figure F1 (harmful-flip rate by BF16 margin bin with intervals and counts) as SVG from 05's JSON
 scripts/18_failure_examples.py     harmful MCQ flips for the report from 05's JSON and the raw answers (lowest BF16 margin first, caps per cell and condition; question, options, both answers, option probabilities, image paths with what is missing locally)
 scripts/serve_judge.sh             open-weights judge on a second vLLM port for the VQA judge trial (any OpenAI-compatible endpoint works via --base-url)
 scripts/host_pull.sh               update the GPU host's checkout: backs up colliding untracked and modified files, fast-forwards, compares
@@ -78,7 +80,7 @@ scripts/quantize_awq.py            own AWQ W4A16 checkpoint with llm-compressor,
 scripts/run_matrix.sh              serve -> all conditions -> stop, per precision; resumable; DRY_RUN=1 prints the plan
 scripts/rescore.py                 recompute MCQ fields after a rule change
 scripts/vast_setup.sh, hpc_pilot.sbatch
-tests/                             129 offline unit tests (pytest)
+tests/                             130 offline unit tests (pytest)
 ```
 
 ## Scope
