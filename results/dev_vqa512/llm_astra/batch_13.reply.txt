@@ -1,0 +1,17 @@
+[
+  {"item":"D181","label":0,"reason":"The answer omits the black commercial vehicle behind and does not identify all the other reference objects with their required colours and positions.","ambiguous":false},
+  {"item":"D182","label":0,"reason":"The answer does not identify a slight left turn as a collision-causing action.","ambiguous":false},
+  {"item":"D183","label":0,"reason":"Acceleration is identified as dangerous, but going straight is only arguably implied by the stopping-distance discussion rather than identified as a collision-causing action.","ambiguous":true},
+  {"item":"D184","label":0,"reason":"The answer identifies acceleration as dangerous and omits sudden braking.","ambiguous":false},
+  {"item":"D185","label":0,"reason":"The answer offers conditional alternatives without settling on maintaining the same speed with high likelihood.","ambiguous":false},
+  {"item":"D186","label":0,"reason":"The answer does not separately identify both pedestrians and both sedans with the reference's required colour and positions.","ambiguous":false},
+  {"item":"D187","label":0,"reason":"The answer omits the yellow sedan behind and the yellow roadblock ahead.","ambiguous":false},
+  {"item":"D188","label":0,"reason":"The answer recommends steady speed but does not recommend both gentle braking to a stop and gradual deceleration without braking.","ambiguous":false},
+  {"item":"D189","label":0,"reason":"The answer substitutes a truck, parked car, and scaffolding for the reference's ordered traffic light and two cars.","ambiguous":false},
+  {"item":"D190","label":0,"reason":"The answer assigns high likelihood to continuing straight but does not specify maintaining the same speed.","ambiguous":false},
+  {"item":"D191","label":0,"reason":"The first and third objects differ from the reference, and the required stopping actions are not consistently stated.","ambiguous":false},
+  {"item":"D192","label":0,"reason":"The answer lists conditional alternatives without selecting maintaining the same speed as the highly likely action.","ambiguous":false},
+  {"item":"D193","label":0,"reason":"The answer omits the white SUV ahead and the white truck behind to the left.","ambiguous":false},
+  {"item":"D194","label":0,"reason":"The answer does not recommend gentle braking to a stop or gradual deceleration without braking.","ambiguous":false},
+  {"item":"D195","label":0,"reason":"The answer identifies acceleration as collision-causing, but its description of current forward movement only arguably supplies the required going-straight action.","ambiguous":true}
+]

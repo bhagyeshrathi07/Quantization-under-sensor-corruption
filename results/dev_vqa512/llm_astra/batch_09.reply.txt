@@ -1,0 +1,17 @@
+[
+  {"item":"D121","label":0,"reason":"The answer recommends waiting at a red light rather than keeping the same speed.","ambiguous":false},
+  {"item":"D122","label":0,"reason":"The answer identifies collision-causing actions despite the reference stating that no such action leads to a collision.","ambiguous":false},
+  {"item":"D123","label":0,"reason":"The answer recommends waiting rather than decelerating gradually without braking.","ambiguous":false},
+  {"item":"D124","label":1,"reason":"Accelerating into the vehicle ahead appears to convey accelerating and going straight, although continuing straight is implicit.","ambiguous":true},
+  {"item":"D125","label":0,"reason":"The answer omits distinct matches for the silver sedan behind right and the two gray SUVs ahead left and right.","ambiguous":false},
+  {"item":"D126","label":0,"reason":"The answer omits the required deceleration, gentle stop, and reversing recommendations and instead recommends maintaining speed.","ambiguous":false},
+  {"item":"D127","label":0,"reason":"The answer discusses high speed and failure to brake but does not identify accelerating as a collision-causing action.","ambiguous":false},
+  {"item":"D128","label":1,"reason":"The answer settles on following the truck with high probability and associates that action with maintaining a consistent speed, although the speed commitment is indirect.","ambiguous":true},
+  {"item":"D129","label":0,"reason":"The answer settles on remaining parked rather than turning left.","ambiguous":false},
+  {"item":"D130","label":0,"reason":"The generic mention of vehicles does not separately identify the reference objects with their required categories, colours, and positions.","ambiguous":false},
+  {"item":"D131","label":0,"reason":"The answer gives the wrong action for the first object and replaces the required truck and sedan with a construction site and building.","ambiguous":false},
+  {"item":"D132","label":0,"reason":"The answer does not recommend backing up or explicitly include the required gradual deceleration without braking and gentle stop.","ambiguous":false},
+  {"item":"D133","label":0,"reason":"The answer recommends reducing speed instead of maintaining it and omits both slight lateral offsets.","ambiguous":false},
+  {"item":"D134","label":0,"reason":"The answer does not recommend acceleration, which is a required reference action.","ambiguous":false},
+  {"item":"D135","label":0,"reason":"The answer omits the three specified rear vehicles and does not identify the pedestrian by the required yellow hat and position.","ambiguous":false}
+]

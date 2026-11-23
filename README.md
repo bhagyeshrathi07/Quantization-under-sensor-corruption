@@ -66,7 +66,7 @@ scripts/11_calibrate_judge.py      --labels-only: pre-discussion agreement and F
 scripts/12_merge_label_copies.py   merge the labellers' copies into the master sheet (same items, order and text; conflicts refused)
 config/explore_512tok.yaml         exploratory copy of the pilot config at the released 512-token decoding length (manifests/explore_512tok_2026-11-16.md); never study data
 config/vqa512.yaml                 the VQA amendment: pilot config with max_tokens 512, frozen separately (freeze_config.py --amendment vqa512); 03/05/08/10/11 take --amendment vqa512, run_matrix.sh AMENDMENT=vqa512
-scripts/13_label_ui.py             local browser tool for labelling one person's copy (manifests/labelling_guide.md beside each item; the labeller's assigned block, in order; reference words highlighted in the model answer; backed-up atomic writes of the label column only; --check)
+scripts/13_label_ui.py             local browser tool for labelling one person's copy (manifests/labelling_guide.md beside each item; the labeller's assigned block, in order; reference words highlighted in the model answer; backed-up atomic writes of the label column only; --check); --consensus: the discussion mode on the master sheet (human and model labels with reasons side by side, consensus and comment per item, "accept the human label on every agreed item"; writes the consensus columns only)
 scripts/14_llm_label.py            side study: a model labels its own copy under the same guide (prompts per batch; --backend codex; never merged into the master sheet)
 scripts/15_label_assignment.py     who labels which items: contiguous blocks in sheet order, written beside the sheet and picked up by 13 and 11
 scripts/16_disagreements.py        a human's disagreements with the model labellers, with the models' reasons, for the consensus discussion (only after the human's block is complete)
@@ -109,7 +109,9 @@ tests/                             126 offline unit tests (pytest)
 
 **VQA amendment (November 16, [manifests/explore_512tok_2026-11-16.md](manifests/explore_512tok_2026-11-16.md)).** 99% of the VQA answers stopped at the frozen 128-token cap (the released decoding is 512). VQA is regenerated at 512 under a separate, enforced amendment freeze into its own directories; the MCQ study and its results are untouched. Sequence: amendment freeze from a clean commit, development run (262 answers), 786 fresh judgings, replacement blind sheets (all done November 17, [manifests/session4_2026-11-17.md](manifests/session4_2026-11-17.md)), labelling with `scripts/13_label_ui.py` by `manifests/labelling_guide.md`, calibration under the unchanged acceptance rules, judge freeze, final VQA run (4,576 answers, about 5.75 GPU hours), matrix judging. The November 14 sheets are withdrawn unlabelled.
 
-**Not started.** VQA judging of the matrix (after the judge freeze), explorer (weeks 10–11), mitigation (12), report (13–14).
+**Judge calibration, November 22** ([manifests/judge_calibration_2026-11-22.md](manifests/judge_calibration_2026-11-22.md)): one human per item plus two model labellers as the second opinion, consensus on all 262 items (21 correct); the judge is not accepted (held-out recall on human-correct items 0.38, bar 0.60). VQA stays unassessed by the judge; the human labels are the VQA evidence; no final VQA run, no matrix judging.
+
+**Not started.** Explorer (weeks 10–11), mitigation (12, to be reported as not executed), report (13–14).
 
 **Open team decisions** are listed in [TEAM_REVIEW.md](TEAM_REVIEW.md), section 8 and the October 19 addendum.
 

@@ -1,0 +1,17 @@
+[
+  {"item":"D061","label":0,"reason":"The answer names accelerating toward the car as collision-causing, contradicting the reference's conclusion that no action leads to a collision.","ambiguous":false},
+  {"item":"D062","label":0,"reason":"The answer does not identify both distinct people or the gray sedan with the required descriptions and positions.","ambiguous":false},
+  {"item":"D063","label":0,"reason":"The answer does not identify sudden braking as a collision-causing action.","ambiguous":false},
+  {"item":"D064","label":0,"reason":"The recommendations omit maintaining the same speed and slightly offsetting to either side.","ambiguous":false},
+  {"item":"D065","label":0,"reason":"The answer omits both reference sedans.","ambiguous":false},
+  {"item":"D066","label":0,"reason":"The answer identifies moving forward as dangerous but does not identify accelerating as a collision-causing action.","ambiguous":false},
+  {"item":"D067","label":0,"reason":"The answer lists acceleration and maneuvering risks but omits sudden braking.","ambiguous":false},
+  {"item":"D068","label":0,"reason":"The answer discusses collision avoidance without identifying sudden braking as collision-causing.","ambiguous":false},
+  {"item":"D069","label":0,"reason":"The generic mention of parked cars does not separately identify the reference objects with their required colours and positions.","ambiguous":false},
+  {"item":"D070","label":0,"reason":"The generic vehicle and pedestrian descriptions do not identify all the distinct reference objects with their required colours and positions.","ambiguous":false},
+  {"item":"D071","label":0,"reason":"The stated high probability concerns the worker signaling a stop rather than the ego vehicle taking the recommended action.","ambiguous":false},
+  {"item":"D072","label":0,"reason":"The ordered objects, their states, and the recommended actions do not match the reference.","ambiguous":false},
+  {"item":"D073","label":0,"reason":"The answer omits the orange car behind and to the right of the ego vehicle.","ambiguous":false},
+  {"item":"D074","label":0,"reason":"The answer recommends slowing down and preparing to stop but does not clearly recommend braking gently to a stop.","ambiguous":true},
+  {"item":"D075","label":0,"reason":"The answer leaves reducing speed and maintaining speed as alternatives rather than settling on the reference action of maintaining speed.","ambiguous":false}
+]

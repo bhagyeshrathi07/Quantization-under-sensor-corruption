@@ -1,0 +1,5912 @@
+{
+  "created": "2026-11-22T19:41:38+00:00",
+  "analysis_class": "calibration",
+  "provenance": {
+    "split": "development",
+    "analysis_class": "calibration",
+    "files": {
+      "results/dev_vqa512/bf16_clean.jsonl": {
+        "precision": "bf16",
+        "condition": "clean",
+        "model_path_or_id": "Qwen/Qwen2.5-VL-7B-Instruct",
+        "checkpoint_fingerprint": "hf:Qwen/Qwen2.5-VL-7B-Instruct@cc594898137f460bfe9f0759e9844b3ce807cfb5",
+        "code_revision": "70338ac4c25a52aac5eac644ed578659822da1bf",
+        "created": "2026-11-17T18:49:18+00:00"
+      },
+      "results/dev_vqa512/int4_clean.jsonl": {
+        "precision": "int4",
+        "condition": "clean",
+        "model_path_or_id": "checkpoints/qwen2.5-vl-7b-awq-w4a16-g128",
+        "checkpoint_fingerprint": "sha256:2bb17c5214a52fe263dd879f2fd4956564906a97d1b6d0b51cf60a1a5d54347c",
+        "code_revision": "70338ac4c25a52aac5eac644ed578659822da1bf",
+        "created": "2026-11-17T19:04:13+00:00"
+      }
+    },
+    "amendment": "vqa512",
+    "frozen": {
+      "date": "2026-11-17T18:40:39+00:00",
+      "git_commit": "6cb21a9dd26f889a4d737705b3d31c46808bef66",
+      "git_dirty": false,
+      "protocol_snapshot": "manifests/PROTOCOL_frozen.md",
+      "requirements_file": "manifests/requirements_frozen.txt",
+      "requirements_sha256": "7a6db2399fabc8f57c7564fb06dd7774b5e22531a9bb503469af08fe661d5bc6",
+      "split_sha256": "4f450077b5d1809652b5a69ef58408378751e6f87cc089258375644b225979fb",
+      "exclusions_sha256": "9a26a05ec3e2b1da947628f84a176f6f70aece7950a579193fbf1a533902512f",
+      "annotations_sha256": "50ee8295313b70810bdd7f04d4953b5f5d5d45b2da1a291e87fc108b4df270de",
+      "prompt_sha256": "24044483e7f02a628e8f17dfc8a1f54aafbcb43e98d0b5e53e7815c415d6fbd3",
+      "core_config_sha256": "9080ce0a337633d999e059839b6842e167a5cd219e56a700f18388bdf15eba10",
+      "protocol_snapshot_sha256": "cbeb1c6ffc9c9c1e84a226ee948ab9b76c5f6ac5086d93a5c72547208f931996"
+    }
+  },
+  "judge_settings": {
+    "base_url": "https://aiapi.paid.lol/v1",
+    "model": "deepseek-v4-flash-ron",
+    "max_tokens": 2048,
+    "max_tokens_param": "max_tokens",
+    "reasoning_effort": "none",
+    "no_cache": true
+  },
+  "judge_backend": {
+    "provider": "DeepSeek API through the team's LiteLLM proxy at aiapi.paid.lol",
+    "upstream_model": "deepseek/deepseek-v4-flash",
+    "thinking_control": "reasoning_effort none, verified through the proxy on November 8, 2026 (DeepSeek's own API documents thinking.type=disabled)"
+  },
+  "production_replicates": 3,
+  "sheet": "manifests/judge_label_sheet_2026-11-17.csv",
+  "key": "results/dev_vqa512/label_sheet_key.json",
+  "labellers": [
+    "ronak",
+    "bhagyesh",
+    "akshay"
+  ],
+  "counts": {
+    "sheet_items": 262,
+    "complete": 262,
+    "unfinished": 0,
+    "partial_tail": 0,
+    "without_aggregate": 0,
+    "calibration_items": 262,
+    "labelled_per_labeller": {
+      "ronak": 88,
+      "bhagyesh": 87,
+      "akshay": 87
+    }
+  },
+  "inter_labeller": {
+    "n_items": 262,
+    "n_items_all_labellers": 0,
+    "pairwise_agreement": {
+      "akshay/bhagyesh": {
+        "n": 0,
+        "agreement": null
+      },
+      "akshay/ronak": {
+        "n": 0,
+        "agreement": null
+      },
+      "bhagyesh/ronak": {
+        "n": 0,
+        "agreement": null
+      }
+    },
+    "fleiss_kappa": null,
+    "labelled_correct_per_labeller": {
+      "ronak": 6,
+      "bhagyesh": 8,
+      "akshay": 17
+    },
+    "labelled_per_labeller": {
+      "ronak": 88,
+      "bhagyesh": 87,
+      "akshay": 87
+    },
+    "majority_correct": 31,
+    "n_items_even_labellers": 0,
+    "unanimous": 0,
+    "n_items_multi": 0,
+    "consensus_correct": 21,
+    "consensus_differs_from_majority": 16
+  },
+  "calibration": {
+    "n_items": 262,
+    "n_scenes": 26,
+    "bars": {
+      "agreement": 0.8,
+      "kappa": 0.4,
+      "recall": 0.6,
+      "min_per_class": 15,
+      "min_items": 100
+    },
+    "calibrated": true,
+    "fit": {
+      "curve": [
+        0.08015267175572519,
+        0.08015267175572519,
+        0.08015267175572519,
+        0.08015267175572519,
+        0.08015267175572519,
+        0.08015267175572519,
+        0.08015267175572519,
+        0.08778625954198473,
+        0.0916030534351145,
+        0.10687022900763359,
+        0.1183206106870229,
+        0.14885496183206107,
+        0.16793893129770993,
+        0.18702290076335878,
+        0.22137404580152673,
+        0.2480916030534351,
+        0.2824427480916031,
+        0.31297709923664124,
+        0.33587786259541985,
+        0.3473282442748092,
+        0.36259541984732824,
+        0.3931297709923664,
+        0.4312977099236641,
+        0.4618320610687023,
+        0.5076335877862596,
+        0.5648854961832062,
+        0.6068702290076335,
+        0.6450381679389313,
+        0.6908396946564885,
+        0.7061068702290076,
+        0.7404580152671756,
+        0.7824427480916031,
+        0.8244274809160306,
+        0.8244274809160306,
+        0.851145038167939,
+        0.8664122137404581,
+        0.8816793893129771,
+        0.9007633587786259,
+        0.916030534351145,
+        0.916030534351145,
+        0.9122137404580153,
+        0.916030534351145,
+        0.9198473282442748,
+        0.9274809160305344,
+        0.9274809160305344,
+        0.9274809160305344,
+        0.9274809160305344,
+        0.9274809160305344,
+        0.9236641221374046,
+        0.9312977099236641,
+        0.9312977099236641,
+        0.9274809160305344,
+        0.9351145038167938,
+        0.9351145038167938,
+        0.9389312977099237,
+        0.9427480916030534,
+        0.9465648854961832,
+        0.9427480916030534,
+        0.9427480916030534,
+        0.9389312977099237,
+        0.9427480916030534,
+        0.9389312977099237,
+        0.9389312977099237,
+        0.9389312977099237,
+        0.9427480916030534,
+        0.9465648854961832,
+        0.9465648854961832,
+        0.9465648854961832,
+        0.9465648854961832,
+        0.9465648854961832,
+        0.9427480916030534,
+        0.9427480916030534,
+        0.9389312977099237,
+        0.9312977099236641,
+        0.9312977099236641,
+        0.9312977099236641,
+        0.9236641221374046,
+        0.9274809160305344,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748,
+        0.9198473282442748
+      ],
+      "threshold": 56,
+      "n": 262,
+      "n_human_correct": 21,
+      "n_human_incorrect": 241,
+      "agreement": 0.9465648854961832,
+      "kappa": 0.6031162086128543,
+      "recall_correct": 0.5714285714285714,
+      "recall_incorrect": 0.979253112033195,
+      "judge_correct_human_incorrect": 5,
+      "human_correct_judge_incorrect": 9,
+      "confusion": {
+        "tp": 12,
+        "fp": 5,
+        "fn": 9,
+        "tn": 236
+      }
+    },
+    "loso": {
+      "folds": [
+        {
+          "scene": "034256c9639044f98da7562ef3de3646",
+          "n_train": 254,
+          "n_held": 8,
+          "threshold": 56,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "tn": 7
+          }
+        },
+        {
+          "scene": "09f67057dd8346388b28f79d9bb1cf04",
+          "n_train": 246,
+          "n_held": 16,
+          "threshold": 56,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "tn": 16
+          }
+        },
+        {
+          "scene": "0b8948ee96ac46faad405bf1ffc70bb1",
+          "n_train": 254,
+          "n_held": 8,
+          "threshold": 56,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "tn": 7
+          }
+        },
+        {
+          "scene": "126aa95f38b649fa857d48672c8ad808",
+          "n_train": 254,
+          "n_held": 8,
+          "threshold": 68,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 2,
+            "tn": 6
+          }
+        },
+        {
+          "scene": "22daa579e9d54040b3f76a4eeef3a587",
+          "n_train": 252,
+          "n_held": 10,
+          "threshold": 56,
+          "confusion": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "tn": 9
+          }
+        },
+        {
+          "scene": "2d8e61ea27fd419ba9b708488e3f2f10",
+          "n_train": 254,
+          "n_held": 8,
+          "threshold": 56,
+          "confusion": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 1,
+            "tn": 6
+          }
+        },
+        {
+          "scene": "2f093cad7209436aa06e103bfe062857",
+          "n_train": 254,
+          "n_held": 8,
+          "threshold": 56,
+          "confusion": {
+            "tp": 1,
+            "fp": 1,
+            "fn": 0,
+            "tn": 6
+          }
+        },
+        {
+          "scene": "37cfda558193400bbe3a5ff14ae4606e",
+          "n_train": 254,
+          "n_held": 8,
+          "threshold": 65,
+          "confusion": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 2,
+            "tn": 5
+          }
+        },
+        {
+          "scene": "3ace9decdd1f4ea0915b9862c95ca128",
+          "n_train": 254,
+          "n_held": 8,
+          "threshold": 56,
+          "confusion": {
+            "tp": 1,
+            "fp": 1,
+            "fn": 0,
+            "tn": 6
+          }
+        },
+        {
+          "scene": "4047f251c21a475abb49518e0fa6fa9e",
+          "n_train": 252,
+          "n_held": 10,
+          "threshold": 56,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "tn": 10
+          }
+        },
+        {
+          "scene": "52b30ecd104a4f4eab6f8f5684a73e56",
+          "n_train": 252,
+          "n_held": 10,
+          "threshold": 56,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "tn": 10
+          }
+        },
+        {
+          "scene": "6207269cb9474c14b01f9610b2ee30aa",
+          "n_train": 254,
+          "n_held": 8,
+          "threshold": 56,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "tn": 8
+          }
+        },
+        {
+          "scene": "892ed06c432448fe87ecb5d31756f14a",
+          "n_train": 244,
+          "n_held": 18,
+          "threshold": 56,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "tn": 18
+          }
+        },
+        {
+          "scene": "8c84164e752a4ab69d039a07c898f7af",
+          "n_train": 252,
+          "n_held": 10,
+          "threshold": 56,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "tn": 10
+          }
+        },
+        {
+          "scene": "928ee3a8c5a84497a6360fe70a4e921e",
+          "n_train": 252,
+          "n_held": 10,
+          "threshold": 56,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "tn": 9
+          }
+        },
+        {
+          "scene": "97349fd50e694a5f994b0954047b96d0",
+          "n_train": 254,
+          "n_held": 8,
+          "threshold": 56,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "tn": 8
+          }
+        },
+        {
+          "scene": "a6fae4900f8e46cba689b59b5bc8a2ab",
+          "n_train": 254,
+          "n_held": 8,
+          "threshold": 56,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "tn": 8
+          }
+        },
+        {
+          "scene": "c6c092a66329470f836714f46b92d59b",
+          "n_train": 252,
+          "n_held": 10,
+          "threshold": 56,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "tn": 10
+          }
+        },
+        {
+          "scene": "c7b8d96173bf41dc8df8c0d16adfc71e",
+          "n_train": 252,
+          "n_held": 10,
+          "threshold": 56,
+          "confusion": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "tn": 9
+          }
+        },
+        {
+          "scene": "cf652a711c8e40209132036a95162fed",
+          "n_train": 244,
+          "n_held": 18,
+          "threshold": 56,
+          "confusion": {
+            "tp": 1,
+            "fp": 1,
+            "fn": 2,
+            "tn": 14
+          }
+        },
+        {
+          "scene": "da41ecbc644b4915b84bb732e35ebf8c",
+          "n_train": 252,
+          "n_held": 10,
+          "threshold": 55,
+          "confusion": {
+            "tp": 1,
+            "fp": 1,
+            "fn": 0,
+            "tn": 8
+          }
+        },
+        {
+          "scene": "df8dfada99a04a81bd1b102eeb84e9bc",
+          "n_train": 254,
+          "n_held": 8,
+          "threshold": 65,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "tn": 7
+          }
+        },
+        {
+          "scene": "e083627747d8499a8c4e94c7abf941e2",
+          "n_train": 254,
+          "n_held": 8,
+          "threshold": 56,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "tn": 8
+          }
+        },
+        {
+          "scene": "f4395dd8e4004f12a8dec3079a93d804",
+          "n_train": 254,
+          "n_held": 8,
+          "threshold": 56,
+          "confusion": {
+            "tp": 1,
+            "fp": 1,
+            "fn": 0,
+            "tn": 6
+          }
+        },
+        {
+          "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+          "n_train": 244,
+          "n_held": 18,
+          "threshold": 65,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 2,
+            "tn": 16
+          }
+        },
+        {
+          "scene": "faa975eaad804c85bd8f2da9b30c8d9a",
+          "n_train": 254,
+          "n_held": 8,
+          "threshold": 56,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "tn": 8
+          }
+        }
+      ],
+      "n_scenes": 26,
+      "pooled": {
+        "threshold": null,
+        "n": 262,
+        "n_human_correct": 21,
+        "n_human_incorrect": 241,
+        "agreement": 0.9274809160305344,
+        "kappa": 0.41994872989979026,
+        "recall_correct": 0.38095238095238093,
+        "recall_incorrect": 0.975103734439834,
+        "judge_correct_human_incorrect": 6,
+        "human_correct_judge_incorrect": 13,
+        "confusion": {
+          "tp": 8,
+          "fp": 6,
+          "fn": 13,
+          "tn": 235
+        }
+      }
+    },
+    "accepted": false,
+    "reasons": [
+      "held-out recall on human-correct items 0.381 below 0.60"
+    ],
+    "frozen_threshold": null,
+    "sensitivity": {
+      "majority_label": {
+        "fit": {
+          "threshold": 56,
+          "n": 262,
+          "n_human_correct": 31,
+          "n_human_incorrect": 231,
+          "agreement": 0.9236641221374046,
+          "kappa": 0.545217844124284,
+          "recall_correct": 0.45161290322580644,
+          "recall_incorrect": 0.987012987012987,
+          "judge_correct_human_incorrect": 3,
+          "human_correct_judge_incorrect": 17,
+          "confusion": {
+            "tp": 14,
+            "fp": 3,
+            "fn": 17,
+            "tn": 228
+          }
+        },
+        "heldout": {
+          "threshold": null,
+          "n": 262,
+          "n_human_correct": 31,
+          "n_human_incorrect": 231,
+          "agreement": 0.9007633587786259,
+          "kappa": 0.4645495991196353,
+          "recall_correct": 0.45161290322580644,
+          "recall_incorrect": 0.961038961038961,
+          "judge_correct_human_incorrect": 9,
+          "human_correct_judge_incorrect": 17,
+          "confusion": {
+            "tp": 14,
+            "fp": 9,
+            "fn": 17,
+            "tn": 222
+          }
+        },
+        "accepted": false,
+        "reasons": [
+          "held-out recall on human-correct items 0.452 below 0.60"
+        ],
+        "items_changed_by_discussion": 16
+      },
+      "replicate_0_only": {
+        "fit": {
+          "threshold": 64,
+          "n": 262,
+          "n_human_correct": 21,
+          "n_human_incorrect": 241,
+          "agreement": 0.9541984732824428,
+          "kappa": 0.6031305225953042,
+          "recall_correct": 0.47619047619047616,
+          "recall_incorrect": 0.995850622406639,
+          "judge_correct_human_incorrect": 1,
+          "human_correct_judge_incorrect": 11,
+          "confusion": {
+            "tp": 10,
+            "fp": 1,
+            "fn": 11,
+            "tn": 240
+          }
+        },
+        "heldout": {
+          "threshold": null,
+          "n": 262,
+          "n_human_correct": 21,
+          "n_human_incorrect": 241,
+          "agreement": 0.9389312977099237,
+          "kappa": 0.5237446034992047,
+          "recall_correct": 0.47619047619047616,
+          "recall_incorrect": 0.979253112033195,
+          "judge_correct_human_incorrect": 5,
+          "human_correct_judge_incorrect": 11,
+          "confusion": {
+            "tp": 10,
+            "fp": 5,
+            "fn": 11,
+            "tn": 236
+          }
+        },
+        "accepted": false,
+        "reasons": [
+          "held-out recall on human-correct items 0.476 below 0.60"
+        ]
+      }
+    }
+  },
+  "items": [
+    {
+      "item": "D001",
+      "scene": "52b30ecd104a4f4eab6f8f5684a73e56",
+      "score": 23.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 25.0,
+      "question_id": "52b30ecd-ee45b7c2-33035c1b72",
+      "precision": "bf16",
+      "cell": "prediction/VQA",
+      "scores": [
+        25,
+        18,
+        28
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D002",
+      "scene": "2f093cad7209436aa06e103bfe062857",
+      "score": 28.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 34.0,
+      "question_id": "2f093cad-8d50d284-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        34,
+        26,
+        26
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D003",
+      "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+      "score": 35.666666666666664,
+      "label": 0,
+      "majority": 1,
+      "score_rep0": 45.0,
+      "question_id": "f69f7b4c-e2486e66-47002369c7",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        45,
+        32,
+        30
+      ],
+      "labels": {
+        "ronak": 1
+      },
+      "consensus_reason": "the reference action is not the recommended one"
+    },
+    {
+      "item": "D004",
+      "scene": "928ee3a8c5a84497a6360fe70a4e921e",
+      "score": 27.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 29.0,
+      "question_id": "928ee3a8-78984662-854038b466",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        29,
+        34,
+        19
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D005",
+      "scene": "892ed06c432448fe87ecb5d31756f14a",
+      "score": 27.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 26.0,
+      "question_id": "892ed06c-36b6aa58-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        26,
+        32,
+        25
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D006",
+      "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+      "score": 37.333333333333336,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 40.0,
+      "question_id": "f69f7b4c-642dc5e3-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        40,
+        32,
+        40
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D007",
+      "scene": "c7b8d96173bf41dc8df8c0d16adfc71e",
+      "score": 16.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 11.0,
+      "question_id": "c7b8d961-c221e488-c7dac9072c",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        11,
+        24,
+        13
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D008",
+      "scene": "cf652a711c8e40209132036a95162fed",
+      "score": 25.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 26.0,
+      "question_id": "cf652a71-ed0dcc79-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        26,
+        25,
+        26
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D009",
+      "scene": "c7b8d96173bf41dc8df8c0d16adfc71e",
+      "score": 10.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 11.0,
+      "question_id": "c7b8d961-c221e488-852f059dcc",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        11,
+        8,
+        12
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D010",
+      "scene": "da41ecbc644b4915b84bb732e35ebf8c",
+      "score": 12.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 13.0,
+      "question_id": "da41ecbc-7e4c3282-33035c1b72",
+      "precision": "int4",
+      "cell": "prediction/VQA",
+      "scores": [
+        13,
+        14,
+        10
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D011",
+      "scene": "22daa579e9d54040b3f76a4eeef3a587",
+      "score": 33.333333333333336,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 30.0,
+      "question_id": "22daa579-ffef59aa-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        30,
+        39,
+        31
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D012",
+      "scene": "e083627747d8499a8c4e94c7abf941e2",
+      "score": 15.666666666666666,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 13.0,
+      "question_id": "e0836277-00b300ae-7d324b51ac",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        13,
+        12,
+        22
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D013",
+      "scene": "892ed06c432448fe87ecb5d31756f14a",
+      "score": 29.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 38.0,
+      "question_id": "892ed06c-62ac9e73-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        38,
+        24,
+        27
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D014",
+      "scene": "cf652a711c8e40209132036a95162fed",
+      "score": 26.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 16.0,
+      "question_id": "cf652a71-751b62e2-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        16,
+        30,
+        32
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D015",
+      "scene": "52b30ecd104a4f4eab6f8f5684a73e56",
+      "score": 25.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 27.0,
+      "question_id": "52b30ecd-ee45b7c2-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        27,
+        26,
+        23
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D016",
+      "scene": "2d8e61ea27fd419ba9b708488e3f2f10",
+      "score": 23.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 22.0,
+      "question_id": "2d8e61ea-140567e7-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        22,
+        24,
+        24
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D017",
+      "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+      "score": 29.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 35.0,
+      "question_id": "f69f7b4c-e2486e66-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        35,
+        24,
+        29
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D018",
+      "scene": "da41ecbc644b4915b84bb732e35ebf8c",
+      "score": 24.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 24.0,
+      "question_id": "da41ecbc-7e4c3282-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        24,
+        23,
+        25
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D019",
+      "scene": "22daa579e9d54040b3f76a4eeef3a587",
+      "score": 64.0,
+      "label": 0,
+      "majority": 1,
+      "score_rep0": 60.0,
+      "question_id": "22daa579-ffef59aa-8f656ae683",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        60,
+        67,
+        65
+      ],
+      "labels": {
+        "ronak": 1
+      },
+      "consensus_reason": "the stated probability is high while the reference says low, so the probability points the other way."
+    },
+    {
+      "item": "D020",
+      "scene": "a6fae4900f8e46cba689b59b5bc8a2ab",
+      "score": 34.333333333333336,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 31.0,
+      "question_id": "a6fae490-475b8b52-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        31,
+        40,
+        32
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D021",
+      "scene": "2f093cad7209436aa06e103bfe062857",
+      "score": 25.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 24.0,
+      "question_id": "2f093cad-8d50d284-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        24,
+        27,
+        26
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D022",
+      "scene": "892ed06c432448fe87ecb5d31756f14a",
+      "score": 36.666666666666664,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 37.0,
+      "question_id": "892ed06c-62ac9e73-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        37,
+        36,
+        37
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D023",
+      "scene": "52b30ecd104a4f4eab6f8f5684a73e56",
+      "score": 27.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 32.0,
+      "question_id": "52b30ecd-ee45b7c2-33035c1b72",
+      "precision": "int4",
+      "cell": "prediction/VQA",
+      "scores": [
+        32,
+        24,
+        27
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D024",
+      "scene": "da41ecbc644b4915b84bb732e35ebf8c",
+      "score": 31.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 28.0,
+      "question_id": "da41ecbc-7e4c3282-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        28,
+        33,
+        32
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D025",
+      "scene": "22daa579e9d54040b3f76a4eeef3a587",
+      "score": 41.666666666666664,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 46.0,
+      "question_id": "22daa579-ffef59aa-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        46,
+        50,
+        29
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D026",
+      "scene": "09f67057dd8346388b28f79d9bb1cf04",
+      "score": 24.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 24.0,
+      "question_id": "09f67057-4ce5f221-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        24,
+        25,
+        23
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D027",
+      "scene": "3ace9decdd1f4ea0915b9862c95ca128",
+      "score": 8.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 8.0,
+      "question_id": "3ace9dec-07822f37-3a563d2470",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        8,
+        8,
+        9
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D028",
+      "scene": "928ee3a8c5a84497a6360fe70a4e921e",
+      "score": 33.666666666666664,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 33.0,
+      "question_id": "928ee3a8-78984662-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        33,
+        40,
+        28
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D029",
+      "scene": "c7b8d96173bf41dc8df8c0d16adfc71e",
+      "score": 25.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 22.0,
+      "question_id": "c7b8d961-c221e488-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        22,
+        30,
+        24
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D030",
+      "scene": "6207269cb9474c14b01f9610b2ee30aa",
+      "score": 16.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 16.0,
+      "question_id": "6207269c-c42eec2e-33c326522b",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        16,
+        9,
+        23
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D031",
+      "scene": "09f67057dd8346388b28f79d9bb1cf04",
+      "score": 25.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 26.0,
+      "question_id": "09f67057-4ce5f221-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        26,
+        22,
+        27
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D032",
+      "scene": "2f093cad7209436aa06e103bfe062857",
+      "score": 31.0,
+      "label": 0,
+      "majority": 1,
+      "score_rep0": 21.0,
+      "question_id": "2f093cad-8d50d284-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        21,
+        44,
+        28
+      ],
+      "labels": {
+        "ronak": 1
+      },
+      "consensus_reason": "The answer recommends stopping but does not specify both gentle braking to a stop and sudden braking."
+    },
+    {
+      "item": "D033",
+      "scene": "0b8948ee96ac46faad405bf1ffc70bb1",
+      "score": 27.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 28.0,
+      "question_id": "0b8948ee-ec7523bf-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        28,
+        34,
+        21
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D034",
+      "scene": "22daa579e9d54040b3f76a4eeef3a587",
+      "score": 10.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 11.0,
+      "question_id": "22daa579-ffef59aa-a5803c392a",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        11,
+        11,
+        9
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D035",
+      "scene": "e083627747d8499a8c4e94c7abf941e2",
+      "score": 19.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 22.0,
+      "question_id": "e0836277-00b300ae-4de676cae2",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        22,
+        18,
+        19
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D036",
+      "scene": "f4395dd8e4004f12a8dec3079a93d804",
+      "score": 51.333333333333336,
+      "label": 0,
+      "majority": 1,
+      "score_rep0": 56.0,
+      "question_id": "f4395dd8-1ddc0dd2-bdbc279cf5",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        56,
+        42,
+        56
+      ],
+      "labels": {
+        "ronak": 1
+      },
+      "consensus_reason": "The answer recommends continuing straight without specifying maintaining the same speed and explicitly assigns moderate probability rather than high."
+    },
+    {
+      "item": "D037",
+      "scene": "4047f251c21a475abb49518e0fa6fa9e",
+      "score": 42.666666666666664,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 45.0,
+      "question_id": "4047f251-d3ab0416-682ade5ccd",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        45,
+        42,
+        41
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D038",
+      "scene": "892ed06c432448fe87ecb5d31756f14a",
+      "score": 14.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 12.0,
+      "question_id": "892ed06c-62ac9e73-d47a1b64f0",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        12,
+        11,
+        19
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D039",
+      "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+      "score": 31.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 25.0,
+      "question_id": "f69f7b4c-e2486e66-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        25,
+        35,
+        34
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D040",
+      "scene": "da41ecbc644b4915b84bb732e35ebf8c",
+      "score": 25.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 24.0,
+      "question_id": "da41ecbc-7e4c3282-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        24,
+        27,
+        25
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D041",
+      "scene": "6207269cb9474c14b01f9610b2ee30aa",
+      "score": 21.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 21.0,
+      "question_id": "6207269c-c42eec2e-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        21,
+        22,
+        22
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D042",
+      "scene": "928ee3a8c5a84497a6360fe70a4e921e",
+      "score": 22.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 26.0,
+      "question_id": "928ee3a8-78984662-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        26,
+        25,
+        16
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D043",
+      "scene": "df8dfada99a04a81bd1b102eeb84e9bc",
+      "score": 35.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 32.0,
+      "question_id": "df8dfada-e3f986e5-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        32,
+        30,
+        43
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D044",
+      "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+      "score": 53.666666666666664,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 56.0,
+      "question_id": "f69f7b4c-642dc5e3-f9c39a490a",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        56,
+        49,
+        56
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": "the answer does not clearly recommend maintaining the ego vehicle's current speed."
+    },
+    {
+      "item": "D045",
+      "scene": "8c84164e752a4ab69d039a07c898f7af",
+      "score": 37.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 36.0,
+      "question_id": "8c84164e-3bf6f0df-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        36,
+        39,
+        36
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D046",
+      "scene": "6207269cb9474c14b01f9610b2ee30aa",
+      "score": 17.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 17.0,
+      "question_id": "6207269c-c42eec2e-33c326522b",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        17,
+        13,
+        21
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D047",
+      "scene": "c7b8d96173bf41dc8df8c0d16adfc71e",
+      "score": 21.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 20.0,
+      "question_id": "c7b8d961-c221e488-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        20,
+        24,
+        19
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D048",
+      "scene": "37cfda558193400bbe3a5ff14ae4606e",
+      "score": 71.33333333333333,
+      "label": 1,
+      "majority": 1,
+      "score_rep0": 71.0,
+      "question_id": "37cfda55-13b1c7b1-6d50b8055f",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        71,
+        79,
+        64
+      ],
+      "labels": {
+        "ronak": 1
+      },
+      "consensus_reason": "The answer commits to proceeding straight as the most likely action with high probability, which matches keep going at the same speed"
+    },
+    {
+      "item": "D049",
+      "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+      "score": 33.666666666666664,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 35.0,
+      "question_id": "f69f7b4c-642dc5e3-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        35,
+        37,
+        29
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D050",
+      "scene": "df8dfada99a04a81bd1b102eeb84e9bc",
+      "score": 19.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 15.0,
+      "question_id": "df8dfada-e3f986e5-b2ae7e883b",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        15,
+        20,
+        24
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D051",
+      "scene": "c7b8d96173bf41dc8df8c0d16adfc71e",
+      "score": 21.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 20.0,
+      "question_id": "c7b8d961-c221e488-33035c1b72",
+      "precision": "bf16",
+      "cell": "prediction/VQA",
+      "scores": [
+        20,
+        22,
+        22
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D052",
+      "scene": "928ee3a8c5a84497a6360fe70a4e921e",
+      "score": 16.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 18.0,
+      "question_id": "928ee3a8-78984662-854038b466",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        18,
+        16,
+        14
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D053",
+      "scene": "cf652a711c8e40209132036a95162fed",
+      "score": 72.0,
+      "label": 1,
+      "majority": 1,
+      "score_rep0": 77.0,
+      "question_id": "cf652a71-ed0dcc79-cfa72647fc",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        77,
+        70,
+        69
+      ],
+      "labels": {
+        "ronak": 1
+      },
+      "consensus_reason": "The answer commits to continuing straight ahead in the current lane and states a high probability for that action"
+    },
+    {
+      "item": "D054",
+      "scene": "034256c9639044f98da7562ef3de3646",
+      "score": 22.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 20.0,
+      "question_id": "034256c9-c1101ac4-f2825581b4",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        20,
+        26,
+        22
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D055",
+      "scene": "e083627747d8499a8c4e94c7abf941e2",
+      "score": 26.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 27.0,
+      "question_id": "e0836277-00b300ae-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        27,
+        27,
+        24
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D056",
+      "scene": "c6c092a66329470f836714f46b92d59b",
+      "score": 25.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 25.0,
+      "question_id": "c6c092a6-74f1506f-593eebb0d1",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        25,
+        14,
+        36
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D057",
+      "scene": "126aa95f38b649fa857d48672c8ad808",
+      "score": 24.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 25.0,
+      "question_id": "126aa95f-71374b6b-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        25,
+        27,
+        21
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D058",
+      "scene": "da41ecbc644b4915b84bb732e35ebf8c",
+      "score": 8.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 12.0,
+      "question_id": "da41ecbc-7e4c3282-f986e0b291",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        12,
+        6,
+        7
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D059",
+      "scene": "892ed06c432448fe87ecb5d31756f14a",
+      "score": 23.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 23.0,
+      "question_id": "892ed06c-36b6aa58-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        23,
+        25,
+        21
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D060",
+      "scene": "2d8e61ea27fd419ba9b708488e3f2f10",
+      "score": 19.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 25.0,
+      "question_id": "2d8e61ea-140567e7-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        25,
+        10,
+        24
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D061",
+      "scene": "a6fae4900f8e46cba689b59b5bc8a2ab",
+      "score": 12.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 12.0,
+      "question_id": "a6fae490-475b8b52-df9041037d",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        12,
+        12,
+        12
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D062",
+      "scene": "4047f251c21a475abb49518e0fa6fa9e",
+      "score": 33.666666666666664,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 40.0,
+      "question_id": "4047f251-d3ab0416-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        40,
+        30,
+        31
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D063",
+      "scene": "97349fd50e694a5f994b0954047b96d0",
+      "score": 29.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 32.0,
+      "question_id": "97349fd5-c42bcde3-5d5c1a3590",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        32,
+        26,
+        29
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D064",
+      "scene": "09f67057dd8346388b28f79d9bb1cf04",
+      "score": 31.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 35.0,
+      "question_id": "09f67057-152e3f20-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        35,
+        31,
+        28
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D065",
+      "scene": "cf652a711c8e40209132036a95162fed",
+      "score": 22.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 23.0,
+      "question_id": "cf652a71-ed0dcc79-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        23,
+        24,
+        21
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D066",
+      "scene": "52b30ecd104a4f4eab6f8f5684a73e56",
+      "score": 30.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 35.0,
+      "question_id": "52b30ecd-ee45b7c2-678af7b404",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        35,
+        26,
+        30
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": "The answer identifies moving forward as dangerous but does not identify accelerating as a collision-causing action."
+    },
+    {
+      "item": "D067",
+      "scene": "cf652a711c8e40209132036a95162fed",
+      "score": 14.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 9.0,
+      "question_id": "cf652a71-751b62e2-05921199ba",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        9,
+        19,
+        15
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D068",
+      "scene": "cf652a711c8e40209132036a95162fed",
+      "score": 10.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 10.0,
+      "question_id": "cf652a71-751b62e2-05921199ba",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        10,
+        10,
+        10
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D069",
+      "scene": "09f67057dd8346388b28f79d9bb1cf04",
+      "score": 22.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 24.0,
+      "question_id": "09f67057-152e3f20-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        24,
+        21,
+        22
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D070",
+      "scene": "e083627747d8499a8c4e94c7abf941e2",
+      "score": 33.333333333333336,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 39.0,
+      "question_id": "e0836277-00b300ae-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        39,
+        27,
+        34
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D071",
+      "scene": "2f093cad7209436aa06e103bfe062857",
+      "score": 76.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 75.0,
+      "question_id": "2f093cad-8d50d284-e2fe3e07ce",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        75,
+        81,
+        72
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D072",
+      "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+      "score": 19.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 18.0,
+      "question_id": "f69f7b4c-e2486e66-33035c1b72",
+      "precision": "bf16",
+      "cell": "prediction/VQA",
+      "scores": [
+        18,
+        18,
+        23
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D073",
+      "scene": "928ee3a8c5a84497a6360fe70a4e921e",
+      "score": 22.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 14.0,
+      "question_id": "928ee3a8-78984662-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        14,
+        20,
+        34
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D074",
+      "scene": "2d8e61ea27fd419ba9b708488e3f2f10",
+      "score": 33.0,
+      "label": 1,
+      "majority": 0,
+      "score_rep0": 37.0,
+      "question_id": "2d8e61ea-140567e7-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        37,
+        29,
+        33
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": "The answer recommends maintaining speed and slowing down ready to stop for the pedestrian, which covers both reference actions in meaning, though 'brake gently to a stop' is only conditional in the answer."
+    },
+    {
+      "item": "D075",
+      "scene": "a6fae4900f8e46cba689b59b5bc8a2ab",
+      "score": 29.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 30.0,
+      "question_id": "a6fae490-475b8b52-85fd2e3209",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        30,
+        27,
+        30
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D076",
+      "scene": "09f67057dd8346388b28f79d9bb1cf04",
+      "score": 10.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 13.0,
+      "question_id": "09f67057-4ce5f221-cb294555c4",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        13,
+        9,
+        8
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D077",
+      "scene": "09f67057dd8346388b28f79d9bb1cf04",
+      "score": 23.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 25.0,
+      "question_id": "09f67057-152e3f20-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        25,
+        22,
+        24
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D078",
+      "scene": "97349fd50e694a5f994b0954047b96d0",
+      "score": 27.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 25.0,
+      "question_id": "97349fd5-c42bcde3-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        25,
+        31,
+        26
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D079",
+      "scene": "928ee3a8c5a84497a6360fe70a4e921e",
+      "score": 30.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 28.0,
+      "question_id": "928ee3a8-78984662-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        28,
+        33,
+        29
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D080",
+      "scene": "52b30ecd104a4f4eab6f8f5684a73e56",
+      "score": 18.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 25.0,
+      "question_id": "52b30ecd-ee45b7c2-c93e5a438d",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        25,
+        17,
+        14
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D081",
+      "scene": "6207269cb9474c14b01f9610b2ee30aa",
+      "score": 22.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 25.0,
+      "question_id": "6207269c-c42eec2e-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        25,
+        19,
+        22
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D082",
+      "scene": "cf652a711c8e40209132036a95162fed",
+      "score": 67.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 63.0,
+      "question_id": "cf652a71-ed0dcc79-cfa72647fc",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        63,
+        71,
+        67
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": "The answer assigns high likelihood to continuing straight but does not state that the vehicle will maintain the same speed."
+    },
+    {
+      "item": "D083",
+      "scene": "df8dfada99a04a81bd1b102eeb84e9bc",
+      "score": 15.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 13.0,
+      "question_id": "df8dfada-e3f986e5-8b826e3b35",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        13,
+        14,
+        18
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D084",
+      "scene": "892ed06c432448fe87ecb5d31756f14a",
+      "score": 23.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 29.0,
+      "question_id": "892ed06c-36b6aa58-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        29,
+        27,
+        13
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D085",
+      "scene": "c7b8d96173bf41dc8df8c0d16adfc71e",
+      "score": 30.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 33.0,
+      "question_id": "c7b8d961-c221e488-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        33,
+        28,
+        30
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D086",
+      "scene": "3ace9decdd1f4ea0915b9862c95ca128",
+      "score": 15.666666666666666,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 12.0,
+      "question_id": "3ace9dec-07822f37-3a563d2470",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        12,
+        14,
+        21
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D087",
+      "scene": "6207269cb9474c14b01f9610b2ee30aa",
+      "score": 17.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 14.0,
+      "question_id": "6207269c-c42eec2e-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        14,
+        24,
+        14
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D088",
+      "scene": "2f093cad7209436aa06e103bfe062857",
+      "score": 6.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 6.0,
+      "question_id": "2f093cad-8d50d284-d003037403",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        6,
+        5,
+        7
+      ],
+      "labels": {
+        "ronak": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D089",
+      "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+      "score": 20.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 25.0,
+      "question_id": "f69f7b4c-642dc5e3-c221259bdf",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        25,
+        24,
+        12
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D090",
+      "scene": "cf652a711c8e40209132036a95162fed",
+      "score": 15.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 15.0,
+      "question_id": "cf652a71-ed0dcc79-33035c1b72",
+      "precision": "bf16",
+      "cell": "prediction/VQA",
+      "scores": [
+        15,
+        18,
+        13
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D091",
+      "scene": "cf652a711c8e40209132036a95162fed",
+      "score": 44.333333333333336,
+      "label": 1,
+      "majority": 0,
+      "score_rep0": 52.0,
+      "question_id": "cf652a71-ed0dcc79-13a3d654ae",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        52,
+        47,
+        34
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": "The answer explicitly includes braking suddenly as an action that may lead to a collision."
+    },
+    {
+      "item": "D092",
+      "scene": "892ed06c432448fe87ecb5d31756f14a",
+      "score": 13.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 19.0,
+      "question_id": "892ed06c-36b6aa58-33035c1b72",
+      "precision": "int4",
+      "cell": "prediction/VQA",
+      "scores": [
+        19,
+        12,
+        9
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D093",
+      "scene": "a6fae4900f8e46cba689b59b5bc8a2ab",
+      "score": 33.666666666666664,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 36.0,
+      "question_id": "a6fae490-475b8b52-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        36,
+        27,
+        38
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D094",
+      "scene": "892ed06c432448fe87ecb5d31756f14a",
+      "score": 7.333333333333333,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 5.0,
+      "question_id": "892ed06c-62ac9e73-559f5a3e03",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        5,
+        10,
+        7
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D095",
+      "scene": "da41ecbc644b4915b84bb732e35ebf8c",
+      "score": 17.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 18.0,
+      "question_id": "da41ecbc-7e4c3282-33035c1b72",
+      "precision": "bf16",
+      "cell": "prediction/VQA",
+      "scores": [
+        18,
+        13,
+        21
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D096",
+      "scene": "c7b8d96173bf41dc8df8c0d16adfc71e",
+      "score": 69.66666666666667,
+      "label": 1,
+      "majority": 1,
+      "score_rep0": 65.0,
+      "question_id": "c7b8d961-c221e488-c7dac9072c",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        65,
+        72,
+        72
+      ],
+      "labels": {
+        "bhagyesh": 1
+      },
+      "consensus_reason": "The answer settles on continuing straight as the most probable action with high probability, matching 'keep going at the same speed, high probability', and its reason does not contradict the reference."
+    },
+    {
+      "item": "D097",
+      "scene": "892ed06c432448fe87ecb5d31756f14a",
+      "score": 22.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 27.0,
+      "question_id": "892ed06c-36b6aa58-9b7089e532",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        27,
+        22,
+        18
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D098",
+      "scene": "37cfda558193400bbe3a5ff14ae4606e",
+      "score": 24.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 26.0,
+      "question_id": "37cfda55-13b1c7b1-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        26,
+        24,
+        24
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D099",
+      "scene": "0b8948ee96ac46faad405bf1ffc70bb1",
+      "score": 32.0,
+      "label": 1,
+      "majority": 0,
+      "score_rep0": 38.0,
+      "question_id": "0b8948ee-ec7523bf-9ffba88e6a",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        38,
+        27,
+        31
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": "Rapid acceleration while following the truck plausibly conveys accelerating and going straight as a collision-causing action, although straight travel is implicit."
+    },
+    {
+      "item": "D100",
+      "scene": "126aa95f38b649fa857d48672c8ad808",
+      "score": 31.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 38.0,
+      "question_id": "126aa95f-71374b6b-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        38,
+        24,
+        31
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D101",
+      "scene": "8c84164e752a4ab69d039a07c898f7af",
+      "score": 25.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 26.0,
+      "question_id": "8c84164e-3bf6f0df-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        26,
+        23,
+        27
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D102",
+      "scene": "22daa579e9d54040b3f76a4eeef3a587",
+      "score": 16.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 16.0,
+      "question_id": "22daa579-ffef59aa-a5803c392a",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        16,
+        21,
+        11
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D103",
+      "scene": "52b30ecd104a4f4eab6f8f5684a73e56",
+      "score": 27.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 29.0,
+      "question_id": "52b30ecd-ee45b7c2-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        29,
+        25,
+        27
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D104",
+      "scene": "4047f251c21a475abb49518e0fa6fa9e",
+      "score": 23.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 24.0,
+      "question_id": "4047f251-d3ab0416-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        24,
+        20,
+        27
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D105",
+      "scene": "892ed06c432448fe87ecb5d31756f14a",
+      "score": 27.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 25.0,
+      "question_id": "892ed06c-36b6aa58-9b7089e532",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        25,
+        25,
+        31
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D106",
+      "scene": "126aa95f38b649fa857d48672c8ad808",
+      "score": 14.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 14.0,
+      "question_id": "126aa95f-71374b6b-cce3964fb1",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        14,
+        17,
+        12
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D107",
+      "scene": "97349fd50e694a5f994b0954047b96d0",
+      "score": 30.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 26.0,
+      "question_id": "97349fd5-c42bcde3-6d0516e73f",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        26,
+        34,
+        32
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D108",
+      "scene": "8c84164e752a4ab69d039a07c898f7af",
+      "score": 36.333333333333336,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 35.0,
+      "question_id": "8c84164e-3bf6f0df-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        35,
+        30,
+        44
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D109",
+      "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+      "score": 25.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 25.0,
+      "question_id": "f69f7b4c-642dc5e3-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        25,
+        33,
+        18
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D110",
+      "scene": "09f67057dd8346388b28f79d9bb1cf04",
+      "score": 8.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 9.0,
+      "question_id": "09f67057-152e3f20-485af2f04f",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        9,
+        5,
+        11
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D111",
+      "scene": "97349fd50e694a5f994b0954047b96d0",
+      "score": 20.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 21.0,
+      "question_id": "97349fd5-c42bcde3-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        21,
+        23,
+        18
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D112",
+      "scene": "034256c9639044f98da7562ef3de3646",
+      "score": 10.666666666666666,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 13.0,
+      "question_id": "034256c9-c1101ac4-973db26f3a",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        13,
+        9,
+        10
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D113",
+      "scene": "0b8948ee96ac46faad405bf1ffc70bb1",
+      "score": 21.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 20.0,
+      "question_id": "0b8948ee-ec7523bf-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        20,
+        26,
+        18
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D114",
+      "scene": "2d8e61ea27fd419ba9b708488e3f2f10",
+      "score": 24.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 24.0,
+      "question_id": "2d8e61ea-140567e7-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        24,
+        24,
+        26
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D115",
+      "scene": "faa975eaad804c85bd8f2da9b30c8d9a",
+      "score": 17.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 19.0,
+      "question_id": "faa975ea-99bcb061-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        19,
+        11,
+        23
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D116",
+      "scene": "22daa579e9d54040b3f76a4eeef3a587",
+      "score": 22.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 20.0,
+      "question_id": "22daa579-ffef59aa-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        20,
+        24,
+        23
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D117",
+      "scene": "f4395dd8e4004f12a8dec3079a93d804",
+      "score": 29.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 26.0,
+      "question_id": "f4395dd8-1ddc0dd2-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        26,
+        35,
+        26
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D118",
+      "scene": "4047f251c21a475abb49518e0fa6fa9e",
+      "score": 15.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 20.0,
+      "question_id": "4047f251-d3ab0416-33035c1b72",
+      "precision": "bf16",
+      "cell": "prediction/VQA",
+      "scores": [
+        20,
+        11,
+        15
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D119",
+      "scene": "09f67057dd8346388b28f79d9bb1cf04",
+      "score": 6.666666666666667,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 6.0,
+      "question_id": "09f67057-4ce5f221-cb294555c4",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        6,
+        6,
+        8
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D120",
+      "scene": "a6fae4900f8e46cba689b59b5bc8a2ab",
+      "score": 26.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 24.0,
+      "question_id": "a6fae490-475b8b52-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        24,
+        31,
+        24
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D121",
+      "scene": "faa975eaad804c85bd8f2da9b30c8d9a",
+      "score": 28.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 30.0,
+      "question_id": "faa975ea-99bcb061-98d2efbdbe",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        30,
+        26,
+        29
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D122",
+      "scene": "a6fae4900f8e46cba689b59b5bc8a2ab",
+      "score": 11.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 11.0,
+      "question_id": "a6fae490-475b8b52-df9041037d",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        11,
+        11,
+        12
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D123",
+      "scene": "892ed06c432448fe87ecb5d31756f14a",
+      "score": 36.333333333333336,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 33.0,
+      "question_id": "892ed06c-36b6aa58-05f00953e2",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        33,
+        41,
+        35
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D124",
+      "scene": "37cfda558193400bbe3a5ff14ae4606e",
+      "score": 58.333333333333336,
+      "label": 1,
+      "majority": 1,
+      "score_rep0": 60.0,
+      "question_id": "37cfda55-13b1c7b1-b686f3f66b",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        60,
+        56,
+        59
+      ],
+      "labels": {
+        "bhagyesh": 1
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D125",
+      "scene": "0b8948ee96ac46faad405bf1ffc70bb1",
+      "score": 26.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 26.0,
+      "question_id": "0b8948ee-ec7523bf-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        26,
+        31,
+        21
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D126",
+      "scene": "4047f251c21a475abb49518e0fa6fa9e",
+      "score": 26.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 29.0,
+      "question_id": "4047f251-d3ab0416-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        29,
+        23,
+        28
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D127",
+      "scene": "c6c092a66329470f836714f46b92d59b",
+      "score": 29.333333333333332,
+      "label": 0,
+      "majority": 1,
+      "score_rep0": 31.0,
+      "question_id": "c6c092a6-74f1506f-671c6c811e",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        31,
+        21,
+        36
+      ],
+      "labels": {
+        "bhagyesh": 1
+      },
+      "consensus_reason": "The answer names failure to detect the car ahead and not braking or changing lanes; accelerating, a reference action, is missing."
+    },
+    {
+      "item": "D128",
+      "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+      "score": 56.0,
+      "label": 1,
+      "majority": 1,
+      "score_rep0": 59.0,
+      "question_id": "f69f7b4c-642dc5e3-f9c39a490a",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        59,
+        51,
+        58
+      ],
+      "labels": {
+        "bhagyesh": 1
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D129",
+      "scene": "97349fd50e694a5f994b0954047b96d0",
+      "score": 10.666666666666666,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 12.0,
+      "question_id": "97349fd5-c42bcde3-6d0516e73f",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        12,
+        11,
+        9
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D130",
+      "scene": "09f67057dd8346388b28f79d9bb1cf04",
+      "score": 20.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 22.0,
+      "question_id": "09f67057-152e3f20-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        22,
+        19,
+        20
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D131",
+      "scene": "c6c092a66329470f836714f46b92d59b",
+      "score": 28.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 28.0,
+      "question_id": "c6c092a6-74f1506f-33035c1b72",
+      "precision": "int4",
+      "cell": "prediction/VQA",
+      "scores": [
+        28,
+        27,
+        30
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D132",
+      "scene": "4047f251c21a475abb49518e0fa6fa9e",
+      "score": 26.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 29.0,
+      "question_id": "4047f251-d3ab0416-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        29,
+        26,
+        25
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D133",
+      "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+      "score": 30.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 25.0,
+      "question_id": "f69f7b4c-e2486e66-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        25,
+        34,
+        32
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D134",
+      "scene": "da41ecbc644b4915b84bb732e35ebf8c",
+      "score": 55.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 54.0,
+      "question_id": "da41ecbc-7e4c3282-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        54,
+        52,
+        59
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D135",
+      "scene": "2f093cad7209436aa06e103bfe062857",
+      "score": 36.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 38.0,
+      "question_id": "2f093cad-8d50d284-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        38,
+        32,
+        38
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D136",
+      "scene": "cf652a711c8e40209132036a95162fed",
+      "score": 54.666666666666664,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 54.0,
+      "question_id": "cf652a71-ed0dcc79-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        54,
+        52,
+        58
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D137",
+      "scene": "0b8948ee96ac46faad405bf1ffc70bb1",
+      "score": 34.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 29.0,
+      "question_id": "0b8948ee-ec7523bf-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        29,
+        24,
+        49
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D138",
+      "scene": "c6c092a66329470f836714f46b92d59b",
+      "score": 26.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 23.0,
+      "question_id": "c6c092a6-74f1506f-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        23,
+        26,
+        31
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D139",
+      "scene": "df8dfada99a04a81bd1b102eeb84e9bc",
+      "score": 27.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 32.0,
+      "question_id": "df8dfada-e3f986e5-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        32,
+        30,
+        21
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D140",
+      "scene": "c7b8d96173bf41dc8df8c0d16adfc71e",
+      "score": 27.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 25.0,
+      "question_id": "c7b8d961-c221e488-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        25,
+        32,
+        24
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D141",
+      "scene": "c6c092a66329470f836714f46b92d59b",
+      "score": 21.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 23.0,
+      "question_id": "c6c092a6-74f1506f-33035c1b72",
+      "precision": "bf16",
+      "cell": "prediction/VQA",
+      "scores": [
+        23,
+        20,
+        20
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D142",
+      "scene": "df8dfada99a04a81bd1b102eeb84e9bc",
+      "score": 11.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 12.0,
+      "question_id": "df8dfada-e3f986e5-8b826e3b35",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        12,
+        12,
+        10
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D143",
+      "scene": "da41ecbc644b4915b84bb732e35ebf8c",
+      "score": 13.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 17.0,
+      "question_id": "da41ecbc-7e4c3282-f986e0b291",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        17,
+        12,
+        10
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D144",
+      "scene": "2d8e61ea27fd419ba9b708488e3f2f10",
+      "score": 13.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 19.0,
+      "question_id": "2d8e61ea-140567e7-f7f3a49613",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        19,
+        14,
+        7
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D145",
+      "scene": "df8dfada99a04a81bd1b102eeb84e9bc",
+      "score": 23.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 20.0,
+      "question_id": "df8dfada-e3f986e5-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        20,
+        25,
+        24
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D146",
+      "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+      "score": 15.666666666666666,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 18.0,
+      "question_id": "f69f7b4c-e2486e66-33035c1b72",
+      "precision": "int4",
+      "cell": "prediction/VQA",
+      "scores": [
+        18,
+        16,
+        13
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D147",
+      "scene": "928ee3a8c5a84497a6360fe70a4e921e",
+      "score": 16.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 23.0,
+      "question_id": "928ee3a8-78984662-33035c1b72",
+      "precision": "int4",
+      "cell": "prediction/VQA",
+      "scores": [
+        23,
+        14,
+        13
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D148",
+      "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+      "score": 23.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 16.0,
+      "question_id": "f69f7b4c-e2486e66-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        16,
+        28,
+        26
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D149",
+      "scene": "3ace9decdd1f4ea0915b9862c95ca128",
+      "score": 72.66666666666667,
+      "label": 1,
+      "majority": 1,
+      "score_rep0": 72.0,
+      "question_id": "3ace9dec-07822f37-886a812bb0",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        72,
+        70,
+        76
+      ],
+      "labels": {
+        "bhagyesh": 1
+      },
+      "consensus_reason": "The answer settles on continuing straight (keep going) as the most likely action with an explicitly high probability, and its reason does not contradict the reference."
+    },
+    {
+      "item": "D150",
+      "scene": "e083627747d8499a8c4e94c7abf941e2",
+      "score": 31.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 25.0,
+      "question_id": "e0836277-00b300ae-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        25,
+        32,
+        36
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D151",
+      "scene": "2d8e61ea27fd419ba9b708488e3f2f10",
+      "score": 15.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 11.0,
+      "question_id": "2d8e61ea-140567e7-863027fbee",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        11,
+        23,
+        12
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D152",
+      "scene": "8c84164e752a4ab69d039a07c898f7af",
+      "score": 32.333333333333336,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 27.0,
+      "question_id": "8c84164e-3bf6f0df-d9b38c9ac1",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        27,
+        39,
+        31
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D153",
+      "scene": "df8dfada99a04a81bd1b102eeb84e9bc",
+      "score": 37.666666666666664,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 37.0,
+      "question_id": "df8dfada-e3f986e5-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        37,
+        36,
+        40
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D154",
+      "scene": "6207269cb9474c14b01f9610b2ee30aa",
+      "score": 24.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 23.0,
+      "question_id": "6207269c-c42eec2e-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        23,
+        27,
+        23
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D155",
+      "scene": "22daa579e9d54040b3f76a4eeef3a587",
+      "score": 48.333333333333336,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 60.0,
+      "question_id": "22daa579-ffef59aa-8f656ae683",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        60,
+        52,
+        33
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D156",
+      "scene": "034256c9639044f98da7562ef3de3646",
+      "score": 26.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 23.0,
+      "question_id": "034256c9-c1101ac4-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        23,
+        27,
+        28
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D157",
+      "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+      "score": 24.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 19.0,
+      "question_id": "f69f7b4c-e2486e66-47002369c7",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        19,
+        23,
+        31
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D158",
+      "scene": "928ee3a8c5a84497a6360fe70a4e921e",
+      "score": 21.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 15.0,
+      "question_id": "928ee3a8-78984662-4493ecebcc",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        15,
+        32,
+        16
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D159",
+      "scene": "a6fae4900f8e46cba689b59b5bc8a2ab",
+      "score": 20.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 22.0,
+      "question_id": "a6fae490-475b8b52-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        22,
+        19,
+        20
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D160",
+      "scene": "faa975eaad804c85bd8f2da9b30c8d9a",
+      "score": 13.666666666666666,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 11.0,
+      "question_id": "faa975ea-99bcb061-98d2efbdbe",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        11,
+        11,
+        19
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D161",
+      "scene": "126aa95f38b649fa857d48672c8ad808",
+      "score": 67.33333333333333,
+      "label": 1,
+      "majority": 1,
+      "score_rep0": 57.0,
+      "question_id": "126aa95f-71374b6b-8dbddc4d6c",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        57,
+        73,
+        72
+      ],
+      "labels": {
+        "bhagyesh": 1
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D162",
+      "scene": "09f67057dd8346388b28f79d9bb1cf04",
+      "score": 24.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 28.0,
+      "question_id": "09f67057-4ce5f221-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        28,
+        22,
+        24
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D163",
+      "scene": "a6fae4900f8e46cba689b59b5bc8a2ab",
+      "score": 21.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 27.0,
+      "question_id": "a6fae490-475b8b52-85fd2e3209",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        27,
+        16,
+        22
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D164",
+      "scene": "f4395dd8e4004f12a8dec3079a93d804",
+      "score": 24.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 24.0,
+      "question_id": "f4395dd8-1ddc0dd2-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        24,
+        24,
+        24
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D165",
+      "scene": "8c84164e752a4ab69d039a07c898f7af",
+      "score": 25.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 29.0,
+      "question_id": "8c84164e-3bf6f0df-33035c1b72",
+      "precision": "bf16",
+      "cell": "prediction/VQA",
+      "scores": [
+        29,
+        24,
+        24
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D166",
+      "scene": "2f093cad7209436aa06e103bfe062857",
+      "score": 75.33333333333333,
+      "label": 1,
+      "majority": 1,
+      "score_rep0": 85.0,
+      "question_id": "2f093cad-8d50d284-e2fe3e07ce",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        85,
+        82,
+        59
+      ],
+      "labels": {
+        "bhagyesh": 1
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D167",
+      "scene": "97349fd50e694a5f994b0954047b96d0",
+      "score": 27.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 25.0,
+      "question_id": "97349fd5-c42bcde3-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        25,
+        24,
+        34
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D168",
+      "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+      "score": 23.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 22.0,
+      "question_id": "f69f7b4c-642dc5e3-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        22,
+        23,
+        25
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D169",
+      "scene": "8c84164e752a4ab69d039a07c898f7af",
+      "score": 9.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 17.0,
+      "question_id": "8c84164e-3bf6f0df-b793717425",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        17,
+        2,
+        9
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D170",
+      "scene": "c6c092a66329470f836714f46b92d59b",
+      "score": 26.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 28.0,
+      "question_id": "c6c092a6-74f1506f-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        28,
+        26,
+        26
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D171",
+      "scene": "97349fd50e694a5f994b0954047b96d0",
+      "score": 11.666666666666666,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 16.0,
+      "question_id": "97349fd5-c42bcde3-5d5c1a3590",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        16,
+        10,
+        9
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D172",
+      "scene": "09f67057dd8346388b28f79d9bb1cf04",
+      "score": 51.333333333333336,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 45.0,
+      "question_id": "09f67057-4ce5f221-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        45,
+        55,
+        54
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D173",
+      "scene": "4047f251c21a475abb49518e0fa6fa9e",
+      "score": 16.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 26.0,
+      "question_id": "4047f251-d3ab0416-33035c1b72",
+      "precision": "int4",
+      "cell": "prediction/VQA",
+      "scores": [
+        26,
+        18,
+        6
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D174",
+      "scene": "6207269cb9474c14b01f9610b2ee30aa",
+      "score": 12.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 11.0,
+      "question_id": "6207269c-c42eec2e-7b6c4e7257",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        11,
+        11,
+        14
+      ],
+      "labels": {
+        "bhagyesh": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D175",
+      "scene": "2d8e61ea27fd419ba9b708488e3f2f10",
+      "score": 77.0,
+      "label": 1,
+      "majority": 1,
+      "score_rep0": 76.0,
+      "question_id": "2d8e61ea-140567e7-863027fbee",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        76,
+        87,
+        68
+      ],
+      "labels": {
+        "bhagyesh": 1
+      },
+      "consensus_reason": "The answer settles on continuing straight as the most likely action with high probability, which matches keeping going at the same speed in meaning."
+    },
+    {
+      "item": "D176",
+      "scene": "2f093cad7209436aa06e103bfe062857",
+      "score": 9.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 10.0,
+      "question_id": "2f093cad-8d50d284-d003037403",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        10,
+        9,
+        9
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D177",
+      "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+      "score": 12.666666666666666,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 12.0,
+      "question_id": "f69f7b4c-642dc5e3-c221259bdf",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        12,
+        12,
+        14
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D178",
+      "scene": "3ace9decdd1f4ea0915b9862c95ca128",
+      "score": 21.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 16.0,
+      "question_id": "3ace9dec-07822f37-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        16,
+        26,
+        23
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D179",
+      "scene": "52b30ecd104a4f4eab6f8f5684a73e56",
+      "score": 18.666666666666668,
+      "label": 0,
+      "majority": 1,
+      "score_rep0": 27.0,
+      "question_id": "52b30ecd-ee45b7c2-c93e5a438d",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        27,
+        18,
+        11
+      ],
+      "labels": {
+        "akshay": 1
+      },
+      "consensus_reason": "The answer recommends stopping and waiting rather than keeping the same speed."
+    },
+    {
+      "item": "D180",
+      "scene": "2d8e61ea27fd419ba9b708488e3f2f10",
+      "score": 27.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 29.0,
+      "question_id": "2d8e61ea-140567e7-f7f3a49613",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        29,
+        29,
+        23
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D181",
+      "scene": "faa975eaad804c85bd8f2da9b30c8d9a",
+      "score": 31.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 28.0,
+      "question_id": "faa975ea-99bcb061-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        28,
+        30,
+        35
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D182",
+      "scene": "126aa95f38b649fa857d48672c8ad808",
+      "score": 15.666666666666666,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 13.0,
+      "question_id": "126aa95f-71374b6b-cce3964fb1",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        13,
+        16,
+        18
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D183",
+      "scene": "52b30ecd104a4f4eab6f8f5684a73e56",
+      "score": 35.333333333333336,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 33.0,
+      "question_id": "52b30ecd-ee45b7c2-678af7b404",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        33,
+        38,
+        35
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": "Acceleration is identified as dangerous, but going straight is only arguably implied by the stopping-distance discussion rather than identified as a collision-causing action."
+    },
+    {
+      "item": "D184",
+      "scene": "892ed06c432448fe87ecb5d31756f14a",
+      "score": 20.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 23.0,
+      "question_id": "892ed06c-62ac9e73-559f5a3e03",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        23,
+        24,
+        14
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D185",
+      "scene": "09f67057dd8346388b28f79d9bb1cf04",
+      "score": 21.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 26.0,
+      "question_id": "09f67057-4ce5f221-bfa8df298d",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        26,
+        20,
+        19
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D186",
+      "scene": "126aa95f38b649fa857d48672c8ad808",
+      "score": 30.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 27.0,
+      "question_id": "126aa95f-71374b6b-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        27,
+        36,
+        27
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D187",
+      "scene": "cf652a711c8e40209132036a95162fed",
+      "score": 24.666666666666668,
+      "label": 0,
+      "majority": 1,
+      "score_rep0": 25.0,
+      "question_id": "cf652a71-751b62e2-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        25,
+        24,
+        25
+      ],
+      "labels": {
+        "akshay": 1
+      },
+      "consensus_reason": "The answer omits the yellow sedan behind and the yellow roadblock ahead."
+    },
+    {
+      "item": "D188",
+      "scene": "c6c092a66329470f836714f46b92d59b",
+      "score": 43.666666666666664,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 53.0,
+      "question_id": "c6c092a6-74f1506f-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        53,
+        41,
+        37
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D189",
+      "scene": "22daa579e9d54040b3f76a4eeef3a587",
+      "score": 8.666666666666666,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 8.0,
+      "question_id": "22daa579-ffef59aa-33035c1b72",
+      "precision": "int4",
+      "cell": "prediction/VQA",
+      "scores": [
+        8,
+        5,
+        13
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D190",
+      "scene": "f4395dd8e4004f12a8dec3079a93d804",
+      "score": 75.33333333333333,
+      "label": 1,
+      "majority": 1,
+      "score_rep0": 72.0,
+      "question_id": "f4395dd8-1ddc0dd2-bdbc279cf5",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        72,
+        83,
+        71
+      ],
+      "labels": {
+        "akshay": 1
+      },
+      "consensus_reason": "The answer settles on continuing straight with high probability, which matches keeping going at the same speed and a high likelihood, though it does not mention speed explicitly."
+    },
+    {
+      "item": "D191",
+      "scene": "22daa579e9d54040b3f76a4eeef3a587",
+      "score": 20.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 20.0,
+      "question_id": "22daa579-ffef59aa-33035c1b72",
+      "precision": "bf16",
+      "cell": "prediction/VQA",
+      "scores": [
+        20,
+        19,
+        21
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D192",
+      "scene": "cf652a711c8e40209132036a95162fed",
+      "score": 30.666666666666668,
+      "label": 0,
+      "majority": 1,
+      "score_rep0": 41.0,
+      "question_id": "cf652a71-751b62e2-a3104952ef",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        41,
+        28,
+        23
+      ],
+      "labels": {
+        "akshay": 1
+      },
+      "consensus_reason": "The answer lists conditional alternatives without selecting maintaining the same speed as the highly likely action."
+    },
+    {
+      "item": "D193",
+      "scene": "034256c9639044f98da7562ef3de3646",
+      "score": 31.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 41.0,
+      "question_id": "034256c9-c1101ac4-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        41,
+        32,
+        22
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D194",
+      "scene": "034256c9639044f98da7562ef3de3646",
+      "score": 30.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 30.0,
+      "question_id": "034256c9-c1101ac4-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        30,
+        26,
+        34
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D195",
+      "scene": "37cfda558193400bbe3a5ff14ae4606e",
+      "score": 39.0,
+      "label": 1,
+      "majority": 1,
+      "score_rep0": 42.0,
+      "question_id": "37cfda55-13b1c7b1-b686f3f66b",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        42,
+        30,
+        45
+      ],
+      "labels": {
+        "akshay": 1
+      },
+      "consensus_reason": "The answer concludes that accelerating (or changing lanes) can cause a collision with the van ahead in the same lane, which covers accelerating and going straight."
+    },
+    {
+      "item": "D196",
+      "scene": "37cfda558193400bbe3a5ff14ae4606e",
+      "score": 36.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 39.0,
+      "question_id": "37cfda55-13b1c7b1-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        39,
+        34,
+        35
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D197",
+      "scene": "0b8948ee96ac46faad405bf1ffc70bb1",
+      "score": 13.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 12.0,
+      "question_id": "0b8948ee-ec7523bf-6412387f26",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        12,
+        14,
+        13
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D198",
+      "scene": "892ed06c432448fe87ecb5d31756f14a",
+      "score": 23.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 25.0,
+      "question_id": "892ed06c-36b6aa58-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        25,
+        21,
+        24
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D199",
+      "scene": "928ee3a8c5a84497a6360fe70a4e921e",
+      "score": 14.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 14.0,
+      "question_id": "928ee3a8-78984662-33035c1b72",
+      "precision": "bf16",
+      "cell": "prediction/VQA",
+      "scores": [
+        14,
+        17,
+        12
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D200",
+      "scene": "4047f251c21a475abb49518e0fa6fa9e",
+      "score": 13.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 13.0,
+      "question_id": "4047f251-d3ab0416-fcfab66466",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        13,
+        10,
+        17
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D201",
+      "scene": "6207269cb9474c14b01f9610b2ee30aa",
+      "score": 10.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 11.0,
+      "question_id": "6207269c-c42eec2e-7b6c4e7257",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        11,
+        11,
+        9
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D202",
+      "scene": "cf652a711c8e40209132036a95162fed",
+      "score": 25.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 21.0,
+      "question_id": "cf652a71-751b62e2-a3104952ef",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        21,
+        22,
+        33
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D203",
+      "scene": "c6c092a66329470f836714f46b92d59b",
+      "score": 30.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 33.0,
+      "question_id": "c6c092a6-74f1506f-671c6c811e",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        33,
+        30,
+        28
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": "The answer identifies acceleration as a collision risk but does not clearly identify going straight as part of the collision-causing action."
+    },
+    {
+      "item": "D204",
+      "scene": "892ed06c432448fe87ecb5d31756f14a",
+      "score": 13.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 22.0,
+      "question_id": "892ed06c-36b6aa58-33035c1b72",
+      "precision": "bf16",
+      "cell": "prediction/VQA",
+      "scores": [
+        22,
+        10,
+        8
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D205",
+      "scene": "8c84164e752a4ab69d039a07c898f7af",
+      "score": 14.666666666666666,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 12.0,
+      "question_id": "8c84164e-3bf6f0df-b793717425",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        12,
+        13,
+        19
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D206",
+      "scene": "f4395dd8e4004f12a8dec3079a93d804",
+      "score": 16.333333333333332,
+      "label": 0,
+      "majority": 1,
+      "score_rep0": 12.0,
+      "question_id": "f4395dd8-1ddc0dd2-075fd4c26c",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        12,
+        21,
+        16
+      ],
+      "labels": {
+        "akshay": 1
+      },
+      "consensus_reason": "The answer explicitly names applicable collision-causing actions and never concludes that no such action is indicated."
+    },
+    {
+      "item": "D207",
+      "scene": "8c84164e752a4ab69d039a07c898f7af",
+      "score": 35.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 29.0,
+      "question_id": "8c84164e-3bf6f0df-d9b38c9ac1",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        29,
+        32,
+        44
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D208",
+      "scene": "3ace9decdd1f4ea0915b9862c95ca128",
+      "score": 12.666666666666666,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 15.0,
+      "question_id": "3ace9dec-07822f37-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        15,
+        10,
+        13
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D209",
+      "scene": "52b30ecd104a4f4eab6f8f5684a73e56",
+      "score": 42.666666666666664,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 47.0,
+      "question_id": "52b30ecd-ee45b7c2-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        47,
+        46,
+        35
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D210",
+      "scene": "cf652a711c8e40209132036a95162fed",
+      "score": 48.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 40.0,
+      "question_id": "cf652a71-ed0dcc79-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        40,
+        54,
+        50
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D211",
+      "scene": "37cfda558193400bbe3a5ff14ae4606e",
+      "score": 27.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 27.0,
+      "question_id": "37cfda55-13b1c7b1-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        27,
+        22,
+        32
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D212",
+      "scene": "e083627747d8499a8c4e94c7abf941e2",
+      "score": 18.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 22.0,
+      "question_id": "e0836277-00b300ae-7d324b51ac",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        22,
+        10,
+        22
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D213",
+      "scene": "da41ecbc644b4915b84bb732e35ebf8c",
+      "score": 77.66666666666667,
+      "label": 1,
+      "majority": 1,
+      "score_rep0": 75.0,
+      "question_id": "da41ecbc-7e4c3282-5403257cb0",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        75,
+        74,
+        84
+      ],
+      "labels": {
+        "akshay": 1
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D214",
+      "scene": "cf652a711c8e40209132036a95162fed",
+      "score": 25.666666666666668,
+      "label": 1,
+      "majority": 1,
+      "score_rep0": 20.0,
+      "question_id": "cf652a71-ed0dcc79-13a3d654ae",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        20,
+        35,
+        22
+      ],
+      "labels": {
+        "akshay": 1
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D215",
+      "scene": "892ed06c432448fe87ecb5d31756f14a",
+      "score": 29.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 24.0,
+      "question_id": "892ed06c-62ac9e73-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        24,
+        37,
+        28
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D216",
+      "scene": "faa975eaad804c85bd8f2da9b30c8d9a",
+      "score": 24.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 26.0,
+      "question_id": "faa975ea-99bcb061-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        26,
+        20,
+        27
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D217",
+      "scene": "09f67057dd8346388b28f79d9bb1cf04",
+      "score": 24.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 27.0,
+      "question_id": "09f67057-4ce5f221-bfa8df298d",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        27,
+        24,
+        22
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D218",
+      "scene": "22daa579e9d54040b3f76a4eeef3a587",
+      "score": 29.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 23.0,
+      "question_id": "22daa579-ffef59aa-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        23,
+        30,
+        35
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D219",
+      "scene": "f4395dd8e4004f12a8dec3079a93d804",
+      "score": 17.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 23.0,
+      "question_id": "f4395dd8-1ddc0dd2-075fd4c26c",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        23,
+        16,
+        12
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D220",
+      "scene": "126aa95f38b649fa857d48672c8ad808",
+      "score": 52.333333333333336,
+      "label": 1,
+      "majority": 1,
+      "score_rep0": 53.0,
+      "question_id": "126aa95f-71374b6b-8dbddc4d6c",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        53,
+        49,
+        55
+      ],
+      "labels": {
+        "akshay": 1
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D221",
+      "scene": "37cfda558193400bbe3a5ff14ae4606e",
+      "score": 31.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 33.0,
+      "question_id": "37cfda55-13b1c7b1-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        33,
+        27,
+        34
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D222",
+      "scene": "faa975eaad804c85bd8f2da9b30c8d9a",
+      "score": 14.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 18.0,
+      "question_id": "faa975ea-99bcb061-f3b8dc4f52",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        18,
+        12,
+        13
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D223",
+      "scene": "f4395dd8e4004f12a8dec3079a93d804",
+      "score": 37.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 45.0,
+      "question_id": "f4395dd8-1ddc0dd2-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        45,
+        28,
+        38
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D224",
+      "scene": "4047f251c21a475abb49518e0fa6fa9e",
+      "score": 28.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 23.0,
+      "question_id": "4047f251-d3ab0416-682ade5ccd",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        23,
+        27,
+        35
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D225",
+      "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+      "score": 20.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 22.0,
+      "question_id": "f69f7b4c-e2486e66-b6074e7935",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        22,
+        14,
+        24
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D226",
+      "scene": "cf652a711c8e40209132036a95162fed",
+      "score": 11.666666666666666,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 8.0,
+      "question_id": "cf652a71-ed0dcc79-33035c1b72",
+      "precision": "int4",
+      "cell": "prediction/VQA",
+      "scores": [
+        8,
+        13,
+        14
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D227",
+      "scene": "df8dfada99a04a81bd1b102eeb84e9bc",
+      "score": 60.666666666666664,
+      "label": 1,
+      "majority": 1,
+      "score_rep0": 66.0,
+      "question_id": "df8dfada-e3f986e5-b2ae7e883b",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        66,
+        58,
+        58
+      ],
+      "labels": {
+        "akshay": 1
+      },
+      "consensus_reason": "The answer settles on continuing straight as the most likely action (high, 80%), which reads as the reference's keep going with a likelihood pointing the same way, though it never says 'at the same speed'."
+    },
+    {
+      "item": "D228",
+      "scene": "892ed06c432448fe87ecb5d31756f14a",
+      "score": 16.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 10.0,
+      "question_id": "892ed06c-62ac9e73-d47a1b64f0",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        10,
+        14,
+        26
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D229",
+      "scene": "f69f7b4cefb7493bb1a8185f6f01d137",
+      "score": 43.333333333333336,
+      "label": 1,
+      "majority": 1,
+      "score_rep0": 28.0,
+      "question_id": "f69f7b4c-e2486e66-b6074e7935",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        28,
+        56,
+        46
+      ],
+      "labels": {
+        "akshay": 1
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D230",
+      "scene": "da41ecbc644b4915b84bb732e35ebf8c",
+      "score": 44.0,
+      "label": 0,
+      "majority": 1,
+      "score_rep0": 45.0,
+      "question_id": "da41ecbc-7e4c3282-5403257cb0",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        45,
+        49,
+        38
+      ],
+      "labels": {
+        "akshay": 1
+      },
+      "consensus_reason": "The conclusion offers maintaining speed or accelerating as alternatives without settling on the reference action."
+    },
+    {
+      "item": "D231",
+      "scene": "faa975eaad804c85bd8f2da9b30c8d9a",
+      "score": 10.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 7.0,
+      "question_id": "faa975ea-99bcb061-f3b8dc4f52",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        7,
+        11,
+        12
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D232",
+      "scene": "892ed06c432448fe87ecb5d31756f14a",
+      "score": 30.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 32.0,
+      "question_id": "892ed06c-36b6aa58-05f00953e2",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        32,
+        26,
+        34
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D233",
+      "scene": "c7b8d96173bf41dc8df8c0d16adfc71e",
+      "score": 11.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 10.0,
+      "question_id": "c7b8d961-c221e488-852f059dcc",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        10,
+        12,
+        12
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D234",
+      "scene": "8c84164e752a4ab69d039a07c898f7af",
+      "score": 13.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 16.0,
+      "question_id": "8c84164e-3bf6f0df-33035c1b72",
+      "precision": "int4",
+      "cell": "prediction/VQA",
+      "scores": [
+        16,
+        11,
+        12
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D235",
+      "scene": "3ace9decdd1f4ea0915b9862c95ca128",
+      "score": 24.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 20.0,
+      "question_id": "3ace9dec-07822f37-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        20,
+        28,
+        24
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D236",
+      "scene": "c7b8d96173bf41dc8df8c0d16adfc71e",
+      "score": 26.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 31.0,
+      "question_id": "c7b8d961-c221e488-33035c1b72",
+      "precision": "int4",
+      "cell": "prediction/VQA",
+      "scores": [
+        31,
+        21,
+        26
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D237",
+      "scene": "e083627747d8499a8c4e94c7abf941e2",
+      "score": 9.0,
+      "label": 0,
+      "majority": 1,
+      "score_rep0": 8.0,
+      "question_id": "e0836277-00b300ae-4de676cae2",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        8,
+        10,
+        9
+      ],
+      "labels": {
+        "akshay": 1
+      },
+      "consensus_reason": "The answer identifies applicable collision risks instead of explicitly concluding that no collision-causing action is indicated."
+    },
+    {
+      "item": "D238",
+      "scene": "cf652a711c8e40209132036a95162fed",
+      "score": 21.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 26.0,
+      "question_id": "cf652a71-751b62e2-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        26,
+        22,
+        16
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D239",
+      "scene": "c6c092a66329470f836714f46b92d59b",
+      "score": 34.333333333333336,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 36.0,
+      "question_id": "c6c092a6-74f1506f-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        36,
+        34,
+        33
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D240",
+      "scene": "c6c092a66329470f836714f46b92d59b",
+      "score": 20.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 18.0,
+      "question_id": "c6c092a6-74f1506f-593eebb0d1",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        18,
+        26,
+        17
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D241",
+      "scene": "034256c9639044f98da7562ef3de3646",
+      "score": 47.333333333333336,
+      "label": 1,
+      "majority": 1,
+      "score_rep0": 69.0,
+      "question_id": "034256c9-c1101ac4-973db26f3a",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        69,
+        29,
+        44
+      ],
+      "labels": {
+        "akshay": 1
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D242",
+      "scene": "892ed06c432448fe87ecb5d31756f14a",
+      "score": 17.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 9.0,
+      "question_id": "892ed06c-62ac9e73-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        9,
+        20,
+        22
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D243",
+      "scene": "e083627747d8499a8c4e94c7abf941e2",
+      "score": 31.0,
+      "label": 0,
+      "majority": 1,
+      "score_rep0": 26.0,
+      "question_id": "e0836277-00b300ae-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        26,
+        32,
+        35
+      ],
+      "labels": {
+        "akshay": 1
+      },
+      "consensus_reason": "The answer omits maintaining the same speed and does not specify gradual deceleration without braking."
+    },
+    {
+      "item": "D244",
+      "scene": "3ace9decdd1f4ea0915b9862c95ca128",
+      "score": 30.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 27.0,
+      "question_id": "3ace9dec-07822f37-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        27,
+        22,
+        41
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D245",
+      "scene": "034256c9639044f98da7562ef3de3646",
+      "score": 31.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 31.0,
+      "question_id": "034256c9-c1101ac4-f817b08b81",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        31,
+        28,
+        36
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D246",
+      "scene": "3ace9decdd1f4ea0915b9862c95ca128",
+      "score": 59.666666666666664,
+      "label": 0,
+      "majority": 1,
+      "score_rep0": 55.0,
+      "question_id": "3ace9dec-07822f37-886a812bb0",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        55,
+        61,
+        63
+      ],
+      "labels": {
+        "akshay": 1
+      },
+      "consensus_reason": "The answer settles on continuing straight as the most probable action with high probability,"
+    },
+    {
+      "item": "D247",
+      "scene": "97349fd50e694a5f994b0954047b96d0",
+      "score": 24.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 23.0,
+      "question_id": "97349fd5-c42bcde3-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        23,
+        24,
+        25
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D248",
+      "scene": "0b8948ee96ac46faad405bf1ffc70bb1",
+      "score": 14.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 17.0,
+      "question_id": "0b8948ee-ec7523bf-9ffba88e6a",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        17,
+        12,
+        14
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D249",
+      "scene": "928ee3a8c5a84497a6360fe70a4e921e",
+      "score": 50.0,
+      "label": 1,
+      "majority": 1,
+      "score_rep0": 41.0,
+      "question_id": "928ee3a8-78984662-4493ecebcc",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        41,
+        54,
+        55
+      ],
+      "labels": {
+        "akshay": 1
+      },
+      "consensus_reason": "the answer commits to slowing down (decelerating) with a stated high probability, and its yield reason does not contradict avoiding a collision"
+    },
+    {
+      "item": "D250",
+      "scene": "09f67057dd8346388b28f79d9bb1cf04",
+      "score": 52.666666666666664,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 52.0,
+      "question_id": "09f67057-152e3f20-f4a7d05c58",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        52,
+        49,
+        57
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D251",
+      "scene": "52b30ecd104a4f4eab6f8f5684a73e56",
+      "score": 25.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 25.0,
+      "question_id": "52b30ecd-ee45b7c2-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        25,
+        28,
+        23
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D252",
+      "scene": "09f67057dd8346388b28f79d9bb1cf04",
+      "score": 24.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 22.0,
+      "question_id": "09f67057-152e3f20-f4a7d05c58",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        22,
+        22,
+        29
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D253",
+      "scene": "0b8948ee96ac46faad405bf1ffc70bb1",
+      "score": 15.333333333333334,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 12.0,
+      "question_id": "0b8948ee-ec7523bf-6412387f26",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        12,
+        11,
+        23
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D254",
+      "scene": "faa975eaad804c85bd8f2da9b30c8d9a",
+      "score": 34.333333333333336,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 31.0,
+      "question_id": "faa975ea-99bcb061-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        31,
+        43,
+        29
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D255",
+      "scene": "8c84164e752a4ab69d039a07c898f7af",
+      "score": 23.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 22.0,
+      "question_id": "8c84164e-3bf6f0df-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        22,
+        23,
+        24
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D256",
+      "scene": "126aa95f38b649fa857d48672c8ad808",
+      "score": 33.0,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 32.0,
+      "question_id": "126aa95f-71374b6b-6e035aed95",
+      "precision": "int4",
+      "cell": "perception/VQA",
+      "scores": [
+        32,
+        34,
+        33
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D257",
+      "scene": "f4395dd8e4004f12a8dec3079a93d804",
+      "score": 63.666666666666664,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 63.0,
+      "question_id": "f4395dd8-1ddc0dd2-f817b08b81",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        63,
+        68,
+        60
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D258",
+      "scene": "034256c9639044f98da7562ef3de3646",
+      "score": 23.666666666666668,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 29.0,
+      "question_id": "034256c9-c1101ac4-f2825581b4",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        29,
+        26,
+        16
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D259",
+      "scene": "cf652a711c8e40209132036a95162fed",
+      "score": 33.666666666666664,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 35.0,
+      "question_id": "cf652a71-751b62e2-6e035aed95",
+      "precision": "bf16",
+      "cell": "perception/VQA",
+      "scores": [
+        35,
+        29,
+        37
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D260",
+      "scene": "37cfda558193400bbe3a5ff14ae4606e",
+      "score": 40.666666666666664,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 52.0,
+      "question_id": "37cfda55-13b1c7b1-6d50b8055f",
+      "precision": "bf16",
+      "cell": "planning/VQA",
+      "scores": [
+        52,
+        35,
+        35
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D261",
+      "scene": "09f67057dd8346388b28f79d9bb1cf04",
+      "score": 13.666666666666666,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 11.0,
+      "question_id": "09f67057-152e3f20-485af2f04f",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        11,
+        12,
+        18
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    },
+    {
+      "item": "D262",
+      "scene": "4047f251c21a475abb49518e0fa6fa9e",
+      "score": 29.333333333333332,
+      "label": 0,
+      "majority": 0,
+      "score_rep0": 29.0,
+      "question_id": "4047f251-d3ab0416-fcfab66466",
+      "precision": "int4",
+      "cell": "planning/VQA",
+      "scores": [
+        29,
+        34,
+        25
+      ],
+      "labels": {
+        "akshay": 0
+      },
+      "consensus_reason": ""
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+[
+  {"item":"D076","label":0,"reason":"The answer names collision-causing turns and failures to yield instead of concluding that no action leads to a collision.","ambiguous":false},
+  {"item":"D077","label":0,"reason":"The answer omits both slight offsets and does not recommend maintaining the current speed.","ambiguous":false},
+  {"item":"D078","label":0,"reason":"The answer omits maintaining the same speed, turning left, and slightly offsetting left.","ambiguous":false},
+  {"item":"D079","label":0,"reason":"The answer omits the orange car behind and to the right and does not separately identify both reference pedestrians ahead.","ambiguous":false},
+  {"item":"D080","label":0,"reason":"The answer recommends stopping with high probability instead of maintaining the same speed.","ambiguous":false},
+  {"item":"D081","label":0,"reason":"The answer omits gradual deceleration without braking and gentle braking to a stop.","ambiguous":false},
+  {"item":"D082","label":0,"reason":"The answer assigns high likelihood to continuing straight but does not state that the vehicle will maintain the same speed.","ambiguous":false},
+  {"item":"D083","label":0,"reason":"The answer never identifies a sharp left turn as a collision-causing action.","ambiguous":false},
+  {"item":"D084","label":0,"reason":"The answer recommends remaining stationary instead of the reference actions of gradual deceleration without braking and continuing at the same speed.","ambiguous":false},
+  {"item":"D085","label":0,"reason":"The answer recommends maintaining a steady speed and omits gradual deceleration without braking.","ambiguous":false},
+  {"item":"D086","label":0,"reason":"The answer does not identify backing up as a collision-causing action.","ambiguous":false},
+  {"item":"D087","label":0,"reason":"The displayed answer includes neither gradual deceleration without braking nor gentle braking to a stop.","ambiguous":false},
+  {"item":"D088","label":0,"reason":"The answer does not identify a slight left turn as a collision-causing action.","ambiguous":false},
+  {"item":"D089","label":0,"reason":"The answer lists acceleration, sudden braking, and lane changes but omits backing up.","ambiguous":false},
+  {"item":"D090","label":0,"reason":"The answer substitutes signs and a building for the pedestrian and two sedans and gives different actions.","ambiguous":false}
+]

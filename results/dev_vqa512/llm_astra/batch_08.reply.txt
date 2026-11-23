@@ -1,0 +1,17 @@
+[
+  {"item":"D106","label":0,"reason":"The answer does not identify a slight left turn as a collision-causing action.","ambiguous":false},
+  {"item":"D107","label":0,"reason":"The answer recommends moving forward cautiously rather than turning left with high likelihood.","ambiguous":false},
+  {"item":"D108","label":0,"reason":"The answer does not recommend gradual deceleration without braking or maintaining the same speed.","ambiguous":false},
+  {"item":"D109","label":0,"reason":"The answer's generic vehicle descriptions do not separately identify the four required objects with their colours and positions.","ambiguous":false},
+  {"item":"D110","label":0,"reason":"The answer identifies applicable collision-causing actions, contradicting the reference's conclusion that none applies.","ambiguous":false},
+  {"item":"D111","label":0,"reason":"The answer omits the specified black SUV, black unknown object, gray SUV, and orange roadblock with their required positions.","ambiguous":false},
+  {"item":"D112","label":0,"reason":"The answer omits the moderate right turn and concludes that the ego vehicle's actions do not lead to a collision.","ambiguous":false},
+  {"item":"D113","label":0,"reason":"The answer does not recommend turning right or moving slightly to the right.","ambiguous":false},
+  {"item":"D114","label":0,"reason":"The answer omits both specified pedestrians and does not identify the required vehicles with their colours and positions.","ambiguous":false},
+  {"item":"D115","label":0,"reason":"The answer recommends stopping and omits the required gradual deceleration without braking and maintenance of current speed.","ambiguous":false},
+  {"item":"D116","label":0,"reason":"The answer does not identify the white small car ahead or the red small car to the front right.","ambiguous":false},
+  {"item":"D117","label":0,"reason":"The generic mention of motorcycles and cars does not separately match the five required objects with their specified colours and positions.","ambiguous":false},
+  {"item":"D118","label":0,"reason":"The answer substitutes a pedestrian, barrier, and building for the required ordered sedan, worker, and man.","ambiguous":false},
+  {"item":"D119","label":0,"reason":"The answer identifies acceleration as a collision-causing action and asserts collision risk, contradicting the reference.","ambiguous":false},
+  {"item":"D120","label":0,"reason":"The answer does not identify the required white SUV behind, white motorhome to the front right, black sedan ahead, or red light ahead.","ambiguous":false}
+]

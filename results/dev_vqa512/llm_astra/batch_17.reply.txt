@@ -1,0 +1,17 @@
+[
+  {"item":"D241","label":1,"reason":"The answer identifies turning right as collision-causing, although whether this sufficiently specifies a moderate right turn is open.","ambiguous":true},
+  {"item":"D242","label":0,"reason":"The answer recommends stopping and omits maintaining speed and accelerating.","ambiguous":false},
+  {"item":"D243","label":0,"reason":"The answer omits maintaining the same speed and does not specify gradual deceleration without braking.","ambiguous":false},
+  {"item":"D244","label":0,"reason":"The generic descriptions do not individually identify all five reference objects with their required attributes.","ambiguous":false},
+  {"item":"D245","label":0,"reason":"The answer specifies neither gentle braking to a stop nor gradual deceleration without braking.","ambiguous":false},
+  {"item":"D246","label":0,"reason":"The answer selects continuing straight with high likelihood but does not specify maintaining the same speed.","ambiguous":false},
+  {"item":"D247","label":0,"reason":"The answer does not identify the reference's distinct vehicles and orange roadblock with matching colours and positions.","ambiguous":false},
+  {"item":"D248","label":0,"reason":"The answer explicitly describes accelerating forward as having no immediate collision risk instead of identifying it as collision-causing.","ambiguous":false},
+  {"item":"D249","label":0,"reason":"The selected action is slowing down and possibly stopping, which does not clearly establish gradual deceleration without braking.","ambiguous":true},
+  {"item":"D250","label":0,"reason":"Although continuing at the same pace is called most likely, its explicitly moderate probability does not clearly match the reference's high probability.","ambiguous":true},
+  {"item":"D251","label":0,"reason":"The answer omits several required safe actions, including maintaining speed, gradual deceleration without braking, and backing up.","ambiguous":false},
+  {"item":"D252","label":0,"reason":"The conclusion favors braking or slowing down rather than selecting maintaining the current speed with high likelihood.","ambiguous":false},
+  {"item":"D253","label":0,"reason":"The selected action of driving past the truck does not specify the required right turn.","ambiguous":false},
+  {"item":"D254","label":0,"reason":"The answer omits the black commercial vehicle behind and the please-pass object ahead, among other required attributes.","ambiguous":false},
+  {"item":"D255","label":0,"reason":"The answer omits the bicycle and black sedan ahead.","ambiguous":false}
+]

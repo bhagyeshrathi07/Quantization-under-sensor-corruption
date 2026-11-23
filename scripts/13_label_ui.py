@@ -23,6 +23,23 @@ unlabelled item.
 The tool reads nothing but the copy and the guide: no key, no judge records,
 no other person's column. Standard library only; `--check` validates the copy
 and prints the progress without starting a server.
+
+Consensus mode (the discussion among the three humans, after every block is
+committed):
+
+    python scripts/13_label_ui.py --consensus
+
+opens the master sheet instead: every item with its human label (and who gave
+it, from the assignment), the model labellers' labels and one-sentence
+reasons (`manifests/judge_label_sheet_<date>.<model>.csv`,
+`results/dev_vqa512/llm_<model>/labels.json`), the consensus and a comment
+box. The team settles each item: 1 or 0 as the consensus, a comment where it
+differs from the human label (written to `consensus_reason`). "Disagreements
+only" filters to the items where a model differs from the human; "accept the
+human label on every agreed item" fills the rest in one step, as decided on
+November 19. Only the `consensus` and `consensus_reason` columns are written;
+every other column is verified unchanged on read-back. Same lock, backup and
+on-disk checks as labelling.
 """
 import argparse
 import csv
@@ -214,6 +231,161 @@ class Copy:
         self.lock_fh.close()
 
 
+class Master:
+    """The master sheet in consensus mode: every item with its human label,
+    the model labellers' labels and reasons; writes the consensus columns only."""
+
+    def __init__(self, path: Path, assignment: Path | None, models: list[str], records_dir: Path):
+        self.path, self.models = path, models
+        self.lock = threading.Lock()
+        self.lock_path = path.with_name(path.name + ".lock")
+        self.lock_fh = self.lock_path.open("a")
+        try:
+            fcntl.flock(self.lock_fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
+            self.lock_fh.close()
+            raise CopyError(f"{path} is open in another instance of this tool (lock {self.lock_path}); one person records the consensus")
+        text = read_raw(path)
+        self.disk_text = text
+        reader = csv.DictReader(io.StringIO(text, newline=""))
+        self.cols = list(reader.fieldnames or [])
+        for c in (*BLIND_COLUMNS, "consensus", "consensus_reason"):
+            if c not in self.cols:
+                raise CopyError(f"{path}: column {c} missing; this is not the master sheet")
+        self.labellers = [c[len("label_"):] for c in self.cols if c.startswith("label_")]
+        self.rows = [r for r in reader if any((v or "").strip() for v in r.values())]
+        if not self.rows:
+            raise CopyError(f"{path}: no items")
+        pos = {}
+        for i, r in enumerate(self.rows):
+            if not (r.get("item") or "").strip() or r["item"] in pos:
+                raise CopyError(f"{path}: item id missing or repeated ({r.get('item')!r})")
+            pos[r["item"]] = i
+        if serialize(self.rows, self.cols).replace("\r\n", "\n") != text.replace("\r\n", "\n"):
+            raise CopyError(f"{path}: the file does not round-trip through the CSV writer (edited by another program?)")
+        # who labelled each item: the assignment when given, else the one filled label column
+        who = {}
+        if assignment is not None:
+            for n, items in load_assignment(assignment, self.rows, self.labellers).items():
+                for it in items:
+                    who.setdefault(it, []).append(n)
+        self.human = []
+        for r in self.rows:
+            names = who.get(r["item"]) or [n for n in self.labellers if (r.get(label_column(n)) or "").strip()]
+            labels = {n: parse_label(r.get(label_column(n)), f"{path} {r['item']} {n}") for n in names}
+            self.human.append({n: l for n, l in labels.items() if l is not None})
+        self.consensus = [parse_label(r.get("consensus"), f"{path} {r['item']} consensus") for r in self.rows]
+        self.reasons = [(r.get("consensus_reason") or "") for r in self.rows]
+        # the model labellers: their copies (same items, same text) and their reason records
+        self.model_labels = {}
+        for m in models:
+            mp = copy_path(path, m)
+            if not mp.exists():
+                raise CopyError(f"{mp} missing: the model labeller {m} has no copy")
+            mrows, mcols = [], []
+            with mp.open(newline="", encoding="utf-8") as fh:
+                rd = csv.DictReader(fh)
+                mcols = list(rd.fieldnames or [])
+                mrows = [x for x in rd if any((v or "").strip() for v in x.values())]
+            if [x["item"] for x in mrows] != [r["item"] for r in self.rows] or blind_digest(mrows) != blind_digest(self.rows):
+                raise CopyError(f"{mp}: items or displayed text differ from the master sheet")
+            rec_path = records_dir / f"llm_{m}" / "labels.json"
+            recs = json.loads(rec_path.read_text())["items"] if rec_path.exists() else {}
+            self.model_labels[m] = [{"label": parse_label(x.get(label_column(m)), f"{mp} {x['item']} {m}"), "reason": recs.get(x["item"], {}).get("reason", ""), "ambiguous": bool(recs.get(x["item"], {}).get("ambiguous", False))} for x in mrows]
+        self.fixed_digest = self._fixed_digest(self.rows)
+
+    def _fixed_digest(self, rows):
+        h = hashlib.sha256()
+        for r in rows:
+            h.update(json.dumps([r.get(c, "") for c in self.cols if c not in ("consensus", "consensus_reason")], ensure_ascii=False).encode("utf-8"))
+            h.update(b"\n")
+        return h.hexdigest()
+
+    def n_filled(self) -> int:
+        return sum(1 for c in self.consensus if c is not None)
+
+    def item(self, i: int) -> dict:
+        r = self.rows[i]
+        hl = self.human[i]
+        human_label = next(iter(hl.values())) if len(hl) == 1 else None
+        models = {m: self.model_labels[m][i] for m in self.models}
+        disagreement = any(v["label"] != human_label for v in models.values()) if human_label is not None else True
+        return {"index": i, "item": r["item"], "cell": r["cell"], "question": r["question"], "ground_truth": r["ground_truth"], "answer": r["answer"],
+                "human": hl, "human_label": human_label, "models": models, "consensus": self.consensus[i], "reason": self.reasons[i], "disagreement": disagreement}
+
+    def state(self) -> dict:
+        return {"mode": "consensus", "sheet": str(self.path), "n": len(self.rows), "filled": self.n_filled(), "models": self.models, "labellers": self.labellers,
+                "items": [self.item(i) for i in range(len(self.rows))]}
+
+    def set_consensus(self, index: int, label: int | None, reason: str | None) -> dict:
+        """Set the consensus (1, 0, or None to clear) and/or the comment of one item."""
+        with self.lock:
+            if not (0 <= index < len(self.rows)):
+                raise CopyError(f"no item at index {index}")
+            if label not in (0, 1, None):
+                raise CopyError(f"consensus {label!r} is not 0, 1 or empty")
+            old = (self.consensus[index], self.reasons[index])
+            self.consensus[index] = label
+            if reason is not None:
+                self.reasons[index] = reason.replace("\r", " ").replace("\n", " ").strip()[:1000]
+            try:
+                self.write()
+            except Exception:
+                self.consensus[index], self.reasons[index] = old
+                raise
+            return {"item": self.rows[index]["item"], "consensus": label, "reason": self.reasons[index], "filled": self.n_filled(), "n": len(self.rows)}
+
+    def accept_agreed(self) -> dict:
+        """Every item without a consensus where the human and every model agree takes the human label (decision of November 19)."""
+        with self.lock:
+            done = []
+            for i in range(len(self.rows)):
+                it = self.item(i)
+                if self.consensus[i] is None and it["human_label"] is not None and not it["disagreement"]:
+                    self.consensus[i] = it["human_label"]
+                    done.append(self.rows[i]["item"])
+            if done:
+                try:
+                    self.write()
+                except Exception:
+                    for i in range(len(self.rows)):
+                        if self.rows[i]["item"] in set(done):
+                            self.consensus[i] = None
+                    raise
+            return {"accepted": len(done), "filled": self.n_filled(), "n": len(self.rows)}
+
+    def write(self):
+        if read_raw(self.path) != self.disk_text:
+            raise CopyError(f"{self.path} changed on disk since this tool last wrote it; nothing written. Restart the tool.")
+        for r, c, why in zip(self.rows, self.consensus, self.reasons):
+            r["consensus"] = "" if c is None else str(c)
+            r["consensus_reason"] = why
+        text = serialize(self.rows, self.cols)
+        tmp = self.path.with_name(self.path.name + ".tmp")
+        with tmp.open("w", encoding="utf-8", newline="") as fh:
+            fh.write(text)
+            fh.flush()
+            os.fsync(fh.fileno())
+        bak = self.path.with_name(self.path.name + ".bak")
+        shutil.copy2(self.path, bak)
+        os.replace(tmp, self.path)
+        back = read_raw(self.path)
+        rows = list(csv.DictReader(io.StringIO(back, newline="")))
+        if back != text or self._fixed_digest(rows) != self.fixed_digest or [parse_label(r["consensus"], "") for r in rows] != self.consensus:
+            shutil.copy2(bak, self.path)
+            raise CopyError(f"{self.path}: the written file does not read back as intended; restored from {bak}")
+        self.disk_text = text
+
+    def close(self):
+        if self.lock_fh.closed:
+            return
+        try:
+            fcntl.flock(self.lock_fh, fcntl.LOCK_UN)
+        except (OSError, ValueError):
+            pass
+        self.lock_fh.close()
+
+
 def guide_sections(guide: Path) -> dict:
     """{heading: text} for every '## ' section of the guide, plus 'full'."""
     if not guide.exists():
@@ -261,6 +433,10 @@ details .md { max-width: 80ch; }
 .md code { font: 13px ui-monospace, monospace; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
 summary { cursor: pointer; font-weight: 600; }
 mark { background: #ffe58a; color: inherit; padding: 0 2px; border-radius: 2px; }
+table.votes { border-collapse: collapse; width: 100%; font-size: 14px; } table.votes th, table.votes td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.votes td.lab { font-weight: 700; } .consensus-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+.consensus-row textarea { flex: 1 1 320px; font: 14px system-ui, sans-serif; padding: 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); }
+.consensus-row label { flex-basis: 100%; font-size: 13px; color: var(--muted); }
 @media (prefers-color-scheme: dark) { mark { background: #7a5c00; } }
 .bar { position:fixed; left:0; right:0; bottom:0; background:var(--panel); border-top:1px solid var(--line); padding:12px 24px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:center; }
 button { font: 600 18px system-ui, sans-serif; padding: 12px 28px; border-radius:8px; border:2px solid var(--line); background:var(--bg); color:var(--fg); cursor:pointer; }
@@ -280,6 +456,7 @@ kbd { font: 12px ui-monospace, monospace; border:1px solid var(--line); border-r
   <span class="muted">keys: <kbd>1</kbd> correct <kbd>0</kbd> incorrect <kbd>&larr;</kbd> <kbd>&rarr;</kbd> move</span>
   <label class="muted"><input type="checkbox" id="render" checked> render markdown</label>
   <label class="muted"><input type="checkbox" id="hilite" checked> mark reference words in the model answer</label>
+  <label class="muted" id="filter-wrap" hidden><input type="checkbox" id="filter" checked> disagreements only</label>
 </header>
 <main>
   <div class="cell" id="cell"></div>
@@ -288,6 +465,17 @@ kbd { font: 12px ui-monospace, monospace; border:1px solid var(--line); border-r
   <div class="cols">
     <div class="panel"><h3>Reference answer (ground truth)</h3><div class="text" id="gt"></div></div>
     <div class="panel"><h3>Model answer</h3><div class="text" id="answer"></div></div>
+  </div>
+  <div class="panel" id="votes" hidden>
+    <h3>Labels</h3>
+    <table class="votes"><thead><tr><th>who</th><th>label</th><th>reason</th></tr></thead><tbody id="votes-body"></tbody></table>
+    <div class="consensus-row">
+      <label>Comment / reason for the consensus (needed where it differs from the human label):</label>
+      <textarea id="reason" rows="2" placeholder="one line"></textarea>
+      <button class="nav" id="save-reason">save comment</button>
+      <button class="nav" id="clear-consensus" title="remove the consensus of this item">clear consensus</button>
+      <button class="nav" id="accept-agreed" title="every item without a consensus where the human and both models agree takes the human label">accept the human label on every agreed item</button>
+    </div>
   </div>
   <details open><summary>Criterion for this cell</summary><div class="md" id="guide-cell"></div></details>
   <details><summary>Full labelling guide</summary><div class="md" id="guide-full"></div></details>
@@ -301,7 +489,9 @@ kbd { font: 12px ui-monospace, monospace; border:1px solid var(--line); border-r
 </div>
 <script>
 const GUIDE = __GUIDE__;
-let S = null, cur = 0, busy = false, shownAt = 0;
+let S = null, cur = 0, busy = false, shownAt = 0, view = [];  // view: indices of the items shown (consensus mode filters)
+const consensusMode = () => S && S.mode === "consensus";
+function rebuildView() { view = consensusMode() && $("filter").checked ? S.items.map((it, i) => it.disagreement ? i : -1).filter(i => i >= 0) : S.items.map((_, i) => i); if (!view.length) view = S.items.map((_, i) => i); }
 const ARM_MS = 400;  // an item must have been on screen this long before a label is taken
 const $ = id => document.getElementById(id);
 const esc = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -338,7 +528,31 @@ function md(text) {
   flushPara(); closeAll();
   return out.join("\n");
 }
+function renderVotes(it) {
+  const body = $("votes-body"); body.innerHTML = "";
+  const row = (who, label, reason) => { const tr = document.createElement("tr"); const a = document.createElement("td"); a.textContent = who; const b = document.createElement("td"); b.className = "lab"; b.textContent = label === null || label === undefined ? "-" : String(label); const c = document.createElement("td"); c.textContent = reason || ""; tr.append(a, b, c); body.appendChild(tr); };
+  for (const [who, label] of Object.entries(it.human)) row(who + " (human)", label, "");
+  for (const [m, v] of Object.entries(it.models)) row(m, v.label, (v.ambiguous ? "[flagged ambiguous] " : "") + (v.reason || ""));
+  row("consensus", it.consensus, it.reason);
+  $("reason").value = it.reason || "";
+}
 function render() {
+  if (consensusMode()) {
+    const it = S.items[view[cur]];
+    const dis = S.items.filter(x => x.disagreement).length, disDone = S.items.filter(x => x.disagreement && x.consensus !== null).length;
+    $("progress-text").textContent = `consensus ${S.filled} / ${S.n} (disagreements ${disDone} / ${dis}), showing ${cur + 1} of ${view.length}`;
+    $("progress").max = S.n; $("progress").value = S.filled;
+    $("cell").textContent = it.cell; $("item-id").textContent = it.item + (it.disagreement ? "  (model disagrees with the human)" : "  (all agree)");
+    $("question").textContent = it.question; $("gt").textContent = it.ground_truth;
+    if ($("render").checked) { $("answer").className = "md"; $("answer").innerHTML = md(it.answer); } else { $("answer").className = "text"; $("answer").textContent = it.answer; }
+    if ($("hilite").checked) highlight($("answer"), it.ground_truth);
+    $("guide-cell").innerHTML = md(GUIDE[it.cell] || "");
+    renderVotes(it);
+    $("b1").classList.toggle("on", it.consensus === 1); $("b0").classList.toggle("on", it.consensus === 0);
+    $("prev").disabled = cur === 0; $("next").disabled = cur + 1 >= view.length;
+    shownAt = performance.now(); window.scrollTo(0, 0);
+    return;
+  }
   const it = S.items[cur];
   $("progress-text").textContent = `${S.labelled} / ${S.n} labelled, showing item ${cur + 1} of your ${S.n}`;
   $("progress").max = S.n; $("progress").value = S.labelled;
@@ -379,12 +593,52 @@ function highlight(root, gt) {
 function status(msg, err) { const s = $("status"); s.textContent = msg; s.className = err ? "err" : "muted"; }
 async function load() {
   const r = await fetch("/api/state"); S = await r.json();
-  cur = Math.min(S.next, S.n - 1);
   $("guide-full").innerHTML = md(GUIDE.full || "");
+  if (consensusMode()) {
+    $("votes").hidden = false; $("filter-wrap").hidden = false;
+    document.querySelector("header b").textContent = "Consensus";
+    $("b1").innerHTML = "1 &nbsp; consensus: correct"; $("b0").innerHTML = "0 &nbsp; consensus: incorrect";
+    rebuildView(); cur = Math.max(0, view.findIndex(i => S.items[i].consensus === null));
+    render(); return;
+  }
+  cur = Math.min(S.next, S.n - 1);
   render();
   if (S.labelled >= S.n) status("all items labelled");
 }
+async function post(path, body) {
+  const r = await fetch(path, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(body)});
+  const j = await r.json(); if (!r.ok) throw new Error(j.error || "request failed"); return j;
+}
+async function setConsensus(v) {
+  if (busy || !S) return;
+  const i = view[cur], it = S.items[i];
+  busy = true; status("saving…");
+  try {
+    const j = await post("/api/consensus", {index: i, item: it.item, label: v, reason: $("reason").value});
+    it.consensus = j.consensus; it.reason = j.reason; S.filled = j.filled;
+    status(v === null ? "consensus cleared" : "saved");
+    if (v !== null && cur + 1 < view.length) cur += 1;
+    render();
+  } catch (e) { status(e.message, true); }
+  busy = false;
+}
+async function saveReason() {
+  if (busy || !S) return;
+  const i = view[cur], it = S.items[i];
+  busy = true; status("saving…");
+  try { const j = await post("/api/consensus", {index: i, item: it.item, label: it.consensus, reason: $("reason").value}); it.reason = j.reason; status("comment saved"); renderVotes(it); }
+  catch (e) { status(e.message, true); }
+  busy = false;
+}
+async function acceptAgreed() {
+  if (busy || !S) return;
+  busy = true; status("filling…");
+  try { const j = await post("/api/accept-agreed", {}); const r = await fetch("/api/state"); S = await r.json(); rebuildView(); cur = Math.min(cur, view.length - 1); render(); status(`accepted the human label on ${j.accepted} item(s); consensus ${j.filled} / ${j.n}`); }
+  catch (e) { status(e.message, true); }
+  busy = false;
+}
 async function label(v) {
+  if (consensusMode()) return setConsensus(v);
   if (busy || !S) return;
   if (performance.now() - shownAt < ARM_MS) { status("read the item first"); return; }
   const it = S.items[cur];
@@ -403,10 +657,12 @@ async function label(v) {
   } catch (e) { status("save failed: " + e, true); }
   busy = false;
 }
-function move(d) { if (!S || busy) return; const n = cur + d; if (n < 0 || n >= S.n || n > S.labelled) return; cur = n; status(""); render(); }
+function move(d) { if (!S || busy) return; const n = cur + d; if (consensusMode()) { if (n < 0 || n >= view.length) return; cur = n; status(""); render(); return; } if (n < 0 || n >= S.n || n > S.labelled) return; cur = n; status(""); render(); }
 $("b1").onclick = () => label(1); $("b0").onclick = () => label(0);
 $("prev").onclick = () => move(-1); $("next").onclick = () => move(1);
 $("render").onchange = () => { if (S) render(); };
+$("filter").onchange = () => { if (S) { rebuildView(); cur = 0; render(); } };
+$("save-reason").onclick = saveReason; $("clear-consensus").onclick = () => setConsensus(null); $("accept-agreed").onclick = acceptAgreed;
 $("hilite").onchange = () => { if (S) render(); };
 document.addEventListener("keydown", e => {
   if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
@@ -445,11 +701,28 @@ def make_handler(copy: Copy, page: str):
                 self._json(404, {"error": "not found"})
 
         def do_POST(self):
-            if self.path != "/api/label":
-                return self._json(404, {"error": "not found"})
             try:
                 n = int(self.headers.get("Content-Length") or 0)
                 body = json.loads(self.rfile.read(n) or b"{}")
+            except (ValueError, json.JSONDecodeError) as e:
+                return self._json(400, {"error": str(e)})
+            if isinstance(copy, Master):
+                try:
+                    if self.path == "/api/accept-agreed":
+                        return self._json(200, copy.accept_agreed())
+                    if self.path != "/api/consensus":
+                        return self._json(404, {"error": "not found"})
+                    index, label, item, reason = body.get("index"), body.get("label"), body.get("item"), body.get("reason")
+                    if not isinstance(index, int) or isinstance(index, bool) or (label is not None and (not isinstance(label, int) or isinstance(label, bool))):
+                        return self._json(400, {"error": "index must be an integer and label 0, 1 or null"})
+                    if item is not None and (not 0 <= index < len(copy.rows) or copy.rows[index]["item"] != item):
+                        return self._json(409, {"error": f"item {item} is not at index {index}; reload the page"})
+                    return self._json(200, copy.set_consensus(index, label, reason if isinstance(reason, str) else None))
+                except (CopyError, CalibrationError) as e:
+                    return self._json(409, {"error": str(e)})
+            if self.path != "/api/label":
+                return self._json(404, {"error": "not found"})
+            try:
                 index, label, item = body.get("index"), body.get("label"), body.get("item")
                 if not isinstance(index, int) or isinstance(index, bool) or not isinstance(label, int) or isinstance(label, bool):
                     return self._json(400, {"error": "index and label must be integers"})
@@ -458,8 +731,6 @@ def make_handler(copy: Copy, page: str):
                 self._json(200, copy.set_label(index, label))
             except (CopyError, CalibrationError) as e:
                 self._json(409, {"error": str(e)})
-            except (ValueError, json.JSONDecodeError) as e:
-                self._json(400, {"error": str(e)})
     return Handler
 
 
@@ -467,8 +738,8 @@ def build_page(labeller: str, guide: Path) -> str:
     return PAGE.replace("__LABELLER__", html.escape(labeller)).replace("__GUIDE__", json.dumps(guide_sections(guide), ensure_ascii=False).replace("</", "<\\/"))
 
 
-def serve(copy: Copy, guide: Path, host: str = "127.0.0.1", port: int = 8765) -> ThreadingHTTPServer:
-    return ThreadingHTTPServer((host, port), make_handler(copy, build_page(copy.labeller, guide)))
+def serve(copy, guide: Path, host: str = "127.0.0.1", port: int = 8765) -> ThreadingHTTPServer:
+    return ThreadingHTTPServer((host, port), make_handler(copy, build_page(getattr(copy, "labeller", "consensus"), guide)))
 
 
 def open_browser(url: str) -> None:
@@ -489,7 +760,10 @@ def open_browser(url: str) -> None:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--labeller", required=True, help="your name as on the sheet, e.g. ronak")
+    ap.add_argument("--labeller", help="your name as on the sheet, e.g. ronak (labelling mode)")
+    ap.add_argument("--consensus", action="store_true", help="discussion mode on the master sheet: human and model labels side by side, consensus and comment per item")
+    ap.add_argument("--models", nargs="*", default=["fable", "astra"], help="model labellers shown in consensus mode (their copies and records must exist)")
+    ap.add_argument("--records-dir", default="results/dev_vqa512", help="where llm_<model>/labels.json live")
     ap.add_argument("--sheet", default=DEFAULT_SHEET, help="the master sheet; the copy is <sheet>.<labeller>.csv")
     ap.add_argument("--copy", help="the copy to label (default: next to --sheet)")
     ap.add_argument("--assignment", help="who labels which items (scripts/15_label_assignment.py); default: the sheet's <stem>.assignment.json when it exists; 'none' to label every item")
@@ -498,6 +772,10 @@ def main():
     ap.add_argument("--no-browser", action="store_true")
     ap.add_argument("--check", action="store_true", help="validate the copy and print the progress; no server")
     args = ap.parse_args()
+    if args.consensus:
+        return consensus_main(args)
+    if not args.labeller:
+        sys.exit("--labeller <name> (labelling) or --consensus (discussion) is required")
     path = Path(args.copy) if args.copy else copy_path(Path(args.sheet), args.labeller)
     if not path.exists():
         sys.exit(f"{path} not found; your copy is written by scripts/10_build_label_sheet.py --copies and committed with the sheet")
@@ -531,6 +809,41 @@ def main():
         server.server_close()
         copy.close()
         print(f"\n{path}: {copy.n_labelled()} / {copy.n_items()} labelled")
+
+
+def consensus_main(args):
+    sheet = Path(args.sheet)
+    if not sheet.exists():
+        sys.exit(f"{sheet} not found")
+    assignment = default_assignment(sheet) if args.assignment is None else (None if args.assignment == "none" else Path(args.assignment))
+    try:
+        master = Master(sheet, assignment, list(args.models), Path(args.records_dir))
+    except (CopyError, CalibrationError) as e:
+        sys.exit(str(e))
+    items = [master.item(i) for i in range(len(master.rows))]
+    dis = sum(1 for it in items if it["disagreement"])
+    print(f"{sheet}: {len(items)} items, consensus on {master.n_filled()}, {dis} item(s) where a model disagrees with the human (models {', '.join(args.models)})")
+    if args.check:
+        master.close()
+        return
+    guide = Path(args.guide)
+    try:
+        server = serve(master, guide, port=args.port)
+    except OSError as e:
+        master.close()
+        sys.exit(f"cannot listen on port {args.port}: {e} (another copy of the tool running? use --port)")
+    url = f"http://127.0.0.1:{args.port}/"
+    print(f"consensus mode at {url} (Ctrl+C to stop; every consensus and comment is saved when you press it)")
+    if not args.no_browser:
+        open_browser(url)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()
+        master.close()
+        print(f"\n{sheet}: consensus on {master.n_filled()} / {len(master.rows)}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,17 @@
+[
+{"item": "D016", "label": 0, "reason": "None of the four reference objects (brown SUV, two pedestrians, white commercial vehicle) appears; the answer lists only generic vehicles and says pedestrians 'may be present'.", "ambiguous": false},
+{"item": "D017", "label": 0, "reason": "The white truck, silver sedan and white sedan are all missing; the answer names only unspecified parked cars and a bus.", "ambiguous": false},
+{"item": "D018", "label": 0, "reason": "The two gray sedans and the black SUV are not identifiable; the answer gives only generic 'trucks and cars' with no colour or position.", "ambiguous": false},
+{"item": "D019", "label": 0, "reason": "The recommended action (stop) matches remaining stationary in meaning, but the stated probability is high while the reference says low, so the probability points the other way.", "ambiguous": false},
+{"item": "D020", "label": 0, "reason": "The reference's 'slightly offset to the left' is absent from the recommended actions; only gradual slowing and stopping is covered.", "ambiguous": false},
+{"item": "D021", "label": 0, "reason": "The brown sedan to the back and the pedestrian with a yellow hat are not matched (only generic pedestrians), and the white landmark line is missing.", "ambiguous": false},
+{"item": "D022", "label": 0, "reason": "The answer recommends remaining stationary at a red light, contradicting the reference's keep going at the same speed, accelerate and proceed.", "ambiguous": false},
+{"item": "D023", "label": 0, "reason": "The first object is parked vehicles rather than the white truck, the order is shifted, the silver sedan is absent, and the pedestrian action is stop rather than continue at the same speed.", "ambiguous": false},
+{"item": "D024", "label": 0, "reason": "Neither keeping the same speed nor accelerating is recommended; the answer instead advises reducing speed and being prepared to stop.", "ambiguous": false},
+{"item": "D025", "label": 0, "reason": "The answer recommends braking to a stop but omits the reference's 'slightly offset to the left'.", "ambiguous": false},
+{"item": "D026", "label": 0, "reason": "The pedestrian in red clothes, the red car and the three white sedans are all missing; the answer gives only generic parked cars and one moving vehicle.", "ambiguous": false},
+{"item": "D027", "label": 0, "reason": "Backing up/reversing is never named as a collision-causing action; the answer only lists avoidance measures while driving forward.", "ambiguous": false},
+{"item": "D028", "label": 0, "reason": "The reference action 'decelerate gradually without braking' is absent; the answer recommends continuing straight and maintaining speed.", "ambiguous": false},
+{"item": "D029", "label": 0, "reason": "The gray sedan to the back right is not identifiable among generic parked cars and the left-turn landmark line is missing; only the bus is loosely matched.", "ambiguous": false},
+{"item": "D030", "label": 0, "reason": "The answer settles on yielding to an approaching car as the most probable action, which differs from the reference's keep going at the same speed.", "ambiguous": false}
+]

@@ -1,0 +1,17 @@
+[
+  {"item":"D031","label":0,"reason":"The answer omits maintaining the same speed and both slight lateral offsets.","ambiguous":false},
+  {"item":"D032","label":0,"reason":"The answer recommends stopping but does not specify both gentle braking to a stop and sudden braking.","ambiguous":false},
+  {"item":"D033","label":0,"reason":"The answer omits turning right and slightly offsetting to the right.","ambiguous":false},
+  {"item":"D034","label":0,"reason":"The answer does not identify a slight right turn as a collision-causing action.","ambiguous":false},
+  {"item":"D035","label":0,"reason":"The answer describes a potential collision requiring evasive action instead of concluding that no collision-causing action applies.","ambiguous":false},
+  {"item":"D036","label":0,"reason":"The answer recommends continuing straight without specifying maintaining the same speed and explicitly assigns moderate probability rather than high.","ambiguous":false},
+  {"item":"D037","label":0,"reason":"The answer does not identify sudden braking as a collision-causing action.","ambiguous":false},
+  {"item":"D038","label":0,"reason":"The answer recommends stopping rather than keeping the same speed.","ambiguous":false},
+  {"item":"D039","label":0,"reason":"The answer recommends reducing speed and omits both slight lateral offsets.","ambiguous":false},
+  {"item":"D040","label":0,"reason":"The generic vehicle descriptions do not separately identify the two gray sedans and black SUV with their required positions and colors.","ambiguous":false},
+  {"item":"D041","label":0,"reason":"The answer does not separately identify the four reference vehicles with their required categories, colors, and positions.","ambiguous":false},
+  {"item":"D042","label":0,"reason":"The answer recommends maintaining speed instead of gradually decelerating without braking.","ambiguous":false},
+  {"item":"D043","label":0,"reason":"The answer omits the described pedestrian and does not separately identify all reference vehicles and the cyclist with their required attributes.","ambiguous":false},
+  {"item":"D044","label":0,"reason":"Although following a steadily moving truck could suggest constant speed, the answer does not clearly recommend maintaining the ego vehicle's current speed.","ambiguous":true},
+  {"item":"D045","label":0,"reason":"The answer does not recommend gradual deceleration without braking or explicitly maintaining the same speed.","ambiguous":false}
+]

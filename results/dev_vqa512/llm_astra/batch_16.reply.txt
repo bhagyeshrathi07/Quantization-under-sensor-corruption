@@ -1,0 +1,17 @@
+[
+  {"item":"D226","label":0,"reason":"The answer replaces the required pedestrian and two sedans with a sign, slope, and building.","ambiguous":false},
+  {"item":"D227","label":0,"reason":"The answer assigns high likelihood to continuing straight but does not state that the ego vehicle will maintain its current speed.","ambiguous":false},
+  {"item":"D228","label":0,"reason":"The answer recommends stopping instead of maintaining the current speed and gives a probability for the light changing rather than the chosen action.","ambiguous":false},
+  {"item":"D229","label":1,"reason":"The answer explicitly identifies abrupt braking as a collision-causing action, matching the reference.","ambiguous":false},
+  {"item":"D230","label":0,"reason":"The conclusion offers maintaining speed or accelerating as alternatives without settling on the reference action.","ambiguous":false},
+  {"item":"D231","label":0,"reason":"The answer does not identify a moderate right turn as a collision-causing action.","ambiguous":false},
+  {"item":"D232","label":0,"reason":"The answer recommends stopping rather than gradually decelerating without braking.","ambiguous":false},
+  {"item":"D233","label":0,"reason":"The answer names acceleration and turning left as dangerous actions but omits backing up.","ambiguous":false},
+  {"item":"D234","label":0,"reason":"The answer omits the required sequence of trash can, stationary bicycle, and moving black sedan.","ambiguous":false},
+  {"item":"D235","label":0,"reason":"The generic object list does not separately identify the reference objects with their required categories, colours, and positions.","ambiguous":false},
+  {"item":"D236","label":0,"reason":"The answer substitutes a pedestrian crossing sign for the left turn marking and recommends yielding to the bus instead of continuing at the same speed.","ambiguous":false},
+  {"item":"D237","label":0,"reason":"The answer identifies applicable collision risks instead of explicitly concluding that no collision-causing action is indicated.","ambiguous":false},
+  {"item":"D238","label":0,"reason":"The answer omits both turning left and gradually decelerating without braking from its safe-action recommendations.","ambiguous":false},
+  {"item":"D239","label":0,"reason":"The answer omits gently braking to a stop and gradually decelerating without braking, both of which are required reference actions.","ambiguous":false},
+  {"item":"D240","label":0,"reason":"The answer recommends stopping with high probability instead of gradually decelerating without braking.","ambiguous":false}
+]

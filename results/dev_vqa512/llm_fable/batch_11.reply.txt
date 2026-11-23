@@ -1,0 +1,17 @@
+[
+{"item": "D151", "label": 0, "reason": "The answer settles on parking in an adjacent space, a different action from the reference's keep going at the same speed.", "ambiguous": false},
+{"item": "D152", "label": 0, "reason": "The answer recommends continuing straight with high probability, not the reference's decelerate gradually without braking.", "ambiguous": false},
+{"item": "D153", "label": 0, "reason": "The reference action of keeping the same speed with a slight rightward offset is absent; the answer instead recommends braking if necessary and proceeding cautiously.", "ambiguous": false},
+{"item": "D154", "label": 0, "reason": "None of the four reference vehicles (white truck back, white sedan front left, brown car back, white sedan back left) appears; the answer only gives a generic 'vehicles' and 'parked cars'.", "ambiguous": false},
+{"item": "D155", "label": 0, "reason": "The action (stop and wait) matches remaining stationary, but the answer states a high probability where the reference says low, pointing the other way.", "ambiguous": false},
+{"item": "D156", "label": 0, "reason": "The white SUV to the front and the white truck to the back left are missing, and the bus is placed approaching from the opposite direction rather than behind.", "ambiguous": false},
+{"item": "D157", "label": 0, "reason": "The answer settles on accelerating cautiously with moderate probability, not keeping the same speed with high probability.", "ambiguous": false},
+{"item": "D158", "label": 0, "reason": "The answer settles on continuing straight at high probability, not the reference's gradual deceleration without braking.", "ambiguous": false},
+{"item": "D159", "label": 0, "reason": "The white SUV behind, white motorhome front right, black sedan ahead and red light are all missing; the answer lists bicycles, a bus and generic other vehicles.", "ambiguous": false},
+{"item": "D160", "label": 0, "reason": "The answer recommends stopping and waiting at a red light, which contradicts the reference's keep going at the same speed.", "ambiguous": false},
+{"item": "D161", "label": 1, "reason": "The answer settles on continuing straight at the current speed and assigns it high probability, matching the reference's action and direction, with the alternatives left as lower-probability contingencies.", "ambiguous": true},
+{"item": "D162", "label": 0, "reason": "The pedestrian in red, the red car and the three white sedans with positions are all missing; the answer gives only generic parked cars.", "ambiguous": false},
+{"item": "D163", "label": 0, "reason": "The answer recommends slowing down with high probability and rates maintaining the current speed as low, contradicting the reference.", "ambiguous": false},
+{"item": "D164", "label": 0, "reason": "The black sedan front right, silver sedan behind and white sedan behind are missing; only motorcycles are named, and as parked on the roadside.", "ambiguous": false},
+{"item": "D165", "label": 0, "reason": "The answer names a wall, a gate and a trash bin instead of the reference's trash can, bicycle and black sedan in that order, and gives no continue-ahead actions.", "ambiguous": false}
+]

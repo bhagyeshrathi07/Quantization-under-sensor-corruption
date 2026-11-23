@@ -193,7 +193,7 @@ def test_copy_is_validated_before_serving(tmp_path):
         real = ROOT / "manifests" / f"judge_label_sheet_2026-11-17.{name}.csv"
         if real.exists():
             try:
-                c = ui.Copy(real, name)
+                c = ui.Copy(real, name, ui.default_assignment(real.with_name("judge_label_sheet_2026-11-17.csv")))  # the real copies follow the sheet's assignment
             except ui.CopyError as e:
                 if "another instance" in str(e):
                     continue  # that labeller has the tool open right now; their copy is theirs

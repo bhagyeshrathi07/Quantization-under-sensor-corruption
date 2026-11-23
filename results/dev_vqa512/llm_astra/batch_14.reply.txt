@@ -1,0 +1,17 @@
+[
+  {"item":"D196","label":0,"reason":"The answer omits maintaining the same speed and slightly offsetting to the right, and does not specify gradual deceleration without braking.","ambiguous":false},
+  {"item":"D197","label":0,"reason":"The answer recommends stopping or slowing down instead of turning right with high probability.","ambiguous":false},
+  {"item":"D198","label":0,"reason":"The answer recommends stopping and omits both gradual deceleration without braking and continuing at the same speed.","ambiguous":false},
+  {"item":"D199","label":0,"reason":"The answer names different objects in the three positions and does not match the required states and actions.","ambiguous":false},
+  {"item":"D200","label":0,"reason":"The answer selects stopping with high probability instead of maintaining the same speed.","ambiguous":false},
+  {"item":"D201","label":0,"reason":"The answer names several applicable collision-causing actions instead of concluding that none leads to a collision.","ambiguous":false},
+  {"item":"D202","label":0,"reason":"The answer recommends adjusting speed instead of keeping the same speed.","ambiguous":false},
+  {"item":"D203","label":0,"reason":"The answer identifies acceleration as a collision risk but does not clearly identify going straight as part of the collision-causing action.","ambiguous":true},
+  {"item":"D204","label":0,"reason":"The answer gives a different ordered set of objects and mismatching states and actions.","ambiguous":false},
+  {"item":"D205","label":0,"reason":"The answer discusses high speed and proximity to a tree without identifying accelerating and going straight as collision-causing actions.","ambiguous":false},
+  {"item":"D206","label":0,"reason":"The answer explicitly names applicable collision-causing actions and never concludes that no such action is indicated.","ambiguous":false},
+  {"item":"D207","label":0,"reason":"The answer selects continuing straight with high probability but omits gradual deceleration without braking.","ambiguous":false},
+  {"item":"D208","label":0,"reason":"The answer recommends stopping and waiting rather than the reference's actions of maintaining speed and decelerating gradually without braking.","ambiguous":false},
+  {"item":"D209","label":0,"reason":"The answer omits the required braking, gradual deceleration without braking, and reversing options, and advises avoiding sudden deceleration.","ambiguous":false},
+  {"item":"D210","label":0,"reason":"The answer includes maintaining speed but does not specify the required gradual deceleration without braking.","ambiguous":false}
+]

@@ -1,0 +1,17 @@
+[
+  {"item":"D166","label":1,"reason":"The answer settles on stopping to follow traffic rules and explicitly gives a high likelihood, though stopping is not precisely the same as remaining stationary.","ambiguous":true},
+  {"item":"D167","label":0,"reason":"The answer recommends reducing speed and omits the required left turn and slight left offset.","ambiguous":false},
+  {"item":"D168","label":0,"reason":"The generic vehicle list does not identify each of the four required objects with its colour and position.","ambiguous":false},
+  {"item":"D169","label":0,"reason":"The answer names speeding and other hazards but does not identify accelerating and going straight as collision-causing actions.","ambiguous":false},
+  {"item":"D170","label":0,"reason":"The answer omits the white truck and does not supply the required colour and position details for the sedan and person.","ambiguous":false},
+  {"item":"D171","label":0,"reason":"The answer omits sudden braking and instead concludes that the ego vehicle's actions do not lead to a collision.","ambiguous":false},
+  {"item":"D172","label":0,"reason":"The answer omits both required slight offsets to the left and right.","ambiguous":false},
+  {"item":"D173","label":0,"reason":"The answer gives different objects, states, and actions from the required ordered sequence.","ambiguous":false},
+  {"item":"D174","label":0,"reason":"The answer names applicable collision-causing actions instead of concluding that none applies.","ambiguous":false},
+  {"item":"D175","label":0,"reason":"The answer gives a high likelihood of continuing straight but does not recommend maintaining the same speed.","ambiguous":false},
+  {"item":"D176","label":0,"reason":"The answer does not identify a slight left turn as a collision-causing action.","ambiguous":false},
+  {"item":"D177","label":0,"reason":"The answer discusses actions of the other vehicle and omits backing up by the ego vehicle.","ambiguous":false},
+  {"item":"D178","label":0,"reason":"The answer recommends remaining stationary and later accelerating instead of maintaining speed and decelerating gradually without braking.","ambiguous":false},
+  {"item":"D179","label":0,"reason":"The answer recommends stopping and waiting rather than keeping the same speed.","ambiguous":false},
+  {"item":"D180","label":0,"reason":"The answer identifies generic turning as dangerous but does not specify the required moderate left turn.","ambiguous":false}
+]

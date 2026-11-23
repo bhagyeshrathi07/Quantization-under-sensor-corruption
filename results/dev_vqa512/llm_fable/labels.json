@@ -1,0 +1,1583 @@
+{
+  "labeller": "fable",
+  "sheet": "manifests/judge_label_sheet_2026-11-17.csv",
+  "guide": "manifests/labelling_guide.md",
+  "guide_sha256": "9be8587189bb36708791260d7799806bab30a5087d3368023cc99043c00250a2",
+  "created": "2026-11-19T22:53:18+00:00",
+  "backend": null,
+  "effort": null,
+  "items": {
+    "D001": {
+      "label": 0,
+      "reason": "The answer's first object is parked vehicles on the right, not the white truck, the pedestrians come third instead of second, the silver sedan is absent, and it recommends slowing down where the reference says continue at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_01.reply.txt"
+    },
+    "D002": {
+      "label": 0,
+      "reason": "Neither braking gently to a stop nor braking suddenly is recommended as an action; the answer only says be prepared to stop and recommends maintaining speed, which contradicts the reference.",
+      "ambiguous": false,
+      "reply": "batch_01.reply.txt"
+    },
+    "D003": {
+      "label": 0,
+      "reason": "The answer settles on staying in the current lane with a high probability of needing to brake rather than committing to keeping the same speed, so the reference action is not the recommended one.",
+      "ambiguous": true,
+      "reply": "batch_01.reply.txt"
+    },
+    "D004": {
+      "label": 0,
+      "reason": "The reference's collision-causing action, a slight left turn, does not appear; the answer names turning right and speeding instead.",
+      "ambiguous": false,
+      "reply": "batch_01.reply.txt"
+    },
+    "D005": {
+      "label": 0,
+      "reason": "The silver truck is present but the black sedan to the front and the woman in blue jeans are not recognizable by category, colour or position among the generic cars and pedestrians listed.",
+      "ambiguous": false,
+      "reply": "batch_01.reply.txt"
+    },
+    "D006": {
+      "label": 0,
+      "reason": "The answer recommends reducing speed, which contradicts the reference's keep going at the same speed, and the reference action is absent.",
+      "ambiguous": false,
+      "reply": "batch_01.reply.txt"
+    },
+    "D007": {
+      "label": 0,
+      "reason": "The recommended action is to park, not to keep going at the same speed, so the action is different.",
+      "ambiguous": false,
+      "reply": "batch_01.reply.txt"
+    },
+    "D008": {
+      "label": 0,
+      "reason": "Only one car ahead is named; the black sedan to the back of the ego vehicle is missing and no colour confirms either sedan.",
+      "ambiguous": false,
+      "reply": "batch_01.reply.txt"
+    },
+    "D009": {
+      "label": 0,
+      "reason": "The answer concludes that no ego action leads to a collision with the bus, and backing up is never named as a collision-causing action.",
+      "ambiguous": false,
+      "reply": "batch_01.reply.txt"
+    },
+    "D010": {
+      "label": 0,
+      "reason": "The answer's objects are parked vehicles with buildings, a wall and trucks near a warehouse, not the black SUV and two gray sedans, and it recommends slowing down against the reference's continue at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_01.reply.txt"
+    },
+    "D011": {
+      "label": 0,
+      "reason": "Stopping at the red light matches braking gently to a stop, but slightly offsetting to the left is missing from the recommendations.",
+      "ambiguous": false,
+      "reply": "batch_01.reply.txt"
+    },
+    "D012": {
+      "label": 0,
+      "reason": "The answer settles on braking and stopping with high probability and gives continuing a low probability, the opposite of the reference's keep going at the same speed with high probability.",
+      "ambiguous": false,
+      "reply": "batch_01.reply.txt"
+    },
+    "D013": {
+      "label": 0,
+      "reason": "The silver pickup truck, the black SUV, the checkered-clothes pedestrians and the red light are not recognizable among the generic vehicles, pedestrians and traffic lights listed.",
+      "ambiguous": false,
+      "reply": "batch_01.reply.txt"
+    },
+    "D014": {
+      "label": 0,
+      "reason": "Turning left is absent and the answer recommends maintaining a steady speed, which contradicts decelerating gradually.",
+      "ambiguous": false,
+      "reply": "batch_01.reply.txt"
+    },
+    "D015": {
+      "label": 0,
+      "reason": "The silver sedan, the white truck and the crossing pedestrians are not recognizable by colour or position among the generic vehicles and pedestrians listed.",
+      "ambiguous": false,
+      "reply": "batch_01.reply.txt"
+    },
+    "D016": {
+      "label": 0,
+      "reason": "None of the four reference objects (brown SUV, two pedestrians, white commercial vehicle) appears; the answer lists only generic vehicles and says pedestrians 'may be present'.",
+      "ambiguous": false,
+      "reply": "batch_02.reply.txt"
+    },
+    "D017": {
+      "label": 0,
+      "reason": "The white truck, silver sedan and white sedan are all missing; the answer names only unspecified parked cars and a bus.",
+      "ambiguous": false,
+      "reply": "batch_02.reply.txt"
+    },
+    "D018": {
+      "label": 0,
+      "reason": "The two gray sedans and the black SUV are not identifiable; the answer gives only generic 'trucks and cars' with no colour or position.",
+      "ambiguous": false,
+      "reply": "batch_02.reply.txt"
+    },
+    "D019": {
+      "label": 0,
+      "reason": "The recommended action (stop) matches remaining stationary in meaning, but the stated probability is high while the reference says low, so the probability points the other way.",
+      "ambiguous": false,
+      "reply": "batch_02.reply.txt"
+    },
+    "D020": {
+      "label": 0,
+      "reason": "The reference's 'slightly offset to the left' is absent from the recommended actions; only gradual slowing and stopping is covered.",
+      "ambiguous": false,
+      "reply": "batch_02.reply.txt"
+    },
+    "D021": {
+      "label": 0,
+      "reason": "The brown sedan to the back and the pedestrian with a yellow hat are not matched (only generic pedestrians), and the white landmark line is missing.",
+      "ambiguous": false,
+      "reply": "batch_02.reply.txt"
+    },
+    "D022": {
+      "label": 0,
+      "reason": "The answer recommends remaining stationary at a red light, contradicting the reference's keep going at the same speed, accelerate and proceed.",
+      "ambiguous": false,
+      "reply": "batch_02.reply.txt"
+    },
+    "D023": {
+      "label": 0,
+      "reason": "The first object is parked vehicles rather than the white truck, the order is shifted, the silver sedan is absent, and the pedestrian action is stop rather than continue at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_02.reply.txt"
+    },
+    "D024": {
+      "label": 0,
+      "reason": "Neither keeping the same speed nor accelerating is recommended; the answer instead advises reducing speed and being prepared to stop.",
+      "ambiguous": false,
+      "reply": "batch_02.reply.txt"
+    },
+    "D025": {
+      "label": 0,
+      "reason": "The answer recommends braking to a stop but omits the reference's 'slightly offset to the left'.",
+      "ambiguous": false,
+      "reply": "batch_02.reply.txt"
+    },
+    "D026": {
+      "label": 0,
+      "reason": "The pedestrian in red clothes, the red car and the three white sedans are all missing; the answer gives only generic parked cars and one moving vehicle.",
+      "ambiguous": false,
+      "reply": "batch_02.reply.txt"
+    },
+    "D027": {
+      "label": 0,
+      "reason": "Backing up/reversing is never named as a collision-causing action; the answer only lists avoidance measures while driving forward.",
+      "ambiguous": false,
+      "reply": "batch_02.reply.txt"
+    },
+    "D028": {
+      "label": 0,
+      "reason": "The reference action 'decelerate gradually without braking' is absent; the answer recommends continuing straight and maintaining speed.",
+      "ambiguous": false,
+      "reply": "batch_02.reply.txt"
+    },
+    "D029": {
+      "label": 0,
+      "reason": "The gray sedan to the back right is not identifiable among generic parked cars and the left-turn landmark line is missing; only the bus is loosely matched.",
+      "ambiguous": false,
+      "reply": "batch_02.reply.txt"
+    },
+    "D030": {
+      "label": 0,
+      "reason": "The answer settles on yielding to an approaching car as the most probable action, which differs from the reference's keep going at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_02.reply.txt"
+    },
+    "D031": {
+      "label": 0,
+      "reason": "None of the reference actions (keep going at the same speed, offset left, offset right) is among the recommendations; the answer gives only general advice.",
+      "ambiguous": false,
+      "reply": "batch_03.reply.txt"
+    },
+    "D032": {
+      "label": 0,
+      "reason": "The answer recommends coming to a stop, which covers braking gently to a stop, but the reference's second action, brake suddenly, is absent and the answer is cut off before completing.",
+      "ambiguous": true,
+      "reply": "batch_03.reply.txt"
+    },
+    "D033": {
+      "label": 0,
+      "reason": "The reference actions turn right and offset to the right are absent; the answer recommends reducing speed and avoiding sharp turns.",
+      "ambiguous": false,
+      "reply": "batch_03.reply.txt"
+    },
+    "D034": {
+      "label": 0,
+      "reason": "The reference's collision-causing action, a slight right turn, does not appear; the answer names remaining stationary instead.",
+      "ambiguous": false,
+      "reply": "batch_03.reply.txt"
+    },
+    "D035": {
+      "label": 0,
+      "reason": "The reference says no action leads to a collision, but the answer treats the object as a collision risk and recommends braking or turning, with no conclusion that no collision-causing action applies.",
+      "ambiguous": false,
+      "reply": "batch_03.reply.txt"
+    },
+    "D036": {
+      "label": 1,
+      "reason": "The answer settles on continuing straight as the most probable action, matching keep going at the same speed, though it then calls the probability moderate rather than high.",
+      "ambiguous": true,
+      "reply": "batch_03.reply.txt"
+    },
+    "D037": {
+      "label": 0,
+      "reason": "The reference's collision-causing action, braking suddenly, is absent; the answer only says continuing without yielding is risky and recommends slowing down.",
+      "ambiguous": false,
+      "reply": "batch_03.reply.txt"
+    },
+    "D038": {
+      "label": 0,
+      "reason": "The answer recommends stopping, the opposite of the reference's keep going at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_03.reply.txt"
+    },
+    "D039": {
+      "label": 0,
+      "reason": "The answer recommends driving slowly and reducing speed, contradicting keep going at the same speed, and the offset actions are absent.",
+      "ambiguous": false,
+      "reply": "batch_03.reply.txt"
+    },
+    "D040": {
+      "label": 0,
+      "reason": "The answer lists only generic vehicles without colour or position, so none of the two gray sedans or the black SUV is recognizably present.",
+      "ambiguous": false,
+      "reply": "batch_03.reply.txt"
+    },
+    "D041": {
+      "label": 0,
+      "reason": "The answer lists only generic cars without colour or position, so the white truck, two white sedans and brown car are not recognizably present.",
+      "ambiguous": false,
+      "reply": "batch_03.reply.txt"
+    },
+    "D042": {
+      "label": 0,
+      "reason": "The answer recommends maintaining the current speed, contradicting the reference's decelerate gradually.",
+      "ambiguous": false,
+      "reply": "batch_03.reply.txt"
+    },
+    "D043": {
+      "label": 0,
+      "reason": "The answer gives only generic cars and a bicycle; the pedestrian in a pink shirt, the white SUV and the black sedans are not recognizably present.",
+      "ambiguous": false,
+      "reply": "batch_03.reply.txt"
+    },
+    "D044": {
+      "label": 1,
+      "reason": "The answer settles on following the truck ahead at its steady pace with high probability, which reads as keeping the current speed, though it never states the speed explicitly.",
+      "ambiguous": true,
+      "reply": "batch_03.reply.txt"
+    },
+    "D045": {
+      "label": 0,
+      "reason": "Neither reference action (decelerate gradually, maintain the same speed) appears; the answer only says drive forward cautiously and gives general advice.",
+      "ambiguous": false,
+      "reply": "batch_03.reply.txt"
+    },
+    "D046": {
+      "label": 0,
+      "reason": "The answer settles on stopping to yield to a bus, a different action from the reference's keep going at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_04.reply.txt"
+    },
+    "D047": {
+      "label": 0,
+      "reason": "The gray sedan to the back right, the green bus to the back and the left turn landmark line are all absent; the answer lists only generic categories.",
+      "ambiguous": false,
+      "reply": "batch_04.reply.txt"
+    },
+    "D048": {
+      "label": 1,
+      "reason": "The answer commits to proceeding straight as the most likely action with high probability, which matches keep going at the same speed, and the stop option is only a fallback it does not settle on.",
+      "ambiguous": false,
+      "reply": "batch_04.reply.txt"
+    },
+    "D049": {
+      "label": 0,
+      "reason": "The answer recommends reducing speed, which contradicts the reference's keep going at the same speed, and the reference action is absent.",
+      "ambiguous": false,
+      "reply": "batch_04.reply.txt"
+    },
+    "D050": {
+      "label": 0,
+      "reason": "The answer's recommendation is a conditional choice between passing and waiting, with the vehicle described as stationary, so it does not commit to keeping going at the same speed.",
+      "ambiguous": true,
+      "reply": "batch_04.reply.txt"
+    },
+    "D051": {
+      "label": 0,
+      "reason": "The first and second objects (pedestrian, parked car) do not match the reference's landmark line and gray sedan, and the bus action (yield and wait) contradicts continue at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_04.reply.txt"
+    },
+    "D052": {
+      "label": 0,
+      "reason": "The answer concludes the pedestrian poses no collision risk and never names a slight left turn as a collision-causing action.",
+      "ambiguous": false,
+      "reply": "batch_04.reply.txt"
+    },
+    "D053": {
+      "label": 1,
+      "reason": "The answer commits to continuing straight ahead in the current lane and states a high probability for that action, matching the reference.",
+      "ambiguous": false,
+      "reply": "batch_04.reply.txt"
+    },
+    "D054": {
+      "label": 0,
+      "reason": "The answer recommends driving forward with high probability, not decelerating gradually, so the action does not match.",
+      "ambiguous": false,
+      "reply": "batch_04.reply.txt"
+    },
+    "D055": {
+      "label": 0,
+      "reason": "The black SUV, white SUV and pink and white business car are not recognizable in the answer's generic 'vehicles', and only the traffic light and pedestrians are present as categories.",
+      "ambiguous": false,
+      "reply": "batch_04.reply.txt"
+    },
+    "D056": {
+      "label": 0,
+      "reason": "The answer settles on continuing straight, not on decelerating gradually, so the action does not match the reference.",
+      "ambiguous": false,
+      "reply": "batch_04.reply.txt"
+    },
+    "D057": {
+      "label": 0,
+      "reason": "Neither keeping the same speed nor decelerating gradually appears among the recommendations; the answer gives only general advice.",
+      "ambiguous": false,
+      "reply": "batch_04.reply.txt"
+    },
+    "D058": {
+      "label": 0,
+      "reason": "Backing up is never named as a collision-causing action and the answer concludes the vehicle can proceed without concern for a collision.",
+      "ambiguous": false,
+      "reply": "batch_04.reply.txt"
+    },
+    "D059": {
+      "label": 0,
+      "reason": "The silver truck to the back, the black sedan to the front and the woman in blue jeans are not recognizable in the answer's generic pedestrians and vehicles.",
+      "ambiguous": false,
+      "reply": "batch_04.reply.txt"
+    },
+    "D060": {
+      "label": 0,
+      "reason": "The answer (cut off at the cap) recommends slowing down and being prepared to stop but never recommends keeping the same speed, a missing reference action.",
+      "ambiguous": false,
+      "reply": "batch_04.reply.txt"
+    },
+    "D061": {
+      "label": 0,
+      "reason": "Reference says no action leads to a collision, but the answer names accelerating towards the car as a collision-causing action and gives no no-risk conclusion.",
+      "ambiguous": false,
+      "reply": "batch_05.reply.txt"
+    },
+    "D062": {
+      "label": 0,
+      "reason": "The man in the gray shirt, the gray sedan and the worker with a white hat are not recognizable in the answer, which gives only one generic pedestrian and one generic car without colour or position.",
+      "ambiguous": false,
+      "reply": "batch_05.reply.txt"
+    },
+    "D063": {
+      "label": 0,
+      "reason": "Reference action 'brake suddenly' is absent; the answer names sudden acceleration or a sharp turn and concludes the risk is low.",
+      "ambiguous": false,
+      "reply": "batch_05.reply.txt"
+    },
+    "D064": {
+      "label": 0,
+      "reason": "The answer gives only general advice (keep distance, check mirrors, stay alert) and never recommends keeping the same speed or offsetting to either side.",
+      "ambiguous": false,
+      "reply": "batch_05.reply.txt"
+    },
+    "D065": {
+      "label": 0,
+      "reason": "Neither black sedan appears in the answer, which lists two pedestrians and static scene elements only.",
+      "ambiguous": false,
+      "reply": "batch_05.reply.txt"
+    },
+    "D066": {
+      "label": 1,
+      "reason": "The answer says moving forward into the street without stopping leads to a collision with the white car, which I read as accelerating and going straight from a parked position, though 'accelerating' is not stated outright.",
+      "ambiguous": true,
+      "reply": "batch_05.reply.txt"
+    },
+    "D067": {
+      "label": 0,
+      "reason": "Reference action 'brake suddenly' is missing; the answer names sudden acceleration, failure to signal and improper lane change instead.",
+      "ambiguous": false,
+      "reply": "batch_05.reply.txt"
+    },
+    "D068": {
+      "label": 0,
+      "reason": "The answer lists avoidance actions as its answer and never names braking suddenly as a collision-causing action.",
+      "ambiguous": false,
+      "reply": "batch_05.reply.txt"
+    },
+    "D069": {
+      "label": 0,
+      "reason": "The answer gives only generic 'cars parked on the side of the road' with no colour or position, so none of the five reference vehicles is recognizable.",
+      "ambiguous": false,
+      "reply": "batch_05.reply.txt"
+    },
+    "D070": {
+      "label": 0,
+      "reason": "The black SUV, white SUV and pink-and-white business car are not recognizable in the answer's generic 'cars and trucks'; only the pedestrians and traffic signal match.",
+      "ambiguous": false,
+      "reply": "batch_05.reply.txt"
+    },
+    "D071": {
+      "label": 0,
+      "reason": "The action 'stop' matches remaining stationary, but the stated high probability is about the worker signalling, not the likelihood of the ego vehicle taking the action, so the probability element is not supplied.",
+      "ambiguous": true,
+      "reply": "batch_05.reply.txt"
+    },
+    "D072": {
+      "label": 0,
+      "reason": "The three objects (white car, black car, bus) do not match the reference's silver sedan, white truck and white sedan, and the first action 'slow down' contradicts continuing at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_05.reply.txt"
+    },
+    "D073": {
+      "label": 0,
+      "reason": "The orange car to the back right is missing; the answer's only vehicle is a 'red SUV', a contradicting colour.",
+      "ambiguous": false,
+      "reply": "batch_05.reply.txt"
+    },
+    "D074": {
+      "label": 1,
+      "reason": "The answer recommends maintaining speed and slowing down ready to stop for the pedestrian, which covers both reference actions in meaning, though 'brake gently to a stop' is only conditional in the answer.",
+      "ambiguous": true,
+      "reply": "batch_05.reply.txt"
+    },
+    "D075": {
+      "label": 0,
+      "reason": "The answer does not settle on keeping the same speed; it gives that action only moderate probability and recommends reducing speed with high probability, contradicting the reference.",
+      "ambiguous": false,
+      "reply": "batch_05.reply.txt"
+    },
+    "D076": {
+      "label": 0,
+      "reason": "Reference says no action leads to a collision, but the answer names applicable collision-causing actions (unexpected turn, failing to yield) and gives no conclusion that none applies.",
+      "ambiguous": false,
+      "reply": "batch_06.reply.txt"
+    },
+    "D077": {
+      "label": 0,
+      "reason": "The answer recommends a moderate speed and general advice only; keeping the same speed and the slight offsets to the right and left are absent.",
+      "ambiguous": false,
+      "reply": "batch_06.reply.txt"
+    },
+    "D078": {
+      "label": 0,
+      "reason": "The answer recommends driving slowly, contradicting keep going at the same speed, and never mentions turning left or offsetting left.",
+      "ambiguous": false,
+      "reply": "batch_06.reply.txt"
+    },
+    "D079": {
+      "label": 0,
+      "reason": "The orange car to the back right is missing and only one generic pedestrians entry is given for two reference pedestrian objects.",
+      "ambiguous": false,
+      "reply": "batch_06.reply.txt"
+    },
+    "D080": {
+      "label": 0,
+      "reason": "The answer settles on stopping, the opposite of the reference action to keep going at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_06.reply.txt"
+    },
+    "D081": {
+      "label": 0,
+      "reason": "The answer recommends driving straight and maintaining speed; decelerating gradually and braking gently to a stop are absent and maintaining speed contradicts them.",
+      "ambiguous": false,
+      "reply": "batch_06.reply.txt"
+    },
+    "D082": {
+      "label": 1,
+      "reason": "The answer settles on continuing straight as the most likely action with high probability, which reads as keeping going at the same speed, and its reason does not contradict the reference.",
+      "ambiguous": true,
+      "reply": "batch_06.reply.txt"
+    },
+    "D083": {
+      "label": 0,
+      "reason": "The answer concludes there is no collision risk and never names a sharp left turn.",
+      "ambiguous": false,
+      "reply": "batch_06.reply.txt"
+    },
+    "D084": {
+      "label": 0,
+      "reason": "The answer recommends remaining stationary and waiting; neither decelerating gradually nor continuing at the same speed is among its recommendations.",
+      "ambiguous": false,
+      "reply": "batch_06.reply.txt"
+    },
+    "D085": {
+      "label": 0,
+      "reason": "The answer recommends maintaining a steady speed, contradicting decelerate gradually, which is absent.",
+      "ambiguous": false,
+      "reply": "batch_06.reply.txt"
+    },
+    "D086": {
+      "label": 0,
+      "reason": "The answer lists actions of the other vehicle and obstructions; backing up is never named as a collision-causing action.",
+      "ambiguous": false,
+      "reply": "batch_06.reply.txt"
+    },
+    "D087": {
+      "label": 0,
+      "reason": "The cut-off answer gives only general advice; decelerating gradually and braking gently to a stop are absent from the text shown.",
+      "ambiguous": false,
+      "reply": "batch_06.reply.txt"
+    },
+    "D088": {
+      "label": 0,
+      "reason": "The answer names failing to slow down as the collision-causing action and never mentions a slight left turn.",
+      "ambiguous": false,
+      "reply": "batch_06.reply.txt"
+    },
+    "D089": {
+      "label": 0,
+      "reason": "The answer names accelerating, sudden braking and lane changes; backing up is absent.",
+      "ambiguous": false,
+      "reply": "batch_06.reply.txt"
+    },
+    "D090": {
+      "label": 0,
+      "reason": "The answer's three objects (crossing sign, road signs, building and slope) do not match the reference's pedestrian and two black sedans, and the actions differ.",
+      "ambiguous": false,
+      "reply": "batch_06.reply.txt"
+    },
+    "D091": {
+      "label": 1,
+      "reason": "The answer names sudden braking ('brakes suddenly without sufficient deceleration ... may collide') as a collision-causing action, though it frames it as braking too late against a vehicle ahead rather than the reference's bare 'brake suddenly'.",
+      "ambiguous": true,
+      "reply": "batch_07.reply.txt"
+    },
+    "D092": {
+      "label": 0,
+      "reason": "The answer's three objects (pedestrian signal, traffic light, vehicles ahead) do not match the reference's woman, black sedan and silver truck.",
+      "ambiguous": false,
+      "reply": "batch_07.reply.txt"
+    },
+    "D093": {
+      "label": 0,
+      "reason": "Neither 'slightly offset to the left' nor 'brake gently to a stop' is among the recommended actions; the answer recommends reducing speed and preparing to brake suddenly, and is cut off.",
+      "ambiguous": false,
+      "reply": "batch_07.reply.txt"
+    },
+    "D094": {
+      "label": 0,
+      "reason": "The answer concludes there is no collision risk with the object instead of naming 'brake suddenly' as a collision-causing action.",
+      "ambiguous": false,
+      "reply": "batch_07.reply.txt"
+    },
+    "D095": {
+      "label": 0,
+      "reason": "The answer's objects (parked truck, oncoming white car, warehouse) do not match the reference's black SUV, gray sedan and gray sedan, and the actions differ.",
+      "ambiguous": false,
+      "reply": "batch_07.reply.txt"
+    },
+    "D096": {
+      "label": 1,
+      "reason": "The answer settles on continuing straight as the most probable action with high probability, matching 'keep going at the same speed, high probability', and its reason does not contradict the reference.",
+      "ambiguous": false,
+      "reply": "batch_07.reply.txt"
+    },
+    "D097": {
+      "label": 0,
+      "reason": "The answer lists 'braking' under collision-causing actions but describes it as braking to avoid a collision, so sudden braking is not presented as the cause; the content is internally contradictory.",
+      "ambiguous": true,
+      "reply": "batch_07.reply.txt"
+    },
+    "D098": {
+      "label": 0,
+      "reason": "The red car, blue and white commercial vehicle, black pickup truck and white truck are missing; the answer names only a white van and a car.",
+      "ambiguous": false,
+      "reply": "batch_07.reply.txt"
+    },
+    "D099": {
+      "label": 1,
+      "reason": "'Sudden acceleration while still following the truck' matches 'accelerating and going straight' as a collision-causing action; the closing hedge does not deny risk from that action.",
+      "ambiguous": true,
+      "reply": "batch_07.reply.txt"
+    },
+    "D100": {
+      "label": 0,
+      "reason": "Neither 'keep going at the same speed' nor 'decelerate gradually without braking' appears among the recommended actions, which are general advice.",
+      "ambiguous": false,
+      "reply": "batch_07.reply.txt"
+    },
+    "D101": {
+      "label": 0,
+      "reason": "The bicycle and the black sedan are missing from the answer; only the trash can is matched.",
+      "ambiguous": false,
+      "reply": "batch_07.reply.txt"
+    },
+    "D102": {
+      "label": 0,
+      "reason": "The answer names failing to stop at a red light and accelerating forward, not the reference's 'slight right turn'.",
+      "ambiguous": false,
+      "reply": "batch_07.reply.txt"
+    },
+    "D103": {
+      "label": 0,
+      "reason": "The silver sedan is missing, and the single pedestrian on the sidewalk does not match pedestrians crossing the road to the front right.",
+      "ambiguous": false,
+      "reply": "batch_07.reply.txt"
+    },
+    "D104": {
+      "label": 0,
+      "reason": "The gray sedan and the man in a gray shirt are missing; only one pedestrian is named against two reference people.",
+      "ambiguous": false,
+      "reply": "batch_07.reply.txt"
+    },
+    "D105": {
+      "label": 0,
+      "reason": "The answer names accelerating on red and changing lanes, not the reference's 'brake suddenly'.",
+      "ambiguous": false,
+      "reply": "batch_07.reply.txt"
+    },
+    "D106": {
+      "label": 0,
+      "reason": "The reference's collision-causing action (slight left turn) never appears; the answer names speed, acceleration, braking and distraction instead.",
+      "ambiguous": false,
+      "reply": "batch_08.reply.txt"
+    },
+    "D107": {
+      "label": 0,
+      "reason": "The answer settles on moving forward as the most probable action, not the reference's turn left, which it only lists among alternatives at moderate probability.",
+      "ambiguous": false,
+      "reply": "batch_08.reply.txt"
+    },
+    "D108": {
+      "label": 0,
+      "reason": "The reference's decelerate-gradually action is absent from the recommended safe actions, which only name driving forward plus general advice.",
+      "ambiguous": false,
+      "reply": "batch_08.reply.txt"
+    },
+    "D109": {
+      "label": 0,
+      "reason": "The answer only lists generic cars, trucks and a bus with no colour or position, so the two white sedans and the white truck are not recognizably matched as distinct objects.",
+      "ambiguous": true,
+      "reply": "batch_08.reply.txt"
+    },
+    "D110": {
+      "label": 0,
+      "reason": "Reference says no action leads to a collision, but the answer names turning left and driving straight as collision-causing actions.",
+      "ambiguous": false,
+      "reply": "batch_08.reply.txt"
+    },
+    "D111": {
+      "label": 0,
+      "reason": "The black SUV, black object front left, gray SUV and orange roadblock are all missing; the answer lists a van, a container truck, fencing and a crane.",
+      "ambiguous": false,
+      "reply": "batch_08.reply.txt"
+    },
+    "D112": {
+      "label": 0,
+      "reason": "The reference's moderate right turn is absent and the answer explicitly concludes no ego action leads to a collision.",
+      "ambiguous": false,
+      "reply": "batch_08.reply.txt"
+    },
+    "D113": {
+      "label": 0,
+      "reason": "The reference's turn right action is missing; the answer only recommends slowing, keeping distance and general caution.",
+      "ambiguous": false,
+      "reply": "batch_08.reply.txt"
+    },
+    "D114": {
+      "label": 0,
+      "reason": "Neither pedestrian nor the brown SUV nor the white commercial vehicle is recognizable; the answer lists only generic cars and trucks and scenery.",
+      "ambiguous": false,
+      "reply": "batch_08.reply.txt"
+    },
+    "D115": {
+      "label": 0,
+      "reason": "The answer recommends stopping at a red light, which contradicts maintaining the current speed, and never names decelerating gradually.",
+      "ambiguous": false,
+      "reply": "batch_08.reply.txt"
+    },
+    "D116": {
+      "label": 0,
+      "reason": "The red small car to the front right is missing (no red vehicle named) and the white small car to the front is not recognizably present (only a white SUV on the left).",
+      "ambiguous": false,
+      "reply": "batch_08.reply.txt"
+    },
+    "D117": {
+      "label": 0,
+      "reason": "The answer only says generic motorcycles and cars with no colour or position, so the black, silver and white sedans are not recognizably matched.",
+      "ambiguous": true,
+      "reply": "batch_08.reply.txt"
+    },
+    "D118": {
+      "label": 0,
+      "reason": "The three objects (gray sedan, worker with white hat, man in gray shirt) are replaced by a crossing pedestrian, a barrier and a building, with different states and actions.",
+      "ambiguous": false,
+      "reply": "batch_08.reply.txt"
+    },
+    "D119": {
+      "label": 0,
+      "reason": "Reference says no ego action leads to a collision, but the answer names ego acceleration as a collision-causing action and is cut off without any no-risk conclusion.",
+      "ambiguous": false,
+      "reply": "batch_08.reply.txt"
+    },
+    "D120": {
+      "label": 0,
+      "reason": "The white SUV, white motorhome, black sedan and red light are all missing; the answer names only generic cars and buses and says signs are not clearly visible.",
+      "ambiguous": false,
+      "reply": "batch_08.reply.txt"
+    },
+    "D121": {
+      "label": 0,
+      "reason": "The answer settles on waiting at a red light (stopped), which is a different action from the reference's keep going at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_09.reply.txt"
+    },
+    "D122": {
+      "label": 0,
+      "reason": "Reference says no action leads to a collision, but the answer names failure to yield to the pedestrian as a collision-causing action with no conclusion of no risk.",
+      "ambiguous": false,
+      "reply": "batch_09.reply.txt"
+    },
+    "D123": {
+      "label": 0,
+      "reason": "The answer settles on waiting at a red light, not the reference's decelerate gradually without braking.",
+      "ambiguous": false,
+      "reply": "batch_09.reply.txt"
+    },
+    "D124": {
+      "label": 1,
+      "reason": "The answer lists accelerating suddenly toward the SUV ahead as a collision-causing action, which matches accelerating and going straight in meaning, though 'going straight' is only implied.",
+      "ambiguous": true,
+      "reply": "batch_09.reply.txt"
+    },
+    "D125": {
+      "label": 0,
+      "reason": "The white truck is present but the silver sedan and the two gray SUVs are not matched; 'multiple cars' is generic with no colour or position confirming them.",
+      "ambiguous": false,
+      "reply": "batch_09.reply.txt"
+    },
+    "D126": {
+      "label": 0,
+      "reason": "The answer recommends driving straight and maintaining speed, contradicting the reference's decelerate, brake to a stop and back up, none of which it recommends.",
+      "ambiguous": false,
+      "reply": "batch_09.reply.txt"
+    },
+    "D127": {
+      "label": 0,
+      "reason": "The answer names failure to detect the car ahead and not braking or changing lanes; accelerating, a reference action, is missing.",
+      "ambiguous": false,
+      "reply": "batch_09.reply.txt"
+    },
+    "D128": {
+      "label": 1,
+      "reason": "The answer settles on following the truck at a safe distance at a consistent speed as the most probable action with high probability, which matches keep going at the same speed in meaning, though 'follow at a safe distance' is not an exact restatement.",
+      "ambiguous": true,
+      "reply": "batch_09.reply.txt"
+    },
+    "D129": {
+      "label": 0,
+      "reason": "The answer settles on continuing to park, not the reference's turn left.",
+      "ambiguous": false,
+      "reply": "batch_09.reply.txt"
+    },
+    "D130": {
+      "label": 0,
+      "reason": "The answer only lists generic 'several vehicles'; the black car, black SUV, white sedan and red car with their positions are not matched.",
+      "ambiguous": false,
+      "reply": "batch_09.reply.txt"
+    },
+    "D131": {
+      "label": 0,
+      "reason": "The first object's action (slow down, be prepared to stop) contradicts the reference's keep going at the same speed, and the second and third objects (construction site, building) are not the reference's white truck and white sedan.",
+      "ambiguous": false,
+      "reply": "batch_09.reply.txt"
+    },
+    "D132": {
+      "label": 0,
+      "reason": "Back up is missing and brake gently to a stop is only a conditional readiness to stop, so reference actions are absent from the recommendations.",
+      "ambiguous": false,
+      "reply": "batch_09.reply.txt"
+    },
+    "D133": {
+      "label": 0,
+      "reason": "The answer recommends reducing speed, contradicting keep going at the same speed, and the offset actions are missing.",
+      "ambiguous": false,
+      "reply": "batch_09.reply.txt"
+    },
+    "D134": {
+      "label": 0,
+      "reason": "Accelerate is missing from the recommendations; the answer only advises proceeding cautiously at a safe speed and distance.",
+      "ambiguous": false,
+      "reply": "batch_09.reply.txt"
+    },
+    "D135": {
+      "label": 0,
+      "reason": "Traffic cones, pedestrians and white lane markings appear, but the silver sedan, brown sedan and silver business car with their positions are not matched.",
+      "ambiguous": false,
+      "reply": "batch_09.reply.txt"
+    },
+    "D136": {
+      "label": 0,
+      "reason": "The answer recommends maintaining a steady speed but never recommends decelerating gradually; being 'ready to brake if necessary' is a conditional readiness, not the reference's deceleration action.",
+      "ambiguous": true,
+      "reply": "batch_10.reply.txt"
+    },
+    "D137": {
+      "label": 0,
+      "reason": "The white truck ahead is present, but the silver sedan and the two gray SUVs are only covered by generic 'cars' with no colour or position to confirm them.",
+      "ambiguous": false,
+      "reply": "batch_10.reply.txt"
+    },
+    "D138": {
+      "label": 0,
+      "reason": "The person (man with a document) matches, but the white sedan and the white truck to the front are missing.",
+      "ambiguous": false,
+      "reply": "batch_10.reply.txt"
+    },
+    "D139": {
+      "label": 0,
+      "reason": "The answer recommends a moderate speed with no 'keep going at the same speed' and no offset to the right, and it is cut off before reaching anything further.",
+      "ambiguous": false,
+      "reply": "batch_10.reply.txt"
+    },
+    "D140": {
+      "label": 0,
+      "reason": "The reference action 'decelerate gradually without braking' is absent; the answer recommends maintaining speed and only general awareness.",
+      "ambiguous": false,
+      "reply": "batch_10.reply.txt"
+    },
+    "D141": {
+      "label": 0,
+      "reason": "The answer's three objects (road ahead, pedestrian, building) do not match the reference's person, white truck and white sedan in order; only the pedestrian appears and in the wrong position.",
+      "ambiguous": false,
+      "reply": "batch_10.reply.txt"
+    },
+    "D142": {
+      "label": 0,
+      "reason": "The reference's 'sharp left turn' never appears; the answer concludes there is no immediate collision risk.",
+      "ambiguous": false,
+      "reply": "batch_10.reply.txt"
+    },
+    "D143": {
+      "label": 0,
+      "reason": "The answer names sudden acceleration, lane change and failure to signal, but not backing up, and concludes a collision is unlikely.",
+      "ambiguous": false,
+      "reply": "batch_10.reply.txt"
+    },
+    "D144": {
+      "label": 0,
+      "reason": "No moderate left turn is named as collision-causing; the vague 'side movement' is conditioned on the other vehicle moving and the answer concludes no immediate risk.",
+      "ambiguous": false,
+      "reply": "batch_10.reply.txt"
+    },
+    "D145": {
+      "label": 0,
+      "reason": "The cyclist, the person in a pink shirt and the white SUV are missing; only a black sedan and generic pedestrians and cars appear.",
+      "ambiguous": false,
+      "reply": "batch_10.reply.txt"
+    },
+    "D146": {
+      "label": 0,
+      "reason": "The answer's objects (pedestrian crossing, parked vehicles, building) do not match the silver sedan, white truck and white sedan of the reference.",
+      "ambiguous": false,
+      "reply": "batch_10.reply.txt"
+    },
+    "D147": {
+      "label": 0,
+      "reason": "The answer's objects (bicycle, bus stop canopy, building) do not match the reference's person, people and orange car, and the actions are 'slow down' instead of keep going.",
+      "ambiguous": false,
+      "reply": "batch_10.reply.txt"
+    },
+    "D148": {
+      "label": 0,
+      "reason": "Only a generic 'truck' and 'cars' are listed without colour or position, so the white truck, silver sedan and white sedan cannot be matched separately.",
+      "ambiguous": false,
+      "reply": "batch_10.reply.txt"
+    },
+    "D149": {
+      "label": 1,
+      "reason": "The answer settles on continuing straight (keep going) as the most likely action with an explicitly high probability, and its reason does not contradict the reference.",
+      "ambiguous": false,
+      "reply": "batch_10.reply.txt"
+    },
+    "D150": {
+      "label": 0,
+      "reason": "The answer recommends reducing speed, which contradicts 'keep going at the same speed', and that reference action is absent.",
+      "ambiguous": false,
+      "reply": "batch_10.reply.txt"
+    },
+    "D151": {
+      "label": 0,
+      "reason": "The answer settles on parking in an adjacent space, a different action from the reference's keep going at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_11.reply.txt"
+    },
+    "D152": {
+      "label": 0,
+      "reason": "The answer recommends continuing straight with high probability, not the reference's decelerate gradually without braking.",
+      "ambiguous": false,
+      "reply": "batch_11.reply.txt"
+    },
+    "D153": {
+      "label": 0,
+      "reason": "The reference action of keeping the same speed with a slight rightward offset is absent; the answer instead recommends braking if necessary and proceeding cautiously.",
+      "ambiguous": false,
+      "reply": "batch_11.reply.txt"
+    },
+    "D154": {
+      "label": 0,
+      "reason": "None of the four reference vehicles (white truck back, white sedan front left, brown car back, white sedan back left) appears; the answer only gives a generic 'vehicles' and 'parked cars'.",
+      "ambiguous": false,
+      "reply": "batch_11.reply.txt"
+    },
+    "D155": {
+      "label": 0,
+      "reason": "The action (stop and wait) matches remaining stationary, but the answer states a high probability where the reference says low, pointing the other way.",
+      "ambiguous": false,
+      "reply": "batch_11.reply.txt"
+    },
+    "D156": {
+      "label": 0,
+      "reason": "The white SUV to the front and the white truck to the back left are missing, and the bus is placed approaching from the opposite direction rather than behind.",
+      "ambiguous": false,
+      "reply": "batch_11.reply.txt"
+    },
+    "D157": {
+      "label": 0,
+      "reason": "The answer settles on accelerating cautiously with moderate probability, not keeping the same speed with high probability.",
+      "ambiguous": false,
+      "reply": "batch_11.reply.txt"
+    },
+    "D158": {
+      "label": 0,
+      "reason": "The answer settles on continuing straight at high probability, not the reference's gradual deceleration without braking.",
+      "ambiguous": false,
+      "reply": "batch_11.reply.txt"
+    },
+    "D159": {
+      "label": 0,
+      "reason": "The white SUV behind, white motorhome front right, black sedan ahead and red light are all missing; the answer lists bicycles, a bus and generic other vehicles.",
+      "ambiguous": false,
+      "reply": "batch_11.reply.txt"
+    },
+    "D160": {
+      "label": 0,
+      "reason": "The answer recommends stopping and waiting at a red light, which contradicts the reference's keep going at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_11.reply.txt"
+    },
+    "D161": {
+      "label": 1,
+      "reason": "The answer settles on continuing straight at the current speed and assigns it high probability, matching the reference's action and direction, with the alternatives left as lower-probability contingencies.",
+      "ambiguous": true,
+      "reply": "batch_11.reply.txt"
+    },
+    "D162": {
+      "label": 0,
+      "reason": "The pedestrian in red, the red car and the three white sedans with positions are all missing; the answer gives only generic parked cars.",
+      "ambiguous": false,
+      "reply": "batch_11.reply.txt"
+    },
+    "D163": {
+      "label": 0,
+      "reason": "The answer recommends slowing down with high probability and rates maintaining the current speed as low, contradicting the reference.",
+      "ambiguous": false,
+      "reply": "batch_11.reply.txt"
+    },
+    "D164": {
+      "label": 0,
+      "reason": "The black sedan front right, silver sedan behind and white sedan behind are missing; only motorcycles are named, and as parked on the roadside.",
+      "ambiguous": false,
+      "reply": "batch_11.reply.txt"
+    },
+    "D165": {
+      "label": 0,
+      "reason": "The answer names a wall, a gate and a trash bin instead of the reference's trash can, bicycle and black sedan in that order, and gives no continue-ahead actions.",
+      "ambiguous": false,
+      "reply": "batch_11.reply.txt"
+    },
+    "D166": {
+      "label": 1,
+      "reason": "The answer settles on stopping (the vehicle ending up stationary, a close paraphrase of remaining stationary) and states the probability of taking that action is high, matching the reference's direction.",
+      "ambiguous": true,
+      "reply": "batch_12.reply.txt"
+    },
+    "D167": {
+      "label": 0,
+      "reason": "The answer recommends reducing speed, which contradicts keeping the same speed, and never recommends turning left or offsetting left.",
+      "ambiguous": false,
+      "reply": "batch_12.reply.txt"
+    },
+    "D168": {
+      "label": 0,
+      "reason": "The answer only lists generic cars, trucks and buses with no colour or position, so none of the four reference objects is confirmed as a distinct match.",
+      "ambiguous": false,
+      "reply": "batch_12.reply.txt"
+    },
+    "D169": {
+      "label": 0,
+      "reason": "The answer names speeding, sensor failure, lane changes and failure to yield but never accelerating while going straight as the collision-causing action.",
+      "ambiguous": true,
+      "reply": "batch_12.reply.txt"
+    },
+    "D170": {
+      "label": 0,
+      "reason": "The white truck to the front is missing from the answer, which names only a person, a distant car and scenery.",
+      "ambiguous": false,
+      "reply": "batch_12.reply.txt"
+    },
+    "D171": {
+      "label": 0,
+      "reason": "The answer concludes there is no collision risk with the object and never names braking suddenly.",
+      "ambiguous": false,
+      "reply": "batch_12.reply.txt"
+    },
+    "D172": {
+      "label": 0,
+      "reason": "The answer recommends maintaining speed but omits the slight offsets to the left and to the right that the reference requires.",
+      "ambiguous": false,
+      "reply": "batch_12.reply.txt"
+    },
+    "D173": {
+      "label": 0,
+      "reason": "The answer's three objects (pedestrian crossing, construction barriers, parked vehicles) do not match the reference's gray sedan, worker and man in a gray shirt.",
+      "ambiguous": false,
+      "reply": "batch_12.reply.txt"
+    },
+    "D174": {
+      "label": 0,
+      "reason": "The reference says no action leads to a collision, but the answer names turning right, speeding and failing to yield as collision-causing actions with no conclusion that none applies.",
+      "ambiguous": false,
+      "reply": "batch_12.reply.txt"
+    },
+    "D175": {
+      "label": 1,
+      "reason": "The answer settles on continuing straight as the most likely action with high probability, which matches keeping going at the same speed in meaning.",
+      "ambiguous": true,
+      "reply": "batch_12.reply.txt"
+    },
+    "D176": {
+      "label": 0,
+      "reason": "The answer never names a slight left turn as a collision-causing action; it only discusses approaching too fast and driving past the worker.",
+      "ambiguous": false,
+      "reply": "batch_12.reply.txt"
+    },
+    "D177": {
+      "label": 0,
+      "reason": "The answer lists actions of the other vehicle rather than the ego vehicle and never names backing up.",
+      "ambiguous": false,
+      "reply": "batch_12.reply.txt"
+    },
+    "D178": {
+      "label": 0,
+      "reason": "The answer recommends stopping and remaining stationary, contradicting keeping the same speed, and omits decelerating gradually.",
+      "ambiguous": false,
+      "reply": "batch_12.reply.txt"
+    },
+    "D179": {
+      "label": 0,
+      "reason": "The answer settles on stopping and waiting, the opposite of the reference's keep going at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_12.reply.txt"
+    },
+    "D180": {
+      "label": 0,
+      "reason": "The answer names only generic turning without direction, which does not confirm the reference's moderate left turn.",
+      "ambiguous": true,
+      "reply": "batch_12.reply.txt"
+    },
+    "D181": {
+      "label": 0,
+      "reason": "The black commercial vehicle to the back is missing, and the silver sedan and red car in front are not both recognizable (only one uncoloured car in front is listed).",
+      "ambiguous": false,
+      "reply": "batch_13.reply.txt"
+    },
+    "D182": {
+      "label": 0,
+      "reason": "The reference's collision-causing action (slight left turn) does not appear; the answer lists speeding, failure to yield, distraction and lane change instead.",
+      "ambiguous": false,
+      "reply": "batch_13.reply.txt"
+    },
+    "D183": {
+      "label": 1,
+      "reason": "The answer names accelerating toward the car ahead as a collision-causing action, which covers accelerating and going straight, though it never says 'straight' explicitly.",
+      "ambiguous": true,
+      "reply": "batch_13.reply.txt"
+    },
+    "D184": {
+      "label": 0,
+      "reason": "The reference action (brake suddenly) is absent; the answer concludes accelerating too quickly is the collision-causing action.",
+      "ambiguous": false,
+      "reply": "batch_13.reply.txt"
+    },
+    "D185": {
+      "label": 0,
+      "reason": "The answer offers stop or move forward without settling on the reference's action and gives no likelihood for keeping the same speed.",
+      "ambiguous": false,
+      "reply": "batch_13.reply.txt"
+    },
+    "D186": {
+      "label": 0,
+      "reason": "Only one pedestrian and generic 'vehicles' are listed, so the second pedestrian, the silver sedan in front and the sedan behind are not each matched.",
+      "ambiguous": false,
+      "reply": "batch_13.reply.txt"
+    },
+    "D187": {
+      "label": 0,
+      "reason": "The yellow sedan behind and the yellow roadblock in front are missing; only the motorcycle and bus appear.",
+      "ambiguous": false,
+      "reply": "batch_13.reply.txt"
+    },
+    "D188": {
+      "label": 0,
+      "reason": "The answer recommends only maintaining a steady speed; braking gently to a stop and decelerating gradually are not among its recommendations (stopping is mentioned only as a conditional contingency).",
+      "ambiguous": true,
+      "reply": "batch_13.reply.txt"
+    },
+    "D189": {
+      "label": 0,
+      "reason": "The three objects (white truck, black car, scaffolding) do not match the reference's red light, white small car and red small car.",
+      "ambiguous": false,
+      "reply": "batch_13.reply.txt"
+    },
+    "D190": {
+      "label": 1,
+      "reason": "The answer settles on continuing straight with high probability, which matches keeping going at the same speed and a high likelihood, though it does not mention speed explicitly.",
+      "ambiguous": true,
+      "reply": "batch_13.reply.txt"
+    },
+    "D191": {
+      "label": 0,
+      "reason": "The objects (pedestrian, parked car, building under construction) do not match the reference's red light, white small car and red small car, and the actions do not match stop.",
+      "ambiguous": false,
+      "reply": "batch_13.reply.txt"
+    },
+    "D192": {
+      "label": 0,
+      "reason": "The answer lists several conditional actions without committing to one and says the probability cannot be determined.",
+      "ambiguous": false,
+      "reply": "batch_13.reply.txt"
+    },
+    "D193": {
+      "label": 0,
+      "reason": "The white SUV in front and the white truck to the back left are missing from the answer.",
+      "ambiguous": false,
+      "reply": "batch_13.reply.txt"
+    },
+    "D194": {
+      "label": 0,
+      "reason": "Neither braking gently to a stop nor decelerating gradually is recommended; the answer recommends continuing at a moderate speed, which contradicts the reference.",
+      "ambiguous": false,
+      "reply": "batch_13.reply.txt"
+    },
+    "D195": {
+      "label": 1,
+      "reason": "The answer concludes that accelerating (or changing lanes) can cause a collision with the van ahead in the same lane, which covers accelerating and going straight.",
+      "ambiguous": true,
+      "reply": "batch_13.reply.txt"
+    },
+    "D196": {
+      "label": 0,
+      "reason": "Answer recommends reducing speed, contradicting 'keep going at the same speed', and never mentions offsetting to the right.",
+      "ambiguous": false,
+      "reply": "batch_14.reply.txt"
+    },
+    "D197": {
+      "label": 0,
+      "reason": "Answer settles on stop or slow down, not the reference's turn right.",
+      "ambiguous": false,
+      "reply": "batch_14.reply.txt"
+    },
+    "D198": {
+      "label": 0,
+      "reason": "Answer recommends stopping at a red light; neither reference action (decelerate gradually, continue at the same speed) is recommended and stop contradicts them.",
+      "ambiguous": false,
+      "reply": "batch_14.reply.txt"
+    },
+    "D199": {
+      "label": 0,
+      "reason": "Answer's three objects (red SUV, bus stop with bicycles, building) match none of the reference's person, people and orange car.",
+      "ambiguous": false,
+      "reply": "batch_14.reply.txt"
+    },
+    "D200": {
+      "label": 0,
+      "reason": "Answer commits to stop, the opposite of the reference's keep going at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_14.reply.txt"
+    },
+    "D201": {
+      "label": 0,
+      "reason": "Reference says no action leads to a collision, but the answer names applicable collision-causing actions (accelerating, abrupt deceleration, changing direction) and gives no no-collision conclusion.",
+      "ambiguous": false,
+      "reply": "batch_14.reply.txt"
+    },
+    "D202": {
+      "label": 0,
+      "reason": "Answer's recommended action is to adjust its speed to keep distance, which is not keeping the same speed; the probability direction matches but the action does not.",
+      "ambiguous": true,
+      "reply": "batch_14.reply.txt"
+    },
+    "D203": {
+      "label": 1,
+      "reason": "Answer names speeding (accelerating) toward the white car ahead in the same direction as a collision-causing action, which reads as accelerating and going straight.",
+      "ambiguous": true,
+      "reply": "batch_14.reply.txt"
+    },
+    "D204": {
+      "label": 0,
+      "reason": "Answer's objects (white truck, crossing pedestrian, traffic light) do not match the reference's woman, black sedan and silver truck.",
+      "ambiguous": false,
+      "reply": "batch_14.reply.txt"
+    },
+    "D205": {
+      "label": 0,
+      "reason": "Answer concludes there is no immediate collision risk, and does not name accelerating and going straight as a collision-causing action.",
+      "ambiguous": false,
+      "reply": "batch_14.reply.txt"
+    },
+    "D206": {
+      "label": 0,
+      "reason": "Reference is None, but the answer lists turning right, slowing and accelerating as actions that could lead to a collision; the cut-off final sentence does not reach a no-collision conclusion.",
+      "ambiguous": true,
+      "reply": "batch_14.reply.txt"
+    },
+    "D207": {
+      "label": 0,
+      "reason": "Answer's committed action is to continue straight, not the reference's decelerate gradually without braking.",
+      "ambiguous": false,
+      "reply": "batch_14.reply.txt"
+    },
+    "D208": {
+      "label": 0,
+      "reason": "Answer recommends stopping at a red light, contradicting keep going at the same speed, and does not recommend decelerating gradually.",
+      "ambiguous": false,
+      "reply": "batch_14.reply.txt"
+    },
+    "D209": {
+      "label": 0,
+      "reason": "Only maintaining speed is recommended; brake suddenly, brake gently to a stop, decelerate gradually and back up are missing, and sudden deceleration is advised against.",
+      "ambiguous": false,
+      "reply": "batch_14.reply.txt"
+    },
+    "D210": {
+      "label": 0,
+      "reason": "Maintain speed is present but decelerating gradually is not recommended as a safe action, only as a conditional response if the car ahead slows, and the answer warns against slowing down.",
+      "ambiguous": true,
+      "reply": "batch_14.reply.txt"
+    },
+    "D211": {
+      "label": 0,
+      "reason": "The answer names only generic vehicles and traffic lights with no colour or position, so the red car, blue and white commercial vehicle, black pickup truck, white truck and green light are not individually matched.",
+      "ambiguous": false,
+      "reply": "batch_15.reply.txt"
+    },
+    "D212": {
+      "label": 0,
+      "reason": "The answer settles on braking with high probability, a different action from the reference's keep going at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_15.reply.txt"
+    },
+    "D213": {
+      "label": 1,
+      "reason": "After listing options the answer settles on maintaining the current speed as the most likely action with high probability, matching the reference's action and likelihood direction.",
+      "ambiguous": false,
+      "reply": "batch_15.reply.txt"
+    },
+    "D214": {
+      "label": 1,
+      "reason": "The answer states that if the ego vehicle were to suddenly brake a collision could occur, which names the reference's action as collision-causing, though it first concludes no immediate risk under current conditions.",
+      "ambiguous": true,
+      "reply": "batch_15.reply.txt"
+    },
+    "D215": {
+      "label": 0,
+      "reason": "The silver pickup truck, pedestrians and traffic light are present, but the black SUV is missing (only generic cars and buses without colour or position).",
+      "ambiguous": false,
+      "reply": "batch_15.reply.txt"
+    },
+    "D216": {
+      "label": 0,
+      "reason": "The answer recommends proceeding through the intersection and general caution but never recommends decelerating gradually, a reference action.",
+      "ambiguous": false,
+      "reply": "batch_15.reply.txt"
+    },
+    "D217": {
+      "label": 0,
+      "reason": "The answer settles on stopping at the sign with moderate probability, not the reference's keep going at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_15.reply.txt"
+    },
+    "D218": {
+      "label": 0,
+      "reason": "The red small car to the front right is missing, and the white small car is not matched (the answer names a white truck, black sedan and silver SUV).",
+      "ambiguous": false,
+      "reply": "batch_15.reply.txt"
+    },
+    "D219": {
+      "label": 0,
+      "reason": "Reference is None but the answer concludes that accelerating suddenly and making a sharp turn could lead to a collision with the object.",
+      "ambiguous": false,
+      "reply": "batch_15.reply.txt"
+    },
+    "D220": {
+      "label": 1,
+      "reason": "The answer settles on continuing at the current speed as the most likely action, matching the reference's action with a likelihood pointing high, and its reason (no immediate threat) does not contradict.",
+      "ambiguous": false,
+      "reply": "batch_15.reply.txt"
+    },
+    "D221": {
+      "label": 0,
+      "reason": "Keeping the same speed and slightly offsetting to the right are absent; the answer recommends driving slowly and general caution only.",
+      "ambiguous": false,
+      "reply": "batch_15.reply.txt"
+    },
+    "D222": {
+      "label": 0,
+      "reason": "The reference's moderate right turn never appears as a collision-causing action; the answer only lists stop, slow down and yield as avoidance actions.",
+      "ambiguous": false,
+      "reply": "batch_15.reply.txt"
+    },
+    "D223": {
+      "label": 0,
+      "reason": "The answer recommends reducing speed, contradicting the reference's keep going and accelerate, which are absent.",
+      "ambiguous": false,
+      "reply": "batch_15.reply.txt"
+    },
+    "D224": {
+      "label": 0,
+      "reason": "The answer names failing to stop or yield and inattentiveness as collision-causing actions, but not braking suddenly.",
+      "ambiguous": false,
+      "reply": "batch_15.reply.txt"
+    },
+    "D225": {
+      "label": 0,
+      "reason": "The answer names a leftward lane change as the collision risk and is cut off before any mention of the ego vehicle braking suddenly.",
+      "ambiguous": false,
+      "reply": "batch_15.reply.txt"
+    },
+    "D226": {
+      "label": 0,
+      "reason": "The answer's three objects (pedestrian crossing sign, grass slope, building) do not match the reference's pedestrian, black sedan ahead and black sedan behind, and its first action (reduce speed) contradicts continue at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_16.reply.txt"
+    },
+    "D227": {
+      "label": 1,
+      "reason": "The answer settles on continuing straight as the most likely action (high, 80%), which reads as the reference's keep going with a likelihood pointing the same way, though it never says 'at the same speed'.",
+      "ambiguous": true,
+      "reply": "batch_16.reply.txt"
+    },
+    "D228": {
+      "label": 0,
+      "reason": "The answer recommends stopping, which contradicts the reference's keep going at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_16.reply.txt"
+    },
+    "D229": {
+      "label": 1,
+      "reason": "The answer lists abrupt braking as a collision-causing action, matching the reference's brake suddenly.",
+      "ambiguous": false,
+      "reply": "batch_16.reply.txt"
+    },
+    "D230": {
+      "label": 0,
+      "reason": "The answer leaves it open between maintaining speed and accelerating without settling on one action, even though it rates maintaining speed as high probability.",
+      "ambiguous": true,
+      "reply": "batch_16.reply.txt"
+    },
+    "D231": {
+      "label": 0,
+      "reason": "The reference's moderate right turn never appears; the answer concludes the stationary ego vehicle's actions do not lead to a collision.",
+      "ambiguous": false,
+      "reply": "batch_16.reply.txt"
+    },
+    "D232": {
+      "label": 0,
+      "reason": "The answer recommends stopping, not the reference's gradual deceleration without braking.",
+      "ambiguous": false,
+      "reply": "batch_16.reply.txt"
+    },
+    "D233": {
+      "label": 0,
+      "reason": "The reference's back up is missing; the answer names accelerating and turning left without yielding instead.",
+      "ambiguous": false,
+      "reply": "batch_16.reply.txt"
+    },
+    "D234": {
+      "label": 0,
+      "reason": "The answer's objects (houses and trees, ivy wall, houses) do not match the reference's trash can, bicycle and black sedan, and its first action (slow down) contradicts continue at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_16.reply.txt"
+    },
+    "D235": {
+      "label": 0,
+      "reason": "The answer lists only generic categories (vehicles, traffic lights, buildings) and does not name the white van, white sedan, gray SUV, business or right turn as distinct objects.",
+      "ambiguous": false,
+      "reply": "batch_16.reply.txt"
+    },
+    "D236": {
+      "label": 0,
+      "reason": "The first object (pedestrian crossing sign) and second object (parked cars) do not match the reference's left turn landmark line and gray sedan, and the bus action (yield) contradicts continue at the same speed.",
+      "ambiguous": false,
+      "reply": "batch_16.reply.txt"
+    },
+    "D237": {
+      "label": 0,
+      "reason": "Against a None-type reference the answer names an applicable collision-causing ego action (not maintaining a safe following distance) and gives no conclusion that none applies.",
+      "ambiguous": false,
+      "reply": "batch_16.reply.txt"
+    },
+    "D238": {
+      "label": 0,
+      "reason": "Neither turn left nor decelerate gradually appears among the recommended safe actions; the answer gives general advice and a tentative proceed straight.",
+      "ambiguous": false,
+      "reply": "batch_16.reply.txt"
+    },
+    "D239": {
+      "label": 0,
+      "reason": "Brake gently to a stop and decelerate gradually are absent from the recommendations, which only offer maintaining a moderate speed and general advice.",
+      "ambiguous": false,
+      "reply": "batch_16.reply.txt"
+    },
+    "D240": {
+      "label": 0,
+      "reason": "The answer recommends stopping, not the reference's gradual deceleration without braking.",
+      "ambiguous": false,
+      "reply": "batch_16.reply.txt"
+    },
+    "D241": {
+      "label": 1,
+      "reason": "The answer names turning right without a clear path as the collision-causing action, matching the reference's moderate right turn.",
+      "ambiguous": false,
+      "reply": "batch_17.reply.txt"
+    },
+    "D242": {
+      "label": 0,
+      "reason": "The answer recommends stopping at a red light, contradicting the reference's keep going, accelerate and proceed, none of which appear.",
+      "ambiguous": false,
+      "reply": "batch_17.reply.txt"
+    },
+    "D243": {
+      "label": 0,
+      "reason": "The answer recommends slowing down and braking if needed but never keeping the same speed, so a reference action is missing and braking contradicts decelerating without braking.",
+      "ambiguous": false,
+      "reply": "batch_17.reply.txt"
+    },
+    "D244": {
+      "label": 0,
+      "reason": "The answer lists only generic vehicles, lights and markings; the white van, white sedan and gray SUV with their positions are absent.",
+      "ambiguous": false,
+      "reply": "batch_17.reply.txt"
+    },
+    "D245": {
+      "label": 0,
+      "reason": "Neither braking gently to a stop nor decelerating gradually is recommended; the answer gives only general caution and brake-if-necessary advice.",
+      "ambiguous": false,
+      "reply": "batch_17.reply.txt"
+    },
+    "D246": {
+      "label": 1,
+      "reason": "The answer settles on continuing straight as the most probable action with high probability, which I read as keeping the current speed since it lists accelerate and stop as separate low-probability options.",
+      "ambiguous": true,
+      "reply": "batch_17.reply.txt"
+    },
+    "D247": {
+      "label": 0,
+      "reason": "The answer names only generic parked vehicles, barriers and construction equipment; the black SUV, gray SUV, black object and orange roadblock are not recognizable.",
+      "ambiguous": false,
+      "reply": "batch_17.reply.txt"
+    },
+    "D248": {
+      "label": 0,
+      "reason": "The answer says accelerating forward would pass the truck without risk and concludes there is no immediate collision risk, contradicting the reference's accelerating and going straight.",
+      "ambiguous": false,
+      "reply": "batch_17.reply.txt"
+    },
+    "D249": {
+      "label": 1,
+      "reason": "The answer commits to slowing down (decelerating) with a stated high probability, and its yield reason does not contradict avoiding a collision; the added stop-if-necessary is conditional.",
+      "ambiguous": true,
+      "reply": "batch_17.reply.txt"
+    },
+    "D250": {
+      "label": 0,
+      "reason": "The action of continuing at the same pace matches, but the stated probability is moderate rather than high, so it does not point the same way as the reference.",
+      "ambiguous": true,
+      "reply": "batch_17.reply.txt"
+    },
+    "D251": {
+      "label": 0,
+      "reason": "The answer gives only general advice (maintain distance, monitor, be ready to stop) and does not recommend keeping the same speed, decelerating, braking gently or backing up.",
+      "ambiguous": false,
+      "reply": "batch_17.reply.txt"
+    },
+    "D252": {
+      "label": 0,
+      "reason": "The answer settles on braking or slowing down rather than continuing at the same speed, and gives no likelihood for the reference's action.",
+      "ambiguous": false,
+      "reply": "batch_17.reply.txt"
+    },
+    "D253": {
+      "label": 0,
+      "reason": "The recommended action is driving past the truck, not turning right.",
+      "ambiguous": false,
+      "reply": "batch_17.reply.txt"
+    },
+    "D254": {
+      "label": 0,
+      "reason": "The red car, silver car and bus appear, but the black commercial vehicle behind and the please-pass object are missing.",
+      "ambiguous": false,
+      "reply": "batch_17.reply.txt"
+    },
+    "D255": {
+      "label": 0,
+      "reason": "Trash bins are present but the bicycle on the roadside and the black sedan are missing.",
+      "ambiguous": false,
+      "reply": "batch_17.reply.txt"
+    },
+    "D256": {
+      "label": 0,
+      "reason": "The sedan to the back of the ego vehicle is missing: the answer places all vehicles ahead and names nothing behind.",
+      "ambiguous": false,
+      "reply": "batch_18.reply.txt"
+    },
+    "D257": {
+      "label": 0,
+      "reason": "The reference's action 'accelerate' is absent from the recommended safe actions, which only continue forward at a safe speed plus general advice.",
+      "ambiguous": false,
+      "reply": "batch_18.reply.txt"
+    },
+    "D258": {
+      "label": 0,
+      "reason": "The answer settles on 'continue straight' with high probability, a different action from the reference's 'decelerate gradually without braking'.",
+      "ambiguous": false,
+      "reply": "batch_18.reply.txt"
+    },
+    "D259": {
+      "label": 0,
+      "reason": "The yellow roadblock to the front is missing, and the yellow sedan to the back is only covered by a generic 'other vehicles' without colour or position.",
+      "ambiguous": false,
+      "reply": "batch_18.reply.txt"
+    },
+    "D260": {
+      "label": 0,
+      "reason": "The answer's most likely action is 'accelerate', which differs from the reference's 'keep going at the same speed' (maintaining speed is given only moderate probability).",
+      "ambiguous": false,
+      "reply": "batch_18.reply.txt"
+    },
+    "D261": {
+      "label": 0,
+      "reason": "Reference is 'None' but the answer names applicable collision-causing actions (driving too fast, abrupt braking, improper lane change) and gives no conclusion that none applies.",
+      "ambiguous": false,
+      "reply": "batch_18.reply.txt"
+    },
+    "D262": {
+      "label": 0,
+      "reason": "The answer recommends stopping with high probability, the opposite of the reference's 'keep going at the same speed'.",
+      "ambiguous": false,
+      "reply": "batch_18.reply.txt"
+    }
+  }
+}

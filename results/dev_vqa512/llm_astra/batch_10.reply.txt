@@ -1,0 +1,17 @@
+[
+  {"item":"D136","label":0,"reason":"The answer recommends steady speed but does not recommend gradual deceleration without braking.","ambiguous":false},
+  {"item":"D137","label":0,"reason":"The answer does not separately identify the silver sedan behind right and the two gray SUVs ahead right and ahead left.","ambiguous":false},
+  {"item":"D138","label":0,"reason":"The answer omits the white sedan and white truck ahead.","ambiguous":false},
+  {"item":"D139","label":0,"reason":"The answer omits the required slight offset to the right and does not explicitly recommend maintaining the current speed.","ambiguous":false},
+  {"item":"D140","label":0,"reason":"The answer does not recommend gradual deceleration without braking.","ambiguous":false},
+  {"item":"D141","label":0,"reason":"The answer lists the road, a pedestrian, and a building instead of the required pedestrian, truck, and sedan in order.","ambiguous":false},
+  {"item":"D142","label":0,"reason":"The answer does not identify a sharp left turn as a collision-causing action.","ambiguous":false},
+  {"item":"D143","label":0,"reason":"The answer omits backing up from its collision-causing actions.","ambiguous":false},
+  {"item":"D144","label":0,"reason":"The answer's generic lateral movement does not identify the required moderate left turn as a collision-causing action.","ambiguous":false},
+  {"item":"D145","label":0,"reason":"The answer omits the cyclist and does not distinctly identify all required vehicles and the pedestrian with their specified colors and positions.","ambiguous":false},
+  {"item":"D146","label":0,"reason":"The answer substitutes a pedestrian crossing, parked vehicles, and a building for the required sedan, truck, and sedan sequence.","ambiguous":false},
+  {"item":"D147","label":0,"reason":"The answer names three different objects and recommends slowing down instead of maintaining speed for the moving reference objects.","ambiguous":false},
+  {"item":"D148","label":0,"reason":"The answer's generic cars and truck lack the required colors, positions, and distinct identification of the three reference vehicles.","ambiguous":false},
+  {"item":"D149","label":0,"reason":"Although it assigns high probability to continuing straight, the answer does not state that the ego vehicle will maintain its current speed.","ambiguous":false},
+  {"item":"D150","label":0,"reason":"The answer recommends reducing speed but omits maintaining the current speed and does not specify gradual deceleration without braking.","ambiguous":false}
+]

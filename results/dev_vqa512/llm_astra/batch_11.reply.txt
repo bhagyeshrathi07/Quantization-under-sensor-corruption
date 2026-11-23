@@ -1,0 +1,17 @@
+[
+  {"item":"D151","label":0,"reason":"The answer recommends parking rather than keeping the same speed.","ambiguous":false},
+  {"item":"D152","label":0,"reason":"The answer recommends continuing straight without the required gradual deceleration without braking.","ambiguous":false},
+  {"item":"D153","label":0,"reason":"The answer omits both maintaining the same speed and slightly offsetting to the right.","ambiguous":false},
+  {"item":"D154","label":0,"reason":"The generic mention of vehicles does not identify the four required objects by category, colour, and position.","ambiguous":false},
+  {"item":"D155","label":0,"reason":"The answer assigns a high probability to stopping and waiting, contradicting the reference's low probability.","ambiguous":false},
+  {"item":"D156","label":0,"reason":"The answer omits the required white SUV ahead and white truck behind to the left.","ambiguous":false},
+  {"item":"D157","label":0,"reason":"The answer recommends accelerating cautiously rather than maintaining the same speed.","ambiguous":false},
+  {"item":"D158","label":0,"reason":"The answer recommends continuing straight and omits the required gradual deceleration without braking.","ambiguous":false},
+  {"item":"D159","label":0,"reason":"The answer fails to identify the required white SUV, white motorhome, black sedan, and red traffic light with their specified positions.","ambiguous":false},
+  {"item":"D160","label":0,"reason":"The answer recommends stopping and waiting rather than keeping the same speed and supplies no likelihood for the reference action.","ambiguous":false},
+  {"item":"D161","label":1,"reason":"The answer settles on continuing at the current speed and direction with high probability, while making stopping and yielding conditional on subsequent circumstances.","ambiguous":false},
+  {"item":"D162","label":0,"reason":"The answer omits the pedestrian in red and does not separately identify the four required cars by colour and position.","ambiguous":false},
+  {"item":"D163","label":0,"reason":"The answer recommends slowing down and assigns low probability to maintaining speed, contradicting both reference elements.","ambiguous":false},
+  {"item":"D164","label":0,"reason":"The answer omits the required black sedan ahead to the right and the silver and white sedans behind.","ambiguous":false},
+  {"item":"D165","label":0,"reason":"The answer names a wall, gate, and trash bin in place of the required ordered sequence of trash can, bicycle, and sedan.","ambiguous":false}
+]

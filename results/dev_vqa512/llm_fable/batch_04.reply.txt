@@ -1,0 +1,17 @@
+[
+{"item": "D046", "label": 0, "reason": "The answer settles on stopping to yield to a bus, a different action from the reference's keep going at the same speed.", "ambiguous": false},
+{"item": "D047", "label": 0, "reason": "The gray sedan to the back right, the green bus to the back and the left turn landmark line are all absent; the answer lists only generic categories.", "ambiguous": false},
+{"item": "D048", "label": 1, "reason": "The answer commits to proceeding straight as the most likely action with high probability, which matches keep going at the same speed, and the stop option is only a fallback it does not settle on.", "ambiguous": false},
+{"item": "D049", "label": 0, "reason": "The answer recommends reducing speed, which contradicts the reference's keep going at the same speed, and the reference action is absent.", "ambiguous": false},
+{"item": "D050", "label": 0, "reason": "The answer's recommendation is a conditional choice between passing and waiting, with the vehicle described as stationary, so it does not commit to keeping going at the same speed.", "ambiguous": true},
+{"item": "D051", "label": 0, "reason": "The first and second objects (pedestrian, parked car) do not match the reference's landmark line and gray sedan, and the bus action (yield and wait) contradicts continue at the same speed.", "ambiguous": false},
+{"item": "D052", "label": 0, "reason": "The answer concludes the pedestrian poses no collision risk and never names a slight left turn as a collision-causing action.", "ambiguous": false},
+{"item": "D053", "label": 1, "reason": "The answer commits to continuing straight ahead in the current lane and states a high probability for that action, matching the reference.", "ambiguous": false},
+{"item": "D054", "label": 0, "reason": "The answer recommends driving forward with high probability, not decelerating gradually, so the action does not match.", "ambiguous": false},
+{"item": "D055", "label": 0, "reason": "The black SUV, white SUV and pink and white business car are not recognizable in the answer's generic 'vehicles', and only the traffic light and pedestrians are present as categories.", "ambiguous": false},
+{"item": "D056", "label": 0, "reason": "The answer settles on continuing straight, not on decelerating gradually, so the action does not match the reference.", "ambiguous": false},
+{"item": "D057", "label": 0, "reason": "Neither keeping the same speed nor decelerating gradually appears among the recommendations; the answer gives only general advice.", "ambiguous": false},
+{"item": "D058", "label": 0, "reason": "Backing up is never named as a collision-causing action and the answer concludes the vehicle can proceed without concern for a collision.", "ambiguous": false},
+{"item": "D059", "label": 0, "reason": "The silver truck to the back, the black sedan to the front and the woman in blue jeans are not recognizable in the answer's generic pedestrians and vehicles.", "ambiguous": false},
+{"item": "D060", "label": 0, "reason": "The answer (cut off at the cap) recommends slowing down and being prepared to stop but never recommends keeping the same speed, a missing reference action.", "ambiguous": false}
+]

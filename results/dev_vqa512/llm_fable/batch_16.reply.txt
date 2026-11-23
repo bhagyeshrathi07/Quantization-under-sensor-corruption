@@ -1,0 +1,17 @@
+[
+{"item": "D226", "label": 0, "reason": "The answer's three objects (pedestrian crossing sign, grass slope, building) do not match the reference's pedestrian, black sedan ahead and black sedan behind, and its first action (reduce speed) contradicts continue at the same speed.", "ambiguous": false},
+{"item": "D227", "label": 1, "reason": "The answer settles on continuing straight as the most likely action (high, 80%), which reads as the reference's keep going with a likelihood pointing the same way, though it never says 'at the same speed'.", "ambiguous": true},
+{"item": "D228", "label": 0, "reason": "The answer recommends stopping, which contradicts the reference's keep going at the same speed.", "ambiguous": false},
+{"item": "D229", "label": 1, "reason": "The answer lists abrupt braking as a collision-causing action, matching the reference's brake suddenly.", "ambiguous": false},
+{"item": "D230", "label": 0, "reason": "The answer leaves it open between maintaining speed and accelerating without settling on one action, even though it rates maintaining speed as high probability.", "ambiguous": true},
+{"item": "D231", "label": 0, "reason": "The reference's moderate right turn never appears; the answer concludes the stationary ego vehicle's actions do not lead to a collision.", "ambiguous": false},
+{"item": "D232", "label": 0, "reason": "The answer recommends stopping, not the reference's gradual deceleration without braking.", "ambiguous": false},
+{"item": "D233", "label": 0, "reason": "The reference's back up is missing; the answer names accelerating and turning left without yielding instead.", "ambiguous": false},
+{"item": "D234", "label": 0, "reason": "The answer's objects (houses and trees, ivy wall, houses) do not match the reference's trash can, bicycle and black sedan, and its first action (slow down) contradicts continue at the same speed.", "ambiguous": false},
+{"item": "D235", "label": 0, "reason": "The answer lists only generic categories (vehicles, traffic lights, buildings) and does not name the white van, white sedan, gray SUV, business or right turn as distinct objects.", "ambiguous": false},
+{"item": "D236", "label": 0, "reason": "The first object (pedestrian crossing sign) and second object (parked cars) do not match the reference's left turn landmark line and gray sedan, and the bus action (yield) contradicts continue at the same speed.", "ambiguous": false},
+{"item": "D237", "label": 0, "reason": "Against a None-type reference the answer names an applicable collision-causing ego action (not maintaining a safe following distance) and gives no conclusion that none applies.", "ambiguous": false},
+{"item": "D238", "label": 0, "reason": "Neither turn left nor decelerate gradually appears among the recommended safe actions; the answer gives general advice and a tentative proceed straight.", "ambiguous": false},
+{"item": "D239", "label": 0, "reason": "Brake gently to a stop and decelerate gradually are absent from the recommendations, which only offer maintaining a moderate speed and general advice.", "ambiguous": false},
+{"item": "D240", "label": 0, "reason": "The answer recommends stopping, not the reference's gradual deceleration without braking.", "ambiguous": false}
+]

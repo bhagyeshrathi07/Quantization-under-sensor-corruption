@@ -147,7 +147,7 @@ def main():
         print(f"assignment {assignment_path}: " + ", ".join(f"{n} {len(v)}" for n, v in assignment.items()))
     what = "all label columns" if args.labels_only else f"all {len(labellers)} labels and consensus"
     print(f"sheet: {len(rows)} items; {len(complete)} complete ({what}), {len(unfinished)} unfinished; labelled per labeller: " + ", ".join(f"{n} {k}" for n, k in progress.items()))
-    partial = max(progress.values()) - min(progress.values()) if progress else 0
+    partial = (max(progress.values()) - min(progress.values()) if progress else 0) if not assignment else 0  # the tail notion is for everyone-labels-everything
     if partial:
         print(f"  {partial} tail item(s) carry labels from some labellers only (kept on the sheet, not used)")
     if not complete:

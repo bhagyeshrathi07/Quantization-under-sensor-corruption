@@ -1,0 +1,17 @@
+[
+  {"item":"D001","label":0,"reason":"The answer gives different objects in a different order and recommends slowing down instead of continuing at the same speed.","ambiguous":false},
+  {"item":"D002","label":0,"reason":"The answer does not recommend both braking gently to a stop and braking suddenly.","ambiguous":false},
+  {"item":"D003","label":0,"reason":"Staying in the current lane does not supply the required recommendation to keep going at the same speed.","ambiguous":false},
+  {"item":"D004","label":0,"reason":"The answer does not identify a slight left turn as a collision-causing action.","ambiguous":false},
+  {"item":"D005","label":0,"reason":"The answer omits the black sedan ahead and the woman wearing blue jeans to the front right.","ambiguous":false},
+  {"item":"D006","label":0,"reason":"The answer recommends reducing speed, contradicting the reference's instruction to maintain speed.","ambiguous":false},
+  {"item":"D007","label":0,"reason":"The answer recommends parking rather than keeping going at the same speed.","ambiguous":false},
+  {"item":"D008","label":0,"reason":"The answer omits the black sedan behind and does not identify the required colours and clothing of the objects ahead.","ambiguous":false},
+  {"item":"D009","label":0,"reason":"The answer does not identify backing up as a collision-causing action and instead concludes that the described actions pose no collision risk.","ambiguous":false},
+  {"item":"D010","label":0,"reason":"The answer substitutes a wall and parked trucks for the required sedans and recommends slowing down instead of maintaining speed.","ambiguous":false},
+  {"item":"D011","label":0,"reason":"The answer omits the required slight offset to the left.","ambiguous":false},
+  {"item":"D012","label":0,"reason":"The answer recommends braking and stopping with high probability instead of maintaining speed with high probability.","ambiguous":false},
+  {"item":"D013","label":0,"reason":"The generic object list does not identify the reference's distinct vehicles, pedestrian clothing, or red light with their required colours and positions.","ambiguous":false},
+  {"item":"D014","label":0,"reason":"The answer omits turning left and gradual deceleration without braking, instead recommending a steady speed.","ambiguous":false},
+  {"item":"D015","label":0,"reason":"The generic vehicle and pedestrian descriptions do not identify the silver sedan ahead, white truck to the front left, and pedestrians crossing to the front right.","ambiguous":false}
+]

@@ -1,0 +1,54 @@
+{
+  "created": "2026-11-21T01:02:03+00:00",
+  "sheet": "manifests/judge_label_sheet_2026-11-17.csv",
+  "labellers": [
+    "ronak",
+    "bhagyesh",
+    "akshay"
+  ],
+  "mode": "labels-only",
+  "counts": {
+    "sheet_items": 262,
+    "complete": 262,
+    "unfinished": 0,
+    "partial_tail": 1,
+    "labelled_per_labeller": {
+      "ronak": 88,
+      "bhagyesh": 87,
+      "akshay": 87
+    }
+  },
+  "inter_labeller": {
+    "n_items": 262,
+    "n_items_all_labellers": 0,
+    "pairwise_agreement": {
+      "akshay/bhagyesh": {
+        "n": 0,
+        "agreement": null
+      },
+      "akshay/ronak": {
+        "n": 0,
+        "agreement": null
+      },
+      "bhagyesh/ronak": {
+        "n": 0,
+        "agreement": null
+      }
+    },
+    "fleiss_kappa": null,
+    "labelled_correct_per_labeller": {
+      "ronak": 6,
+      "bhagyesh": 8,
+      "akshay": 17
+    },
+    "labelled_per_labeller": {
+      "ronak": 88,
+      "bhagyesh": 87,
+      "akshay": 87
+    },
+    "majority_correct": 31,
+    "n_items_even_labellers": 0,
+    "unanimous": 0,
+    "n_items_multi": 0
+  }
+}

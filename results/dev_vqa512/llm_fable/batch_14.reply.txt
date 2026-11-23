@@ -1,0 +1,17 @@
+[
+{"item": "D196", "label": 0, "reason": "Answer recommends reducing speed, contradicting 'keep going at the same speed', and never mentions offsetting to the right.", "ambiguous": false},
+{"item": "D197", "label": 0, "reason": "Answer settles on stop or slow down, not the reference's turn right.", "ambiguous": false},
+{"item": "D198", "label": 0, "reason": "Answer recommends stopping at a red light; neither reference action (decelerate gradually, continue at the same speed) is recommended and stop contradicts them.", "ambiguous": false},
+{"item": "D199", "label": 0, "reason": "Answer's three objects (red SUV, bus stop with bicycles, building) match none of the reference's person, people and orange car.", "ambiguous": false},
+{"item": "D200", "label": 0, "reason": "Answer commits to stop, the opposite of the reference's keep going at the same speed.", "ambiguous": false},
+{"item": "D201", "label": 0, "reason": "Reference says no action leads to a collision, but the answer names applicable collision-causing actions (accelerating, abrupt deceleration, changing direction) and gives no no-collision conclusion.", "ambiguous": false},
+{"item": "D202", "label": 0, "reason": "Answer's recommended action is to adjust its speed to keep distance, which is not keeping the same speed; the probability direction matches but the action does not.", "ambiguous": true},
+{"item": "D203", "label": 1, "reason": "Answer names speeding (accelerating) toward the white car ahead in the same direction as a collision-causing action, which reads as accelerating and going straight.", "ambiguous": true},
+{"item": "D204", "label": 0, "reason": "Answer's objects (white truck, crossing pedestrian, traffic light) do not match the reference's woman, black sedan and silver truck.", "ambiguous": false},
+{"item": "D205", "label": 0, "reason": "Answer concludes there is no immediate collision risk, and does not name accelerating and going straight as a collision-causing action.", "ambiguous": false},
+{"item": "D206", "label": 0, "reason": "Reference is None, but the answer lists turning right, slowing and accelerating as actions that could lead to a collision; the cut-off final sentence does not reach a no-collision conclusion.", "ambiguous": true},
+{"item": "D207", "label": 0, "reason": "Answer's committed action is to continue straight, not the reference's decelerate gradually without braking.", "ambiguous": false},
+{"item": "D208", "label": 0, "reason": "Answer recommends stopping at a red light, contradicting keep going at the same speed, and does not recommend decelerating gradually.", "ambiguous": false},
+{"item": "D209", "label": 0, "reason": "Only maintaining speed is recommended; brake suddenly, brake gently to a stop, decelerate gradually and back up are missing, and sudden deceleration is advised against.", "ambiguous": false},
+{"item": "D210", "label": 0, "reason": "Maintain speed is present but decelerating gradually is not recommended as a safe action, only as a conditional response if the car ahead slows, and the answer warns against slowing down.", "ambiguous": true}
+]

@@ -1,0 +1,17 @@
+[
+  {"item":"D016","label":0,"reason":"The answer does not identify the brown SUV, two distinct pedestrians with the specified clothing and positions, or white commercial vehicle ahead.","ambiguous":false},
+  {"item":"D017","label":0,"reason":"The answer omits the white truck behind, silver sedan behind, and white sedan ahead with their required descriptions.","ambiguous":false},
+  {"item":"D018","label":0,"reason":"Generic references to vehicles do not identify the two gray sedans and black SUV with their required positions.","ambiguous":false},
+  {"item":"D019","label":0,"reason":"The answer assigns a high probability to stopping, whereas the reference assigns a low probability to remaining stationary.","ambiguous":false},
+  {"item":"D020","label":0,"reason":"The answer omits the required slight offset to the left.","ambiguous":false},
+  {"item":"D021","label":0,"reason":"The answer fails to identify every reference object with its required description and position, including the brown sedan behind and pedestrian with a yellow hat ahead left.","ambiguous":false},
+  {"item":"D022","label":0,"reason":"The answer recommends remaining stationary and omits maintaining speed and accelerating, contrary to the reference's safe actions.","ambiguous":false},
+  {"item":"D023","label":0,"reason":"The answer gives a different object order, omits the moving silver sedan, and fails to supply the required maintain-speed actions.","ambiguous":false},
+  {"item":"D024","label":0,"reason":"The answer omits the required recommendations to maintain speed and accelerate.","ambiguous":false},
+  {"item":"D025","label":0,"reason":"The answer omits the required slight offset to the left and does not specify gentle braking to a stop.","ambiguous":false},
+  {"item":"D026","label":0,"reason":"The answer omits the pedestrian in red and does not separately identify the four reference vehicles with their required colors and positions.","ambiguous":false},
+  {"item":"D027","label":0,"reason":"The answer gives collision-avoidance advice without identifying backing up as a collision-causing action.","ambiguous":false},
+  {"item":"D028","label":0,"reason":"The answer does not recommend gradually decelerating without braking.","ambiguous":false},
+  {"item":"D029","label":0,"reason":"The answer does not identify the gray sedan behind right, green bus behind, or left-turn landmark line ahead.","ambiguous":false},
+  {"item":"D030","label":0,"reason":"The answer settles on yielding with high probability instead of maintaining the same speed with high probability.","ambiguous":false}
+]

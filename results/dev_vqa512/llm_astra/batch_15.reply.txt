@@ -1,0 +1,17 @@
+[
+  {"item":"D211","label":0,"reason":"The answer omits the individually identifiable reference vehicles and the green traffic light with their required colours and positions.","ambiguous":false},
+  {"item":"D212","label":0,"reason":"The answer recommends braking instead of maintaining the current speed with high probability.","ambiguous":false},
+  {"item":"D213","label":1,"reason":"The answer settles on maintaining the current speed with high probability because there is no immediate threat.","ambiguous":false},
+  {"item":"D214","label":1,"reason":"The answer explicitly identifies sudden braking by the ego vehicle as an action that could cause a collision.","ambiguous":false},
+  {"item":"D215","label":0,"reason":"The answer does not identify all reference objects with the required categories, colours, and relative positions.","ambiguous":false},
+  {"item":"D216","label":0,"reason":"The answer does not recommend gradual deceleration without braking or explicitly maintaining the current speed.","ambiguous":false},
+  {"item":"D217","label":0,"reason":"The answer settles on stopping at the sign rather than maintaining the current speed with high probability.","ambiguous":false},
+  {"item":"D218","label":0,"reason":"The answer omits the white car ahead, the red car ahead to the right, and the red traffic light ahead.","ambiguous":false},
+  {"item":"D219","label":0,"reason":"The answer identifies sudden acceleration and sharp turning as collision-causing actions instead of concluding that none applies.","ambiguous":false},
+  {"item":"D220","label":1,"reason":"The answer settles on continuing at the current speed as the most likely action and describes no immediate threat from the pedestrian.","ambiguous":false},
+  {"item":"D221","label":0,"reason":"The answer omits maintaining the current speed, gradual deceleration without braking, and a slight offset to the right.","ambiguous":false},
+  {"item":"D222","label":0,"reason":"The answer never identifies a moderate right turn by the ego vehicle as a collision-causing action.","ambiguous":false},
+  {"item":"D223","label":0,"reason":"The answer recommends reducing speed and omits the required recommendations to maintain speed, accelerate, and proceed.","ambiguous":false},
+  {"item":"D224","label":0,"reason":"The answer identifies failure to stop or yield as dangerous but omits sudden braking as a collision-causing action.","ambiguous":false},
+  {"item":"D225","label":0,"reason":"The answer does not identify sudden braking by the ego vehicle as a collision-causing action.","ambiguous":false}
+]

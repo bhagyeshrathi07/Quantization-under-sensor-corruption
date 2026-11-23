@@ -1,0 +1,9 @@
+[
+  {"item":"D256","label":0,"reason":"The answer omits the sedan behind and does not identify the silver sedan ahead or the two pedestrians with their required positions.","ambiguous":false},
+  {"item":"D257","label":0,"reason":"The answer recommends proceeding but does not recommend accelerating or explicitly maintaining the current speed.","ambiguous":false},
+  {"item":"D258","label":0,"reason":"The answer settles on continuing straight rather than gradually decelerating without braking.","ambiguous":false},
+  {"item":"D259","label":0,"reason":"The answer omits the yellow roadblock ahead and does not identify the yellow sedan behind or supply the required colours and positions for the other objects.","ambiguous":false},
+  {"item":"D260","label":0,"reason":"The answer settles on accelerating with high probability rather than maintaining the current speed with high probability.","ambiguous":false},
+  {"item":"D261","label":0,"reason":"The answer names actions that could cause a collision instead of concluding that no collision-causing action is indicated.","ambiguous":false},
+  {"item":"D262","label":0,"reason":"The answer recommends stopping immediately rather than keeping the same speed.","ambiguous":false}
+]

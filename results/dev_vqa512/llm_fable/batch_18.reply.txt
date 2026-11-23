@@ -1,0 +1,7 @@
+[{"item": "D256", "label": 0, "reason": "The sedan to the back of the ego vehicle is missing: the answer places all vehicles ahead and names nothing behind.", "ambiguous": false},
+{"item": "D257", "label": 0, "reason": "The reference's action 'accelerate' is absent from the recommended safe actions, which only continue forward at a safe speed plus general advice.", "ambiguous": false},
+{"item": "D258", "label": 0, "reason": "The answer settles on 'continue straight' with high probability, a different action from the reference's 'decelerate gradually without braking'.", "ambiguous": false},
+{"item": "D259", "label": 0, "reason": "The yellow roadblock to the front is missing, and the yellow sedan to the back is only covered by a generic 'other vehicles' without colour or position.", "ambiguous": false},
+{"item": "D260", "label": 0, "reason": "The answer's most likely action is 'accelerate', which differs from the reference's 'keep going at the same speed' (maintaining speed is given only moderate probability).", "ambiguous": false},
+{"item": "D261", "label": 0, "reason": "Reference is 'None' but the answer names applicable collision-causing actions (driving too fast, abrupt braking, improper lane change) and gives no conclusion that none applies.", "ambiguous": false},
+{"item": "D262", "label": 0, "reason": "The answer recommends stopping with high probability, the opposite of the reference's 'keep going at the same speed'.", "ambiguous": false}]

@@ -1,0 +1,17 @@
+[
+  {"item":"D091","label":1,"reason":"The answer explicitly includes braking suddenly as an action that may lead to a collision.","ambiguous":false},
+  {"item":"D092","label":0,"reason":"The three objects, their states, and the recommended actions do not match the reference sequence.","ambiguous":false},
+  {"item":"D093","label":0,"reason":"The answer does not recommend slightly offsetting left or braking gently to a stop.","ambiguous":false},
+  {"item":"D094","label":0,"reason":"Sudden braking is missing from the collision-causing actions discussed.","ambiguous":false},
+  {"item":"D095","label":0,"reason":"The answer substitutes different objects and gives states and actions that conflict with the reference.","ambiguous":false},
+  {"item":"D096","label":0,"reason":"The answer assigns high likelihood to continuing straight but does not specify maintaining the same speed.","ambiguous":false},
+  {"item":"D097","label":0,"reason":"The answer describes braking as collision avoidance and never identifies sudden braking as a collision-causing action.","ambiguous":false},
+  {"item":"D098","label":0,"reason":"The answer fails to identify all four reference vehicles with their required descriptions and the green light ahead.","ambiguous":false},
+  {"item":"D099","label":1,"reason":"Rapid acceleration while following the truck plausibly conveys accelerating and going straight as a collision-causing action, although straight travel is implicit.","ambiguous":true},
+  {"item":"D100","label":0,"reason":"The answer recommends neither maintaining the same speed nor gradually decelerating without braking.","ambiguous":false},
+  {"item":"D101","label":0,"reason":"The bicycle and black sedan ahead are missing.","ambiguous":false},
+  {"item":"D102","label":0,"reason":"The answer does not identify a slight right turn as a collision-causing action.","ambiguous":false},
+  {"item":"D103","label":0,"reason":"The silver sedan ahead is missing, and the truck and pedestrians lack the required matching descriptions and positions.","ambiguous":false},
+  {"item":"D104","label":0,"reason":"The answer omits the gray sedan and does not separately identify the gray-shirted man behind left and white-hatted worker ahead right.","ambiguous":false},
+  {"item":"D105","label":0,"reason":"The answer names acceleration and lane changes as collision risks but omits sudden braking.","ambiguous":false}
+]

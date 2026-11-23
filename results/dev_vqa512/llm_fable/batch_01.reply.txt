@@ -1,0 +1,17 @@
+[
+{"item": "D001", "label": 0, "reason": "The answer's first object is parked vehicles on the right, not the white truck, the pedestrians come third instead of second, the silver sedan is absent, and it recommends slowing down where the reference says continue at the same speed.", "ambiguous": false},
+{"item": "D002", "label": 0, "reason": "Neither braking gently to a stop nor braking suddenly is recommended as an action; the answer only says be prepared to stop and recommends maintaining speed, which contradicts the reference.", "ambiguous": false},
+{"item": "D003", "label": 0, "reason": "The answer settles on staying in the current lane with a high probability of needing to brake rather than committing to keeping the same speed, so the reference action is not the recommended one.", "ambiguous": true},
+{"item": "D004", "label": 0, "reason": "The reference's collision-causing action, a slight left turn, does not appear; the answer names turning right and speeding instead.", "ambiguous": false},
+{"item": "D005", "label": 0, "reason": "The silver truck is present but the black sedan to the front and the woman in blue jeans are not recognizable by category, colour or position among the generic cars and pedestrians listed.", "ambiguous": false},
+{"item": "D006", "label": 0, "reason": "The answer recommends reducing speed, which contradicts the reference's keep going at the same speed, and the reference action is absent.", "ambiguous": false},
+{"item": "D007", "label": 0, "reason": "The recommended action is to park, not to keep going at the same speed, so the action is different.", "ambiguous": false},
+{"item": "D008", "label": 0, "reason": "Only one car ahead is named; the black sedan to the back of the ego vehicle is missing and no colour confirms either sedan.", "ambiguous": false},
+{"item": "D009", "label": 0, "reason": "The answer concludes that no ego action leads to a collision with the bus, and backing up is never named as a collision-causing action.", "ambiguous": false},
+{"item": "D010", "label": 0, "reason": "The answer's objects are parked vehicles with buildings, a wall and trucks near a warehouse, not the black SUV and two gray sedans, and it recommends slowing down against the reference's continue at the same speed.", "ambiguous": false},
+{"item": "D011", "label": 0, "reason": "Stopping at the red light matches braking gently to a stop, but slightly offsetting to the left is missing from the recommendations.", "ambiguous": false},
+{"item": "D012", "label": 0, "reason": "The answer settles on braking and stopping with high probability and gives continuing a low probability, the opposite of the reference's keep going at the same speed with high probability.", "ambiguous": false},
+{"item": "D013", "label": 0, "reason": "The silver pickup truck, the black SUV, the checkered-clothes pedestrians and the red light are not recognizable among the generic vehicles, pedestrians and traffic lights listed.", "ambiguous": false},
+{"item": "D014", "label": 0, "reason": "Turning left is absent and the answer recommends maintaining a steady speed, which contradicts decelerating gradually.", "ambiguous": false},
+{"item": "D015", "label": 0, "reason": "The silver sedan, the white truck and the crossing pedestrians are not recognizable by colour or position among the generic vehicles and pedestrians listed.", "ambiguous": false}
+]
