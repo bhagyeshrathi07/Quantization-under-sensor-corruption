@@ -1579,5 +1579,11 @@
       "ambiguous": false,
       "reply": "batch_18.reply.txt"
     }
-  }
+  },
+  "model": "gpt-6-astra-per-codex-config-not-passed-explicitly",
+  "operator_reported": [
+    "model",
+    "execution_evidence"
+  ],
+  "execution_evidence": "none-retained"
 }

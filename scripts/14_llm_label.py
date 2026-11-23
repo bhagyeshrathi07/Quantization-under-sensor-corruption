@@ -76,14 +76,14 @@ def read_rows(path: Path) -> tuple[list[dict], list[str]]:
 def make_copy(sheet: Path, labeller: str) -> Path:
     """The model's own copy: the master's blind columns plus one label column, like 10 --copies."""
     dest = label_ui.copy_path(sheet, labeller)
-    if dest.exists():
-        return dest
     rows, cols = read_rows(sheet)
     for c in BLIND_COLUMNS:
         if c not in cols:
             sys.exit(f"{sheet}: column {c} missing")
     if label_column(labeller) in cols:
         sys.exit(f"{sheet}: the master sheet already has a column for {labeller}; a model labeller must not be a human column")
+    if dest.exists():
+        return dest
     with dest.open("w", encoding="utf-8", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=[*BLIND_COLUMNS, label_column(labeller)])
         w.writeheader()
@@ -141,13 +141,19 @@ def ingest_reply(copy_obj: label_ui.Copy, reply_path: Path, expected: list[str] 
     return len(data)
 
 
-def run_codex(prompt_path: Path, reply_path: Path, effort: str, codex_cmd: list[str], timeout_s: int) -> None:
+def run_codex(prompt_path: Path, reply_path: Path, effort: str, codex_cmd: list[str], timeout_s: int, model: str | None = None) -> None:
     """One `codex exec` turn from an empty temporary folder (no repository in
-    sight), read-only sandbox, the reply written by Codex's -o to reply_path."""
+    sight), read-only sandbox, the reply written by Codex's -o to reply_path;
+    the JSON event stream is kept beside it (`<batch>.events.jsonl`) as the
+    execution record, and the model is passed explicitly when given."""
     reply_path = reply_path.resolve()  # codex runs elsewhere, so the reply path must not depend on its working folder
     with tempfile.TemporaryDirectory() as empty:
-        cmd = [*codex_cmd, "exec", "--json", "--skip-git-repo-check", "-s", "read-only", "-o", str(reply_path), "-c", f'model_reasoning_effort="{effort}"', "-"]
+        cmd = [*codex_cmd, "exec", "--json", "--skip-git-repo-check", "-s", "read-only", "-o", str(reply_path), "-c", f'model_reasoning_effort="{effort}"']
+        if model:
+            cmd += ["-m", model]
+        cmd.append("-")
         proc = subprocess.run(cmd, input=prompt_path.read_text(encoding="utf-8"), capture_output=True, text=True, cwd=empty, timeout=timeout_s)
+    reply_path.with_name(reply_path.name.replace(".reply.txt", ".events.jsonl")).write_text(proc.stdout, encoding="utf-8")
     if proc.returncode != 0 or not reply_path.exists():
         raise RuntimeError(f"{prompt_path.name}: codex exit {proc.returncode}: {(proc.stderr or proc.stdout)[-400:]}")
 
@@ -166,13 +172,21 @@ def main():
     ap.add_argument("--parallel", type=int, default=3)
     ap.add_argument("--timeout", type=int, default=1800, help="seconds per batch for the backend")
     ap.add_argument("--codex-cmd", default="codex", help="the codex executable (tests substitute a fake)")
+    ap.add_argument("--model", help="model id passed to the backend explicitly and recorded (codex: -m); without it the backend's configured default is used and recorded as 'configured default'")
+    ap.add_argument("--record", nargs="*", default=[], metavar="KEY=VALUE", help="operator-reported facts recorded in labels.json (e.g. backend=claude-agent model=claude-fable-5-1 effort=medium) for replies produced outside this script")
     args = ap.parse_args()
     sheet = Path(args.sheet)
     out_dir = Path(args.out_dir or f"results/dev_vqa512/llm_{args.labeller}")
     copy = make_copy(sheet, args.labeller)
     guide = Path(args.guide)
     record_path = out_dir / "labels.json"
-    record = json.loads(record_path.read_text()) if record_path.exists() else {"labeller": args.labeller, "sheet": str(sheet), "guide": str(guide), "guide_sha256": label_ui.hashlib.sha256(guide.read_bytes()).hexdigest(), "created": datetime.now(timezone.utc).isoformat(timespec="seconds"), "backend": None, "effort": None, "items": {}}
+    record = json.loads(record_path.read_text()) if record_path.exists() else {"labeller": args.labeller, "sheet": str(sheet), "guide": str(guide), "guide_sha256": label_ui.hashlib.sha256(guide.read_bytes()).hexdigest(), "created": datetime.now(timezone.utc).isoformat(timespec="seconds"), "backend": None, "model": None, "effort": None, "items": {}}
+    for kv in args.record:
+        k, _, v = kv.partition("=")
+        if not k or not v:
+            sys.exit(f"--record takes KEY=VALUE, got {kv!r}")
+        record[k] = v
+        record.setdefault("operator_reported", []).append(k)
 
     if args.emit or args.backend:
         prompts = emit(copy, guide, out_dir, args.batch)
@@ -183,6 +197,7 @@ def main():
     replies: list[Path] = [Path(p) for p in (args.ingest or [])]
     if args.backend == "codex":
         record["backend"], record["effort"] = "codex", args.effort
+        record["model"] = args.model or "configured default (~/.codex/config.toml)"
         prompts = sorted(out_dir.glob("batch_*.prompt.txt"))
         todo = [p for p in prompts if not p.with_name(p.name.replace(".prompt.txt", ".reply.txt")).exists()]
         print(f"codex: {len(todo)} batch(es) to run, {len(prompts) - len(todo)} replied already")
@@ -190,7 +205,7 @@ def main():
 
         def one(p):
             try:
-                run_codex(p, p.with_name(p.name.replace(".prompt.txt", ".reply.txt")), args.effort, args.codex_cmd.split(), args.timeout)
+                run_codex(p, p.with_name(p.name.replace(".prompt.txt", ".reply.txt")), args.effort, args.codex_cmd.split(), args.timeout, args.model)
                 print(f"  {p.name}: replied")
             except Exception as e:  # noqa: BLE001 - report and continue with the other batches
                 failures.append(str(e))

@@ -4,8 +4,8 @@
   "guide": "manifests/labelling_guide.md",
   "guide_sha256": "9be8587189bb36708791260d7799806bab30a5087d3368023cc99043c00250a2",
   "created": "2026-11-19T22:53:18+00:00",
-  "backend": null,
-  "effort": null,
+  "backend": "claude-code-agent",
+  "effort": "medium",
   "items": {
     "D001": {
       "label": 0,
@@ -1579,5 +1579,13 @@
       "ambiguous": false,
       "reply": "batch_18.reply.txt"
     }
-  }
+  },
+  "operator_reported": [
+    "backend",
+    "model",
+    "effort",
+    "execution_evidence"
+  ],
+  "model": "claude-fable-5-1",
+  "execution_evidence": "none-retained"
 }

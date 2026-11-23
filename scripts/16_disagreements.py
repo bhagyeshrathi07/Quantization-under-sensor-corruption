@@ -59,6 +59,20 @@ def main():
     unlabelled = [it for it in mine if hl[it] is None]
     if unlabelled and not args.allow_partial:
         sys.exit(f"{args.labeller} has {len(unlabelled)} assigned item(s) without a label (first {unlabelled[0]}); the disagreement list is produced only after the whole assignment is labelled")
+    # and every other block too: the list shows model labels, and no human may still be labelling (review of November 23)
+    if assignment_path and not args.allow_partial:
+        everyone = load_assignment(assignment_path, master, [c[len("label_"):] for c in master[0] if c.startswith("label_")])
+        for other, items in everyone.items():
+            if other == args.labeller:
+                continue
+            try:
+                orows = read_rows(copy_path(sheet, other))
+            except FileNotFoundError:
+                sys.exit(f"{copy_path(sheet, other)} missing; every labeller's block must be complete before any disagreement list is produced")
+            ol = {r["item"]: (r.get(label_column(other)) or "").strip() for r in orows}
+            missing = [it for it in items if not ol.get(it)]
+            if missing:
+                sys.exit(f"{other} has {len(missing)} assigned item(s) without a label (first {missing[0]}); the disagreement list is produced only after every block is labelled")
     done = [it for it in mine if hl[it] is not None]
     models = {}
     for m in args.models:

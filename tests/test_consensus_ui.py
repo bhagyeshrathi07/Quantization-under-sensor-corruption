@@ -110,6 +110,22 @@ def test_consensus_mode_shows_all_labels_and_writes_the_consensus_columns_only(t
     a = load_assignment(tmp_path / "sheet.assignment.json", rows, list(NAMES))
     with pytest.raises(CalibrationError, match="has every label but no consensus"):
         classify_sheet(rows, list(NAMES), need_consensus=True, assignment=a)
+    # a consensus that differs from the human label needs a comment (review of November 23); D003: human 1
+    m0 = ui.Master(sheet, tmp_path / "sheet.assignment.json", ["fable", "astra"], tmp_path / "records")
+    with pytest.raises(ui.CopyError, match="a comment with the reason is required"):
+        m0.set_consensus(2, 0, "")
+    assert m0.set_consensus(2, 0, "the action is missing")["consensus"] == 0
+    assert m0.set_consensus(2, 1, "")["consensus"] == 1  # equal to the human label: no comment needed
+    m0.close()
+    # consensus mode does not open while any assigned human label is missing
+    with sheet.open(encoding="utf-8", newline="") as fh:
+        rows_all = list(csv.DictReader(fh))
+    rows_all[4]["label_akshay"] = ""
+    _write(tmp_path / "unfinished.csv", rows_all, cols)
+    for mm in ("fable", "astra"):
+        (tmp_path / f"unfinished.{mm}.csv").write_text((tmp_path / f"sheet.{mm}.csv").read_text())
+    with pytest.raises(ui.CopyError, match="consensus mode opens only when every block is fully labelled"):
+        ui.Master(tmp_path / "unfinished.csv", tmp_path / "sheet.assignment.json", ["fable", "astra"], tmp_path / "records")
     # a model copy whose text differs from the master, or a second instance, is refused
     bad = tmp_path / "sheet.astra.csv"
     text = bad.read_text(encoding="utf-8")

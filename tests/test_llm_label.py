@@ -46,9 +46,14 @@ def test_emit_and_ingest_in_order_and_refusals(tmp_path):
     assert "every object" in p1 and "--- ITEM D001 ---" in p1 and "--- ITEM D002 ---" in p1 and "D003" not in p1
     assert "Do not open any file" in p1 and "precision" not in p1.lower() and "score" not in p1.lower().replace("scores", "")
     assert json.loads((out / "batch_03.items.json").read_text()) == ["D005"]
-    # a human column cannot be a model labeller
+    # a human column cannot be a model labeller, whether or not that human's copy already exists (review of November 23)
     r = _run("--labeller", "ronak", "--sheet", sheet, "--guide", guide, "--out-dir", out, "--emit")
     assert r.returncode == 1 and "must not be a human column" in r.stderr
+    _master(tmp_path / "sheet2.csv")
+    (tmp_path / "sheet2.ronak.csv").write_text((tmp_path / "sheet2.csv").read_text())
+    r = _run("--labeller", "ronak", "--sheet", tmp_path / "sheet2.csv", "--guide", guide, "--out-dir", tmp_path / "x", "--emit")
+    assert r.returncode == 1 and "must not be a human column" in r.stderr
+    assert (tmp_path / "sheet2.ronak.csv").read_text() == (tmp_path / "sheet2.csv").read_text()
     # replies: batch 2 before batch 1 is refused (not the next unlabelled rows); then in order, with a fence and prose tolerated
     (out / "batch_02.reply.txt").write_text('[{"item": "D003", "label": 1, "reason": "r", "ambiguous": false}, {"item": "D004", "label": 0, "reason": "r"}]')
     r = _run("--labeller", "fable", "--sheet", sheet, "--guide", guide, "--out-dir", out, "--ingest", out / "batch_02.reply.txt")
@@ -100,7 +105,13 @@ with open(out, "w") as fh:
     assert r.returncode == 0, r.stdout + r.stderr
     assert "3 batch(es) to run" in r.stdout and "5 / 5 labelled" in r.stdout
     rec = json.loads((out / "labels.json").read_text())
-    assert rec["backend"] == "codex" and rec["effort"] == "high" and len(rec["items"]) == 5
+    assert rec["backend"] == "codex" and rec["effort"] == "high" and len(rec["items"]) == 5 and rec["model"].startswith("configured default")
+    assert (out / "batch_01.events.jsonl").exists()  # the execution stream is kept
+    # the model is passed explicitly and recorded when given; operator-reported facts are recorded as such
+    r = _run("--labeller", "astra", "--sheet", sheet, "--guide", guide, "--out-dir", out, "--batch", "2", "--backend", "codex", "--codex-cmd", f"{sys.executable} {fake}", "--model", "gpt-x", "--record", "note=test")
+    assert r.returncode == 0, r.stdout + r.stderr
+    rec = json.loads((out / "labels.json").read_text())
+    assert rec["model"] == "gpt-x" and rec["note"] == "test" and rec["operator_reported"] == ["note"]
     assert all(str(ROOT) not in v["reason"] for v in rec["items"].values())  # the model ran outside the repository
     # a second run has nothing left to do and changes nothing
     r = _run("--labeller", "astra", "--sheet", sheet, "--guide", guide, "--out-dir", out, "--batch", "2", "--backend", "codex", "--codex-cmd", f"{sys.executable} {fake}")

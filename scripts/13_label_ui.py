@@ -270,10 +270,16 @@ class Master:
                 for it in items:
                     who.setdefault(it, []).append(n)
         self.human = []
+        unfinished = []
         for r in self.rows:
             names = who.get(r["item"]) or [n for n in self.labellers if (r.get(label_column(n)) or "").strip()]
             labels = {n: parse_label(r.get(label_column(n)), f"{path} {r['item']} {n}") for n in names}
+            if not names or any(l is None for l in labels.values()):
+                unfinished.append(r["item"])
             self.human.append({n: l for n, l in labels.items() if l is not None})
+        if unfinished:
+            # the model labels and reasons are shown here, so no human may still be labelling
+            raise CopyError(f"{path}: {len(unfinished)} item(s) without every assigned human label (first {unfinished[0]}); consensus mode opens only when every block is fully labelled, so that nobody sees a model label before their own")
         self.consensus = [parse_label(r.get("consensus"), f"{path} {r['item']} consensus") for r in self.rows]
         self.reasons = [(r.get("consensus_reason") or "") for r in self.rows]
         # the model labellers: their copies (same items, same text) and their reason records
@@ -325,9 +331,12 @@ class Master:
             if label not in (0, 1, None):
                 raise CopyError(f"consensus {label!r} is not 0, 1 or empty")
             old = (self.consensus[index], self.reasons[index])
+            new_reason = reason.replace("\r", " ").replace("\n", " ").strip()[:1000] if reason is not None else self.reasons[index]
+            human_label = self.item(index)["human_label"]
+            if label is not None and human_label is not None and label != human_label and not new_reason:
+                raise CopyError(f"item {self.rows[index]['item']}: the consensus differs from the human label ({human_label}); a comment with the reason is required")
             self.consensus[index] = label
-            if reason is not None:
-                self.reasons[index] = reason.replace("\r", " ").replace("\n", " ").strip()[:1000]
+            self.reasons[index] = new_reason
             try:
                 self.write()
             except Exception:

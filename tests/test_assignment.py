@@ -138,6 +138,11 @@ def test_tool_assignment_writer_and_disagreement_list(tmp_path):
         (d / "labels.json").write_text(json.dumps({"items": {it: {"label": v, "reason": f"{m} says {v}", "ambiguous": it == "D004"} for it, v in zip(ITEMS_IDS(), labs)}}))
     r = _run("16_disagreements.py", "--labeller", "ronak", "--sheet", sheet, "--records-dir", tmp_path / "records")
     assert r.returncode == 1 and "without a label" in r.stderr
+    # bhagyesh's own block is complete, but ronak's and akshay's are not: refused until every block is labelled (review of November 23)
+    r = _run("16_disagreements.py", "--labeller", "bhagyesh", "--sheet", sheet, "--records-dir", tmp_path / "records")
+    assert r.returncode == 1 and "assigned item(s) without a label" in r.stderr and "every block" in r.stderr
+    _write(tmp_path / "sheet.ronak.csv", _rows({"D001": {"ronak": 1}}), [*ui.BLIND_COLUMNS, "label_ronak"])
+    _write(tmp_path / "sheet.akshay.csv", _rows({"D005": {"akshay": 0}}), [*ui.BLIND_COLUMNS, "label_akshay"])
     r = _run("16_disagreements.py", "--labeller", "bhagyesh", "--sheet", sheet, "--records-dir", tmp_path / "records")
     assert r.returncode == 0, r.stdout + r.stderr
     md = (tmp_path / "records" / "disagreements_bhagyesh.md").read_text()
